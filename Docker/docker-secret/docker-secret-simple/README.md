@@ -1,64 +1,63 @@
+#### Docker Secret Simple
 ! https://docs.docker.com/engine/swarm/secrets/
-
-# Docker Secret Simple
 ! https://docs.docker.com/engine/swarm/secrets/#simple-example-get-started-with-secrets
 
-1. Add a secret to Docker. The docker secret create command reads standard input because the last argument, which represents the file to read the secret from, is set to -.
+##### 1. Add a secret to Docker. The docker secret create command reads standard input because the last argument, which represents the file to read the secret from, is set to -.
 
- $ printf "This is a secret" | docker secret create my_secret_data -
+	$ printf "This is a secret" | docker secret create my_secret_data -
 
-2. Create a redis service and grant it access to the secret. By default, the container can access the secret at /run/secrets/<secret_name>, but you can customize the file name on the container using the target option.
-
-
- $ docker service  create --name redis --secret my_secret_data redis:alpine
-
-3. Verify that the task is running without issues using docker service ps. If everything is working, the output looks similar to this:
+##### 2. Create a redis service and grant it access to the secret. By default, the container can access the secret at /run/secrets/<secret_name>, but you can customize the file name on the container using the target option.
 
 
- $ docker service ps redis
+	$ docker service  create --name redis --secret my_secret_data redis:alpine
+
+##### 3. Verify that the task is running without issues using docker service ps. If everything is working, the output looks similar to this:
+
+
+	$ docker service ps redis
 
 If there were an error, and the task were failing and repeatedly restarting, you would see something like this:
 
 
- $ docker service ps redis
+	$ docker service ps redis
 
-4. Get the ID of the redis service task container using docker ps , so that you can use docker container exec to connect to the container and read the contents of the secret data file, which defaults to being readable by all and has the same name as the name of the secret. The first command below illustrates how to find the container ID, and the second and third commands use shell completion to do this automatically.
-
-
- $ docker ps --filter name=redis -q
- $ docker container exec $(docker ps --filter name=redis -q) ls -l /run/secrets
- $ docker container exec $(docker ps --filter name=redis -q) cat /run/secrets/my_secret_data
-
-5. Verify that the secret is not available if you commit the container.
-
- $ docker commit $(docker ps --filter name=redis -q) committed_redis
-
- $ docker run --rm -it committed_redis cat /run/secrets/my_secret_data
-
- cat: can't open '/run/secrets/my_secret_data': No such file or directory
-
-6. Try removing the secret. The removal fails because the redis service is running and has access to the secret.
+##### 4. Get the ID of the redis service task container using docker ps , so that you can use docker container exec to connect to the container and read the contents of the secret data file, which defaults to being readable by all and has the same name as the name of the secret. The first command below illustrates how to find the container ID, and the second and third commands use shell completion to do this automatically.
 
 
- $ docker secret ls
- $ docker secret rm my_secret_data
+	$ docker ps --filter name=redis -q
+	$ docker container exec $(docker ps --filter name=redis -q) ls -l /run/secrets
+	$ docker container exec $(docker ps --filter name=redis -q) cat /run/secrets/my_secret_data
 
-7. Remove access to the secret from the running redis service by updating the service.
+##### 5. Verify that the secret is not available if you commit the container.
 
+	$ docker commit $(docker ps --filter name=redis -q) committed_redis
 
- $ docker service update --secret-rm my_secret_data redis
-
-8. Repeat steps 3 and 4 again, verifying that the service no longer has access to the secret. The container ID is different, because the service update command redeploys the service.
-
- $ docker container exec -it $(docker ps --filter name=redis -q) cat /run/secrets/my_secret_data
+	$ docker run --rm -it committed_redis cat /run/secrets/my_secret_data
 
  cat: can't open '/run/secrets/my_secret_data': No such file or directory
 
-9. Stop and remove the service, and remove the secret from Docker.
+##### 6. Try removing the secret. The removal fails because the redis service is running and has access to the secret.
 
 
- docker service rm redis
- docker secret rm my_secret_data
+	$ docker secret ls
+	$ docker secret rm my_secret_data
+
+##### 7. Remove access to the secret from the running redis service by updating the service.
+
+
+	$ docker service update --secret-rm my_secret_data redis
+
+##### 8. Repeat steps 3 and 4 again, verifying that the service no longer has access to the secret. The container ID is different, because the service update command redeploys the service.
+
+	$ docker container exec -it $(docker ps --filter name=redis -q) cat /run/secrets/my_secret_data
+
+ cat: can't open '/run/secrets/my_secret_data': No such file or directory
+
+##### 9. Stop and remove the service, and remove the secret from Docker.
+
+
+	$ docker service rm redis
+	$ docker secret rm my_secret_data
 
 
 ##### 1. Add a secret to Docker. The docker secret create command reads standard input because the last argument, which represents the file to read the secret from, is set to -.
