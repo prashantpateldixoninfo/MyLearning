@@ -1,5 +1,6 @@
-#### Docker Secret Simple
+## Docker Secret Simple
 ! https://docs.docker.com/engine/swarm/secrets/
+
 ! https://docs.docker.com/engine/swarm/secrets/#simple-example-get-started-with-secrets
 
 ##### 1. Add a secret to Docker. The docker secret create command reads standard input because the last argument, which represents the file to read the secret from, is set to -.
