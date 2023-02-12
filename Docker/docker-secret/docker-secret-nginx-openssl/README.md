@@ -1,4 +1,4 @@
-##Intermediate example: Use secrets with a Nginx service
+## Intermediate example: Use secrets with a Nginx service
 
 #### This example is divided into two parts. The first part is all about generating the site certificate and does not directly involve Docker secrets at all, but it sets up the second part, where you store and use the site certificate and Nginx configuration as secrets.
 
