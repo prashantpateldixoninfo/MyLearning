@@ -61,7 +61,11 @@ If there were an error, and the task were failing and repeatedly restarting, you
 	$ docker secret rm my_secret_data
 
 
-#### My Experiment
+####
+
+```diff 
+- My Experiment
+```
 
 ##### 1. Add a secret to Docker. The docker secret create command reads standard input because the last argument, which represents the file to read the secret from, is set to -.
     $ printf "This is a secret" | docker secret create my_secret_data -
