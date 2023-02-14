@@ -20,7 +20,7 @@ void *addition(void *arg)
 {
     thread_data_t *data = (thread_data_t *)arg;
     printf("Thread ID <%d> going to add %d and %d\n", data->tid, data->num1, data->num2);
-    sleep(2);
+    sleep(9);
     printf("Addition of %d and %d is %d\n", data->num1, data->num2, data->num1 + data->num2);
 }
 
@@ -28,7 +28,7 @@ void *subtraction(void *arg)
 {
     thread_data_t *data = (thread_data_t *)arg;
     printf("Thread ID <%d> going to subtract %d and %d\n", data->tid, data->num1, data->num2);
-    sleep(2);
+    sleep(5);
     printf("Subtraction of %d and %d is %d\n", data->num1, data->num2, data->num1 - data->num2);
 }
 
@@ -36,7 +36,7 @@ void *multipication(void *arg)
 {
     thread_data_t *data = (thread_data_t *)arg;
     printf("Thread ID <%d> going to multiply %d and %d\n", data->tid, data->num1, data->num2);
-    sleep(2);
+    sleep(7);
     printf("Multipication of %d and %d is %d\n", data->num1, data->num2, data->num1 * data->num2);
 }
 
@@ -44,7 +44,7 @@ void *division(void *arg)
 {
     thread_data_t *data = (thread_data_t *)arg;
     printf("Thread ID <%d> going to divide %d and %d\n", data->tid, data->num1, data->num2);
-    sleep(2);
+    sleep(5);
     if(data->num2 != 0)
     {
     	printf("Division of %d and %d is %f\n", data->num1, data->num2, (float)data->num1/(float)data->num2);
@@ -92,6 +92,7 @@ int main(int argc, char *argv[])
         thr_data[i].num1 = num11;
 	thr_data[i].num2 = num22;
 
+	//fun_ptr_arr[i](&thr_data[i]); // Run as process and comment below thread code
         if((rc = pthread_create(&thr[i], NULL, fun_ptr_arr[i], &thr_data[i])))
 	{
             fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
