@@ -22,8 +22,8 @@ void *thr_func(void *arg)
  
     printf("hello from thr_func, thread id: %d\n", data->tid);
     /* get mutex before modifying and printing shared_x */
+    sleep(7);
     pthread_mutex_lock(&lock_x);
-    sleep(2);
     shared_x += data->stuff;
     printf("x = %f\n", shared_x);
     pthread_mutex_unlock(&lock_x);
@@ -50,6 +50,7 @@ int main(int argc, char **argv)
     {
         thr_data[i].tid = i;
         thr_data[i].stuff = (i + 1) * NUM_THREADS;
+        printf("thr_data[%d].stuff = %lf\n", i, thr_data[i].stuff);
         //if((rc = pthread_create(&thr[i], NULL, thr_func, &thr_data[i])))
         if((rc = pthread_create(&thr[i], NULL, fun_ptr_arr[i], &thr_data[i])))
 	{

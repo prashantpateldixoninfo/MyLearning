@@ -44,7 +44,7 @@ void *division(void *arg)
 {
     thread_data_t *data = (thread_data_t *)arg;
     printf("Thread ID <%d> going to divide %d and %d\n", data->tid, data->num1, data->num2);
-    sleep(5);
+    sleep(3);
     if(data->num2 != 0)
     {
     	printf("Division of %d and %d is %f\n", data->num1, data->num2, (float)data->num1/(float)data->num2);
