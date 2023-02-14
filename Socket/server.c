@@ -18,7 +18,7 @@ int main(int argc, char const* argv[])
     int addrlen = sizeof(address);
     char ip_addr_str[INET_ADDRSTRLEN];
     char buffer[1024] = { 0 };
-    char* hello = "Hi Message from server";
+    char* hello = "Hi Message from Prashant";
 
     // Creating socket file descriptor
     printf("==> Creat socket descriptor on Server <==\n");
@@ -27,6 +27,7 @@ int main(int argc, char const* argv[])
     	perror("socket failed");
     	exit(EXIT_FAILURE);
     }
+    printf("server_fd = %d\n", server_fd);
 
     // Forcefully attaching socket to the port 8080
     printf("==> Forcing socket to reuser IP Address and Port(8080) through setsockopt <==\n");
@@ -59,22 +60,28 @@ int main(int argc, char const* argv[])
     }
 
     printf("==> Accept the connection from Clients <==\n");
-    if((new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0)
+    while(1)
     {
-    	perror("accept");
-    	exit(EXIT_FAILURE);
-    }
+        if((new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0)
+        {
+            perror("accept");
+            exit(EXIT_FAILURE);
+        }
 
-    inet_ntop(AF_INET, &address.sin_addr, ip_addr_str, INET_ADDRSTRLEN);
-    printf("Client IP Family ==> %d\n", address.sin_family);
-    printf("Client IP Address ==> %s\n", ip_addr_str);
-    printf("Client Port Number ==> %d\n", ntohs(address.sin_port));
-    printf("==> Going to read the message from Client through new file descriptor <==\n");
-    valread = read(new_socket, buffer, 1024);
-    printf("Message Received from Client as ==> %s\n", buffer);
+        inet_ntop(AF_INET, &address.sin_addr, ip_addr_str, INET_ADDRSTRLEN);
+        printf("Client IP Family ==> %d\n", address.sin_family);
+        printf("Client IP Address ==> %s\n", ip_addr_str);
+        printf("Client Port Number ==> %d\n", ntohs(address.sin_port));
 
-    printf("==> Going to Send new message 'Hi Message from server' to client <==\n");
-    send(new_socket, hello, strlen(hello), 0);
+        //printf("==> Going to read the message from Client through new file descriptor <==\n");
+        memset(buffer, 0, 1024);
+        valread = read(new_socket, buffer, 1024);
+        printf("valread = %d\n", valread);
+        printf("Message Received from Client as ==> %s\n", buffer);
+
+        printf("==> Going to Send new message 'Hi Message from Prashant' to client <==\n");
+        send(new_socket, hello, strlen(hello), 0);
+    };
 
     // closing the connected socket
     printf("==> Closing the connected socket <==\n");
