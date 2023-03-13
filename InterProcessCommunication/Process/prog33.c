@@ -13,6 +13,7 @@ int main()
 	pid = fork();
 	if(pid == 0)
 	{
+		sleep(1);
 		printf("The intial value of variable i in the child process is %d\n",i);
 		i+=10;		
 		printf("Value of variable i in Child process after incrementation is %d\n", i);
@@ -20,6 +21,8 @@ int main()
 	}
 	else
 	{
+		i+=20;
+		printf("In parent i = %d\n", i);
 		wait(0);
 		printf("value of i in parent process is %d\n", i);
 	}

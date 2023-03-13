@@ -6,7 +6,10 @@
 
 int main()
 {
+	int pid = getpid();
 	int ppid = getppid();
+	printf("Process ID is %d\n", pid);
 	printf("Parent process ID is %d\n", ppid);
+	sleep(15);
 	return 0;
 }

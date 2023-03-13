@@ -13,9 +13,10 @@ int main()
 		/* The child is made to sleep so that the parent dies */
 		printf("Child Process with pid = %d and ppid = %d\n", getpid(), getppid());
 		sleep(5);
-		system ("ps -al");
+		system ("ps -aelf");
 		printf("Child Process with pid = %d and ppid = %d\n", getpid(), getppid());
 		sleep(5);
+		system ("ps -aelf");
 	}
 	else
 	{

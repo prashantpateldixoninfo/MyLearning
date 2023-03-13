@@ -23,7 +23,7 @@ int main()
 	fclose(fp);
 	
 	fp = fopen("book", "r");
-    pid = fork();
+    	pid = fork();
 
 	if(pid == 0)
 	{

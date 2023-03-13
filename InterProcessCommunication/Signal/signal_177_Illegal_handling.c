@@ -12,8 +12,8 @@ void abc(int signo)
 int main()
 {
 	int i=0, j=50;
-	signal(SIGFPE, abc); // key, function
 	//signal(SIGFPE, SIG_DFL); // key, function
+	signal(SIGFPE, abc); // key, function
 	j=j/i;
 	return 0;
 }

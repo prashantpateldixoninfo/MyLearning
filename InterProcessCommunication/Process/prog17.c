@@ -10,7 +10,7 @@ int main()
 	if(fork() > 0)
 	{
 		printf("Parent Process\n");
-		sleep(10);
+		sleep(20);
 	}
 		
 	return 0;

@@ -8,5 +8,6 @@ int main()
 {
 	int pid = getpid();
 	printf("Process Id is %d\n", pid);
+	sleep(10);
 	return 0;
 }

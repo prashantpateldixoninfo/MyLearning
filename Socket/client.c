@@ -28,7 +28,7 @@ int main(int argc, char const* argv[])
 
     // Convert IPv4 and IPv6 addresses from text to binary form
     printf("==> Convert IPv4 and IPv6 addresses from text to binary form <==\n");
-    if(inet_pton(AF_INET, "192.168.160.4", &serv_addr.sin_addr) <= 0)
+    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0)
     {
     	printf("Invalid address/ Address not supported\n");
     	return -1;

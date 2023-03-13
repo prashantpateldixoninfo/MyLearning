@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <string.h>
 
 int main()
 {
@@ -16,24 +17,24 @@ int main()
 	if(pid == 0)
 	{
 		printf("Child begins %d\n",getpid());
-		printf("File handle is %d\n", lseek(fp, 0, 1));
+		printf("File handle is %ld\n", lseek(fp, 0, 1));
 		read(fp, buff, 10);
 		buff[10] = '\0';
 		printf("Child read : ");
 		puts(buff);
-		printf("File handle is now %d in the child process\n", lseek(fp, 0, 1));
+		printf("File handle is now %ld in the child process\n", lseek(fp, -strlen(buff), 1));
 		printf("Child existing\n");
 	}
 	else
 	{
 		wait(0);
 		printf("Parent begins %d\n",getpid());
-		printf("File handle is %d\n", lseek(fp, 0, 1));
+		printf("File handle is %ld\n", lseek(fp, 0, 1));
 		read(fp, buff, 10);
 		buff[10] = '\0';
 		printf("Parent read : ");
 		puts(buff);
-		printf("File handle is now %d in the parent process\n", lseek(fp, 0, 1));
+		printf("File handle is now %ld in the parent process\n", lseek(fp, 0, 1));
 		printf("Child existing\n");
 	}
 	return 0;

@@ -9,7 +9,7 @@
 int main()
 {
 	int pid = fork();
-	if(pid == 0) // fist child process
+	if(pid == 0) // first child process
 	{
 		printf("1st child's process id is %d\n", getpid());
 		printf("first-child terminating from memory\n");
