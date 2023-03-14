@@ -1,3 +1,6 @@
 *.o
 client
 server
+client_sock_file
+server_sock_file
+

@@ -1,3 +1,4 @@
 *.o
 multithread_simple
 multithread_mutex
+multithread_test
