@@ -1,27 +1,18 @@
-### Install the genieacs server from 
---------------------------------------------------
-https://github.com/genieacs/genieacs
+### Install the genieacs server(ACS --> Auto Configuration Server)
+-------------------------------------------------------------------
+	Follow the README.md path as genieacs/README.md 
 
-### Dowload the genieacs-sim and execute
-=============================================
-Configuration of GeniesACS-SIM for GENIEACS
-=============================================
-git clone https://github.com/genieacs/genieacs-sim
-./genieacs-sim -s 654321 -u "http://192.168.1.8:7547"
+### Dowload the genieacs-sim(CEP Simulator) and Run
+------------------------------------------------------------------
+	Follow the README.md path as genieacs-simulator/README.md 
 
 
-### Run the openWRT with TR-069
-=============================================
-Configuration of EasyCWMP for GENIEACS
-==========================================
-uci show easycwmp
-uci set easycwmp.@acs[0].url='http://192.168.1.8:7547'
-uci set easycwmp.@acs[0].username='admin'
-uci set easycwmp.@acs[0].password='admin'
-uci commit
-uci show easycwmp
-/etc/init.d/easycwmpd start
-
+### Run the openWRT with TR-069 as Client
+-------------------------------------------------------------------
+	Follow the README.md path as OpenWRT_TR069/README.md
+	(Run the openWRT with TR-069 and Configure EasyCWMP for genieacs server)
+ 
 
 ### Document of TR-069 
-https://cwmp-data-models.broadband-forum.org/
+-------------------------------------------------------------------
+	https://cwmp-data-models.broadband-forum.org/
