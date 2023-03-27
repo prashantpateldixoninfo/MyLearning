@@ -14,10 +14,14 @@
 		--> Select libmicroxml under Librairies
 		--> Save and Exit
 	9) make -j1 V=s
-	10) You will get compilation error during linking.
+	10) You will get compilation error during linking. Then
+	    Please change the  'struct event_code event_code_array[__EVENT_MAX];' to  'extern struct event_code event_code_array[__EVENT_MAX];' in file cwmp.h of 	      build_dir/target-i386_pentium4_musl/easycwmp/easycwmp-1.8.6/src/
+	    Note: Prerequisite files needed during compilation: easycwmp.zip, libmicroxml.zip, cwmp.h
+	11) This will not required if above one(10) is worked for you. If not...
+		You will get compilation error during linking. Then
 		Please compare cwmp.h, cwmp.c and xml.c file and merge the changes at build_dir/target-i386_pentium4_musl/easycwmp/easycwmp-1.8.6/src/
-	Note: Prerequisite files needed during compilation: easycwmp.zip, libmicroxml.zip, cwmp.h, cwmp.c and xml.c
-	11) Deploy the openWRT image in VBox and Change the N/W setting as Host Only Adapter and Bridge Adapter
+		Note: Prerequisite files needed during compilation: easycwmp.zip, libmicroxml.zip, cwmp.h, cwmp.c and xml.c
+	12) Deploy the openWRT image in VBox and Change the N/W setting as Host Only Adapter and Bridge Adapter
 ----------------------------------------------------------------------------------------------------------------
 
 ### Run the openWRT with TR-069 and Configure EasyCWMP for genieacs server
