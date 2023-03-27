@@ -1,3 +1,8 @@
+### Big Picture
+-----------------------
+
+![TR-069](https://user-images.githubusercontent.com/122257142/227917526-09d2e870-f593-475a-acff-643e7c5ee3f7.jpg)
+
 ### Install the genieacs server(ACS --> Auto Configuration Server)
 -------------------------------------------------------------------
 	Follow the README.md path as genieacs/README.md 
@@ -16,3 +21,4 @@
 ### Document of TR-069 
 -------------------------------------------------------------------
 	https://cwmp-data-models.broadband-forum.org/
+	
