@@ -1,7 +1,8 @@
 ### Big Picture
 -----------------------
 
-![TR-069](https://user-images.githubusercontent.com/122257142/227917526-09d2e870-f593-475a-acff-643e7c5ee3f7.jpg)
+![TR-069](https://user-images.githubusercontent.com/122257142/228450191-4e513993-ea02-4d54-88f3-96d49e3fdf10.jpg)
+
 
 ### Install the genieacs server(ACS --> Auto Configuration Server)
 -------------------------------------------------------------------
