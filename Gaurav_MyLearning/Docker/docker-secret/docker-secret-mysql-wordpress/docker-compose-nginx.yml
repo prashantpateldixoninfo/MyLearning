@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  web:
+    image: nginxdemos/hello
+    secrets:                    # secrets block only for 'web' service
+     - my_external_secret
+     - my_file_secret
+
+secrets:                        # top level secrets block
+  my_external_secret:
+    external: true
+  my_file_secret:
+    file: my_file_secret.txt

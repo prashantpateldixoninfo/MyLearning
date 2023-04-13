@@ -1,0 +1,3 @@
+*.o
+multithread_simple
+multithread_mutex
