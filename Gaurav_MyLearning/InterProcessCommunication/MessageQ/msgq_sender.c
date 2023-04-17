@@ -10,8 +10,8 @@ int main()
 	}Message;
 
 	/* Creating a new message queue */
-	qid = msgget((key_t) 10, IPC_CREAT|0666);
-	printf(" %d\n", qid);
+	qid = msgget((key_t) 9, IPC_CREAT|0666);
+	printf(" value of qid=%d\n", qid);
 	if(qid == -1)
 	{
 		perror(" Msgget Error\n");

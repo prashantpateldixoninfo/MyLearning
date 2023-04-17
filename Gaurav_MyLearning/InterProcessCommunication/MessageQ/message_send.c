@@ -21,6 +21,7 @@ main(int argc, char *argv[])
 {
     int msqid;
     int msgflg = IPC_CREAT | 0666;
+    printf("value of msgflg=%d\n",msgflg);
     key_t key;
     message_buf sbuf;
     size_t buf_length;
