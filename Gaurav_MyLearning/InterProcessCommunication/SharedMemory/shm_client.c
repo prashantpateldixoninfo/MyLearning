@@ -16,6 +16,7 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 	shm = shmat(shmid, (void *)0, 0);
+        //printf("value of shm=%d\n",(int)shm);
 	if(shm == (void *)-1)
 	{
 		fprintf(stderr, "shmat failed\n");

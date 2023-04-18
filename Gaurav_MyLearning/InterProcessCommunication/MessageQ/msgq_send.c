@@ -25,7 +25,8 @@ int main(void) {
       perror("ftok");
       exit(1);
    }
-   
+  
+   //sleep(10); 
    if ((msqid = msgget(key, PERMS | IPC_CREAT)) == -1) {
       perror("msgget");
       exit(1);
