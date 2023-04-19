@@ -15,19 +15,11 @@ int main()
     {
         cout << "\nTriangle is equilateral triangle\n ";
     }
-    else if ( side1 == side2 )
+    else if ( side1 == side2 || side2 == side3 || side3 == side1 )
     {
         cout << " \n Trianle is isoceles triangle \n";
     }
-    else if ( side2 == side3 )
-    {
-        cout << " \n Trianle is isoceles triangle \n";
-    }
-    
-    else if ( side1 == side3 )
-    {
-        cout << " \n Trianle is isoceles triangle \n";
-    }
+ 
     else
     {
         cout<<"\n triangle is scaler triangle\n ";
