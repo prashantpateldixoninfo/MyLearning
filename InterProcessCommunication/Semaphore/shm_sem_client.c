@@ -1,8 +1,8 @@
 
 #include "shm_sem.h"
 
-int semaphore_p(int sem_id);
-int semaphore_v(int sem_id);
+int semaphore_p(int sem_id); // Wait
+int semaphore_v(int sem_id); // Signal
 
 int main()
 {
