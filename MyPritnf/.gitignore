@@ -1,4 +1,6 @@
 variable_args
 mylog.txt
+mylog_time.txt
 shm_sem_client
 shm_sem_server
+time

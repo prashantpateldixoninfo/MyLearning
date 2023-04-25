@@ -19,6 +19,9 @@ struct sh_dat
 	char text[TEXT_SZ];
 };
 
+#define print_flog(fmt, ...) fprintf(fptr, "[%s] [%s] [%s] [%d] ", timestamp(), __FILE__, __func__, __LINE__), fprintf(fptr, (fmt), ##__VA_ARGS__), fprintf(fptr, "\n")
+
+
 char * timestamp();
 void mycolor(int color);
 void colorreset();
