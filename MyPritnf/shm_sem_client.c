@@ -1,6 +1,5 @@
 #include "shm_sem.h"
 
-FILE *fptr = NULL;
 
 int main()
 {
@@ -10,18 +9,10 @@ int main()
 	char buffer[TEXT_SZ];
 	int shmid, semid;
 
-    fptr = fopen("mylog.txt", "a+");
-    if(fptr == NULL)
-    {
-        fprintf(stderr, "[%s] [%s] [%s] [%d] Unable to create/open the mylog.txt file\n", timestamp(), __FILE__, __func__, __LINE__);
-        exit(EXIT_FAILURE);
-    }
-
 	shmid = shmget((key_t)1234, sizeof(struct sh_dat), 0666 | IPC_CREAT);
 	if(shmid == -1)
 	{
 		print_flog("Shared Memory creation failed");
-        fclose(fptr);
 		exit(EXIT_FAILURE);
 	}
 	print_flog("Shared Memory created");
@@ -30,7 +21,6 @@ int main()
 	if(semid == -1)
 	{
 		print_flog("Semaphore creation failed");
-        fclose(fptr);
 		shmctl(shmid, IPC_RMID, NULL);
 		exit(EXIT_FAILURE);
 	}
@@ -40,7 +30,6 @@ int main()
 	if(shm == (void *)-1)
 	{
 		print_flog("Shared Memory attach failed");
-        fclose(fptr);
         shmctl(shmid, IPC_RMID, NULL);
         semctl(semid, IPC_RMID, 0);
 		exit(EXIT_FAILURE);
@@ -77,14 +66,12 @@ int main()
 	if(shmdt(sh_ptr) == -1)
 	{
 		print_flog("Shared Memory detached failed");
-        fclose(fptr);
         shmctl(shmid, IPC_RMID, NULL);
         semctl(semid, IPC_RMID, 0);
 		exit(EXIT_FAILURE);
 	}
 	print_flog("Shared Memory Detached");
 
-    fclose(fptr); // Closing file
     shmctl(shmid, IPC_RMID, NULL);
     semctl(semid, IPC_RMID, 0);
 	exit(EXIT_SUCCESS);

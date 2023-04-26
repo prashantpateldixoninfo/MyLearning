@@ -1,6 +1,15 @@
-#include "shm_sem.h"
+//#include "shm_sem.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <time.h>
 
-extern FILE *fptr;
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+
 
 char * timestamp()
 {
@@ -37,7 +46,7 @@ int semaphore_p(int sem_id)
 	sem_b.sem_flg = SEM_UNDO;
 	if(semop(sem_id, &sem_b, 1) == -1)
 	{
-		fprintf(fptr, "[%s] [%s] [%s] [%d] semaphore_p failed \n", timestamp(), __FILE__, __func__, __LINE__);
+		fprintf(stderr, "[%s] [%s] [%s] [%d] semaphore_p failed \n", timestamp(), __FILE__, __func__, __LINE__);
 		return 0;
 	}
 	return 1;
@@ -51,7 +60,7 @@ int semaphore_v(int sem_id)
 	sem_b.sem_flg = SEM_UNDO;
 	if(semop(sem_id, &sem_b, 1) == -1)
 	{
-		fprintf(fptr, "[%s] [%s] [%s] [%d] semaphore_v failed \n", timestamp(), __FILE__, __func__, __LINE__);
+		fprintf(stderr, "[%s] [%s] [%s] [%d] semaphore_v failed \n", timestamp(), __FILE__, __func__, __LINE__);
 		return 0;
 	}
 	return 1;
