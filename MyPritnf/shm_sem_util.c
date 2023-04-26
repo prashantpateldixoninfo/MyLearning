@@ -1,6 +1,5 @@
 #include "shm_sem.h"
 
-extern FILE * fptr;
 
 char *timestamp()
 {

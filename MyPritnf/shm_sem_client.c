@@ -27,6 +27,19 @@ int main()
     }
     print_flog("Semaphore created");
 
+    if(semctl(semid, 0, GETVAL, 1) == 0) // Semaphore value not yet set
+    {
+        // Initially making the semaphore available
+        if(semctl(semid, 0, SETVAL, 1) == -1)
+        {
+            print_flog("Semaphore SETVAL failed");
+            shmctl(shmid, IPC_RMID, 0);
+            semctl(semid, IPC_RMID, 0);
+            exit(EXIT_FAILURE);
+        }
+        print_flog("Semaphore SETVAL Succeed");
+    }
+
     shm = shmat(shmid, (void *)0, 0);
     if(shm == (void *) - 1)
     {

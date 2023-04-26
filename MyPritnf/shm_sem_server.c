@@ -26,13 +26,17 @@ int main()
     }
     print_flog("Semaphore created");
 
-    // Initially making the semaphore available
-    if(semctl(semid, 0, SETVAL, 1) == -1)
+    if(semctl(semid, 0, GETVAL, 1) == 0) // Semaphore value not yet set
     {
-        fprintf(stderr, "semctl(SETVAL) failed\n");
-        shmctl(shmid, IPC_RMID, 0);
-        semctl(semid, IPC_RMID, 0);
-        exit(EXIT_FAILURE);
+        // Initially making the semaphore available
+        if(semctl(semid, 0, SETVAL, 1) == -1)
+        {
+            print_flog("Semaphore SETVAL failed");
+            shmctl(shmid, IPC_RMID, 0);
+            semctl(semid, IPC_RMID, 0);
+            exit(EXIT_FAILURE);
+        }
+        print_flog("Semaphore SETVAL Succeed");
     }
 
     // Attaching the shared memory to server process
