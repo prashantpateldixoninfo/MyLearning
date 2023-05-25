@@ -1,0 +1,3 @@
+[submodule "Docker/techworld-js-docker-demo-app"]
+	path = Docker/techworld-js-docker-demo-app
+	url = https://gitlab.com/nanuchi/techworld-js-docker-demo-app
