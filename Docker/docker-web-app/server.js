@@ -3,8 +3,8 @@ const app = express();
 app.use(express.json());
 
 const cources = [
-    { id : 1,  name : 'physics'},
-    {id : 2,  name : 'chemistry'},
+    {id : 7,  name : 'physics'},
+    {id : 5,  name : 'chemistry'},
     {id : 3,  name : 'math'}
 ];
 
@@ -24,6 +24,33 @@ app.get('/api/cources/:id', (req,res) => {
     const cource = cources.find( c => c.id === parseInt(req.params.id) )
     if (!cource) res.status(404).send("not found")
     res.send(cource)
+})
+
+app.delete('/api/cources/:id', (req, res) => {
+    console.log("Calling Delete RestAPI");
+    //console.log("My request is = ", req);
+    let index = cources.findIndex(c => c.id === parseInt(req.params.id))
+    console.log("index = ", index);
+    if(index == -1)
+        res.status(404).send("Invalid ID "+req.params.id);
+    //delete cources[index]; // it will leave hole in memory
+    cources.splice(index);
+    res.send(cources)
+})
+
+app.patch('/api/cources/:id', (req, res) => {
+    console.log("Calling Patch RestAPI");
+    //console.log("My request is = ", req);
+    let index = cources.findIndex(c => c.id === parseInt(req.params.id))
+    console.log("index = ", index);
+    if(index == -1)
+        res.status(404).send("Invalid ID "+req.params.id);
+    console.log("Body is ", req.body);
+    if(req.body) {
+        cources[index].id = req.body.id;
+        cources[index].name = req.body.name;
+    }   
+    res.send(cources)
 })
 
 
