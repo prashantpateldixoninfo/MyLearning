@@ -78,18 +78,26 @@ app.get('/api/cources/:id/search/?', (req,res) => {
 app.post('/api/cources/', (req, res) => {
     console.log("indside post API");
     console.log(req.body);
-    obj = new Object();
-    if ( req.body.id) {
-        console.log("id available");
-        obj.id = req.body.id;
-    }
-    if ( req.body.name) {
-        console.log("name available");
-        obj.name = req.body.name;
+
+    function rollinglist(item) {
+        obj = new Object();
+        if(item.id) {
+            console.log("id available");
+            obj.id = item.id;
+        }
+        if(item.name) {
+            console.log("name available");
+            obj.name = item.name;
+        }
+        console.log(obj);
+        cources.push(obj);
     }
 
-    console.log(obj);
-    cources.push(obj);
+    if(Array.isArray(req.body)) {
+        req.body.forEach(rollinglist);
+    } else {
+        rollinglist(req.body);
+    }
     res.send(cources);
 });
 
