@@ -11,10 +11,12 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
+    console.log("GET /");
     res.sendFile(path.join(__dirname, "index.html"));
   });
 
 app.get('/profile-picture', function (req, res) {
+  console.log("GET /profile-picture");
   let img = fs.readFileSync(path.join(__dirname, "images/profile-1.jpg"));
   res.writeHead(200, {'Content-Type': 'image/jpg' });
   res.end(img, 'binary');
@@ -34,8 +36,10 @@ let databaseName = "my-db";
 
 app.post('/update-profile', function (req, res) {
   let userObj = req.body;
+  console.log("GET /update-profile");
 
-  MongoClient.connect(mongoUrlLocal, mongoClientOptions, function (err, client) {
+  //MongoClient.connect(mongoUrlLocal, mongoClientOptions, function (err, client) {
+  MongoClient.connect(mongoUrlDocker, mongoClientOptions, function (err, client) {
     if (err) throw err;
 
     let db = client.db(databaseName);
@@ -56,8 +60,10 @@ app.post('/update-profile', function (req, res) {
 
 app.get('/get-profile', function (req, res) {
   let response = {};
+  console.log("GET /get-profile");
   // Connect to the db
-  MongoClient.connect(mongoUrlLocal, mongoClientOptions, function (err, client) {
+  //MongoClient.connect(mongoUrlLocal, mongoClientOptions, function (err, client) {
+  MongoClient.connect(mongoUrlDocker, mongoClientOptions, function (err, client) {
     if (err) throw err;
 
     let db = client.db(databaseName);
