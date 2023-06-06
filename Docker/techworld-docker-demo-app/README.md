@@ -55,7 +55,8 @@ Step 1: Create the application image
 
 Step 2: start application, mongodb and mongo-express
 
-    docker-compose -f docker-compose.yaml up
+    docker-compose -f docker-compose.yaml down // to stop and remove the containers
+    docker-compose -f docker-compose.yaml up -d // to run the containers
     
 Step 3: access the nodejs application from browser 
 
