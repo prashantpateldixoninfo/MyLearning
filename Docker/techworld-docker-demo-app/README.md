@@ -36,12 +36,12 @@ Step 6: Uncomment the below line in the server.js file for mongoUrlLocal.
         MongoClient.connect(mongoUrlLocal, mongoClientOptions, function (err, client) {
         And comment out MongoClient.connect(mongoUrlDocker, mongoClientOptions, function (err, client) {
 
-Step 6: Start your nodejs application locally - go to `app` directory of project 
+Step 7: Start your nodejs application locally - go to `app` directory of project 
 
     npm install 
     node server.js
     
-Step 7: Access you nodejs application UI from browser
+Step 8: Access you nodejs application UI from browser
 
     http://localhost:3000
 
@@ -49,15 +49,11 @@ Step 7: Access you nodejs application UI from browser
 
 #### To start the application
 
-Step 1: Create the application image
-    
-    docker build . -t mytechworld
-
-Step 2: start application, mongodb and mongo-express
+Step 1: start application, mongodb and mongo-express
 
     docker-compose -f docker-compose.yaml down // to stop and remove the containers
     docker-compose -f docker-compose.yaml up -d // to run the containers
     
-Step 3: access the nodejs application from browser 
+Step 2: access the nodejs application from browser 
 
     http://localhost:3000
