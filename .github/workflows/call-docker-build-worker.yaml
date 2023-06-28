@@ -23,7 +23,7 @@ jobs:
 
     name: Worker Call Docker Build
 
-    uses: prashantpateldixoninfo/.github/.github/workflows/reusable-docker-build.yaml@main
+    uses: pingppatel/.github/.github/workflows/reusable-docker-build.yaml@main
 
     permissions:
       contents: read
@@ -51,8 +51,8 @@ jobs:
       ### A list of the account/repo names for docker build. List should match what's enabled above
       ### defaults to:
       image-names: |
-        ghcr.io/prashantpateldixoninfo/example-voting-app-worker
-        prashantpateldixoninfo/examplevotingapp_worker
+        ghcr.io/pingppatel/example-voting-app-worker
+        pingppatel/examplevotingapp_worker
       
       ### REQUIRED set rules for tagging images, based on special action syntax:
       ### https://github.com/docker/metadata-action#tags-input
