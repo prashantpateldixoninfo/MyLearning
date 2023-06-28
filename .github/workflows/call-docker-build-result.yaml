@@ -8,14 +8,14 @@ on:
       - 'main'
     # only build when important files change
     paths:
-      - 'result/**'
+      - 'Docker/docker-voting-app/example-voting-app/result/**'
       - '.github/workflows/call-docker-build-result.yaml'
   pull_request:
     branches:
       - 'main'
     # only build when important files change
     paths:
-      - 'result/**'
+      - 'Docker/docker-voting-app/example-voting-app/result/**'
       - '.github/workflows/call-docker-build-result.yaml'
 
 jobs:
