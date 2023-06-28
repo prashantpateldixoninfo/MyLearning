@@ -65,7 +65,7 @@ jobs:
       
       ### path to where docker should copy files into image
       ### defaults to root of repository (.)
-      context: result
+      context: Docker/docker-voting-app/example-voting-app/result
       
       ### Dockerfile alternate name. Default is Dockerfile (relative to context path)
       # file: Containerfile
