@@ -23,7 +23,7 @@ jobs:
 
     name: Result Call Docker Build
 
-    uses: pingppatel/.github/.github/workflows/reusable-docker-build.yaml@main
+    uses: dockersamples/.github/.github/workflows/reusable-docker-build.yaml@main
 
     permissions:
       contents: read
