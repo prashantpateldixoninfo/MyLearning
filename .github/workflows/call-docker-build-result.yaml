@@ -23,7 +23,7 @@ jobs:
 
     name: Result Call Docker Build
 
-    uses: dockersamples/.github/.github/workflows/reusable-docker-build.yaml@main
+    uses: prashantpateldixoninfo/.github/.github/workflows/reusable-docker-build.yaml@main
 
     permissions:
       contents: read
@@ -51,8 +51,8 @@ jobs:
       ### A list of the account/repo names for docker build. List should match what's enabled above
       ### defaults to:
       image-names: |
-        ghcr.io/dockersamples/example-voting-app-result
-        dockersamples/examplevotingapp_result
+        ghcr.io/prashantpateldixoninfo/example-voting-app-result
+        prashantpateldixoninfo/examplevotingapp_result
       
       ### REQUIRED set rules for tagging images, based on special action syntax:
       ### https://github.com/docker/metadata-action#tags-input

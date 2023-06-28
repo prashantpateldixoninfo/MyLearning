@@ -8,14 +8,14 @@ on:
       - 'main'
     # only build when important files change
     paths:
-      - 'vote/**'
+      - 'Docker/docker-voting-app/example-voting-app/vote/**'
       - '.github/workflows/call-docker-build-vote.yaml'
   pull_request:
     branches:
       - 'main'
     # only build when important files change
     paths:
-      - 'vote/**'
+      - 'Docker/docker-voting-app/example-voting-app/vote/**'
       - '.github/workflows/call-docker-build-vote.yaml'
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
 
     name: Vote Call Docker Build
 
-    uses: dockersamples/.github/.github/workflows/reusable-docker-build.yaml@main
+    uses: prashantpateldixoninfo/.github/.github/workflows/reusable-docker-build.yaml@main
 
     permissions:
       contents: read
@@ -51,8 +51,8 @@ jobs:
       ### A list of the account/repo names for docker build. List should match what's enabled above
       ### defaults to:
       image-names: |
-        ghcr.io/dockersamples/example-voting-app-vote
-        dockersamples/examplevotingapp_vote
+        ghcr.io/prashantpateldixoninfo/example-voting-app-vote
+        prashantpateldixoninfo/examplevotingapp_vote
       
       ### REQUIRED set rules for tagging images, based on special action syntax:
       ### https://github.com/docker/metadata-action#tags-input
@@ -65,7 +65,7 @@ jobs:
       
       ### path to where docker should copy files into image
       ### defaults to root of repository (.)
-      context: vote
+      context: Docker/docker-voting-app/example-voting-app/vote
       
       ### Dockerfile alternate name. Default is Dockerfile (relative to context path)
       # file: Containerfile
