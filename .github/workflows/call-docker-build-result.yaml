@@ -52,7 +52,7 @@ jobs:
       ### defaults to:
       image-names: |
         ghcr.io/prashantpateldixoninfo/example-voting-app-result
-        prashantpateldixoninfo/examplevotingapp_result
+        ### prashantpateldixoninfo/examplevotingapp_result
       
       ### REQUIRED set rules for tagging images, based on special action syntax:
       ### https://github.com/docker/metadata-action#tags-input
