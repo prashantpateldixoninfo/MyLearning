@@ -1,0 +1,10 @@
+version: '3'
+services:
+  my-movie:
+    build: .
+    image: mymovieworld
+    #restart: always
+    deploy:
+      replicas: 2
+    ports:
+      - 3333-3334:3333
