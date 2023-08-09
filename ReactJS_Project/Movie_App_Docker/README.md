@@ -9,7 +9,7 @@
 
 ## 02. Directly use docker-compose.yaml file(it will create image and run it)
 ### docker-compose.yaml file as below
-'''    
+`    
     version: '3'
     services:
       my-movie:
@@ -18,8 +18,7 @@
       restart: always
       ports:
         - 3333:3333
-'''
-
+`
 #### Note: package.json file should have PORT=3333
     Ex:     "start": "PORT=3333 react-scripts start"
 
@@ -29,9 +28,9 @@
 
 ## 03. Run the project in Docker Swarm mode(Distributed enviornment), And Run multiple instances with replicas
 ### docker-compose.yaml file as below
-'''
-    version: '3'
-    services:
+`
+  version: '3'
+  services:
     my-movie:
       build: .
       image: mymovieworld
@@ -40,7 +39,7 @@
       replicas: 2
       ports:
         - 3333-3336:3333
-'''
+`
 ### `docker stack deploy --compose-file=docker-compose.yaml movieapp-stack`
 ### `docker ps`
 ### `docker service ls`
