@@ -10,7 +10,7 @@
 ## 02. Directly use docker-compose.yaml file(it will create image and run it)
 ### docker-compose.yaml file as below
    
-    version: '3'
+    version: 3
     services:
       my-movie:
       build: .
@@ -29,7 +29,7 @@
 ## 03. Run the project in Docker Swarm mode(Distributed enviornment), And Run multiple instances with replicas
 ### docker-compose.yaml file as below
 
-  version: '3'
+  version: 3
   services:
     my-movie:
       build: .
