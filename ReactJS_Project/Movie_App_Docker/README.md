@@ -9,41 +9,49 @@
 
 ## 02. Directly use docker-compose.yaml file(it will create image and run it)
 ### docker-compose.yaml file as below
-   
-    version: 3
-    services:
-      my-movie:
-      build: .
-      image: mymovieworld
-      restart: always
-      ports:
-        - 3333:3333
 
-#### Note: package.json file should have PORT=3333
-    Ex:     "start": "PORT=3333 react-scripts start"
+```
+  version: '3'
+  services:
+    my-movie:
+      build: .
+      image: mymovieworld
+      restart: always
+      ports:
+        - 3333:3333
+```
+> [!NOTE]
+> package.json file should have PORT=3333
+> Ex:     "start": "PORT=3333 react-scripts start"
 
-### `docker-compose up -d`
-### `docker ps`
-### `docker-compose down`
+```
+`docker-compose up -d`
+`docker ps`
+`docker-compose down`
+```
 
 ## 03. Run the project in Docker Swarm mode(Distributed enviornment), And Run multiple instances with replicas
 ### docker-compose.yaml file as below
 
+```
   version: 3
   services:
-    my-movie:
-      build: .
-      image: mymovieworld
-      #restart: always
-      deploy:
-      replicas: 2
-      ports:
-        - 3333-3336:3333
+    my-movie:
+      build: .
+      image: mymovieworld
+      #restart: always
+      deploy:
+        replicas: 2
+      ports:
+        - 3333-3336:3333
+```
 
-### `docker stack deploy --compose-file=docker-compose.yaml movieapp-stack`
-### `docker ps`
-### `docker service ls`
-### `docker stack rm movieapp-stack`
+```
+`docker stack deploy --compose-file=docker-compose.yaml movieapp-stack`
+`docker ps`
+`docker service ls`
+`docker stack rm movieapp-stack`
+```
 
 ### This will create 4 instances of Movie Application which run on 3333, 3334, 3335 and 3336 port and it has 2 replicas
    [http://localhost:3333](http://localhost:3333)
