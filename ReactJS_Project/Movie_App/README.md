@@ -1,16 +1,16 @@
-# Getting Started with Create React App
+# `Getting Started with Create React App`
 
 ## This project can run directly on Ubuntu/other Linux platform with default port 3000
 ## Below two libaries(react-scripts, axios) need to install one time.
 
-### `npm install react-scripts`
-### `npm install axios`
-### `npm start`
+```
+npm install react-scripts
+npm install axios
+npm start
+```
 
-Runs the app in the development mode.\
+### Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-
 
 
 ## Available Scripts
