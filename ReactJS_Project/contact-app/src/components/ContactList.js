@@ -2,11 +2,19 @@ import React from "react";
 import ContactCard from "./ContactCard";
 
 const ContactList = (props) => {
-    // console.log(props);
+    console.log("props = >", props);
 
-    const renderContactList = props.mycontacts.map((mycontact) => {
+    const deleteContactHandler = (id) => {
+        props.getContactId(id);
+    }
+
+    const renderContactList = props.myContacts.map((contact) => {
         return (
-            <ContactCard mycontact={mycontact}/>
+            <ContactCard 
+                myContact={contact}
+                clickHandler={deleteContactHandler}
+                key={contact.id}
+            />
         );
     })
     return <div className="ui celled list">{renderContactList}</div>
