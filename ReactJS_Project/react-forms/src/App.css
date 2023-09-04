@@ -20,6 +20,14 @@ body {
   border-radius: 5px;
   background: #fff;
 }
+.icon {
+  position: absolute;
+  left: 155px; /* Adjust the value to position the icon as desired */
+  top: 10%;
+  transform: translateY(-30%);
+  cursor: pointer; /* Add this if you want the icon to be clickable */
+}
+
 pre {
   width: 70%;
   color: #fff;
@@ -31,4 +39,9 @@ button {
 }
 p {
   color:red
+}
+
+p::before {
+  display: inline;
+  content: "⚠ ";
 }

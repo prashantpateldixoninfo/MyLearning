@@ -3,13 +3,14 @@ import { useForm } from "react-hook-form";
 import "./App.css";
 
 function App() {
-  const { register, handleSubmit, errors } = useForm();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [userInfo, setUserInfo] = useState();
 
   const onSubmit = (data) => {
     setUserInfo(data);
     console.log(data);
   };
+  console.log(watch(errors));
   console.log(errors);
 
   return (
@@ -24,11 +25,11 @@ function App() {
             <input
               type="text"
               // name="username"
-              placeholder="Username"
+              placeholder="Full Name"
               {...register("username", { required: "Username is required" })}
             />
+            {errors.username && <p>This field is required</p>}
           </div>
-          {/* <p>{errors.username?.message}</p> */}
           <div className="field">
             <label>Email</label>
             <input
@@ -44,8 +45,8 @@ function App() {
                   }
                 })}
             />
+            {errors.email && <p>This field is required</p>}
           </div>
-          {/* <p>{errors.email?.message}</p> */}
           <div className="field">
             <label>Password</label>
             <input
@@ -61,14 +62,12 @@ function App() {
                   maxLength: {
                     value: 10,
                     message: "Password cannot exceed more than 10 characters",
-                  }
-                }
-              )
+                  }})
               }
               placeholder="Password"
             />
+            {errors.passowrd && <p>This field is required</p>}
           </div>
-          {/* <p>{errors.password?.message}</p> */}
           <button className="fluid ui button blue">Submit</button>
         </div>
       </form>
