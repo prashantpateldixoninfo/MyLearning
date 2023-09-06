@@ -61,27 +61,27 @@ function App() {
   return (
     <div className='container'>
       {
-        Object.keys(formErrors).length === 0 && isSubmit ? 
-        (<div 
-          className='ui message success'
-          style = {
-            {
-              color: "green",
-              background: "yellow"
-            }
-          }>Signed in Successfully</div>) : 
-        (<div>
-          <div
+        Object.keys(formErrors).length === 0 && isSubmit ?
+          (<div
             className='ui message success'
-            style = {
+            style={
               {
-                color: "red",
+                color: "green",
                 background: "yellow"
               }
-            }>Signed in Failed</div>
-          <pre>{JSON.stringify(formValues, undefined, 2)}</pre>
-        </div>
-        )
+            }>Signed in Successfully</div>) :
+          (<div>
+            <div
+              className='ui message success'
+              style={
+                {
+                  color: "red",
+                  background: "yellow"
+                }
+              }>Signed in Failed</div>
+            <pre>{JSON.stringify(formValues, undefined, 2)}</pre>
+          </div>
+          )
       }
       <form onSubmit={handleSubmit}>
         <h1>Login Form</h1>
