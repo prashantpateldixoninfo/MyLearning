@@ -32,29 +32,24 @@ function App() {
 
   function validate(values) {
     const errors = {};
-    // console.log("validate ==> ", values);
     const regex_email = /^\S+@\S+\.\S+$/i;
 
     // Username Validation
     if (values.username === "") { // Emptyness
       errors.username = "Username is required";
-      // console.log(errors.username);
     }
 
     // Email Validation
     if (values.email === "") { // Emptyness
       errors.email = "Email is required";
-      // console.log(errors.email);
     }
     else if (!regex_email.test(values.email)) {
       errors.email = "Email format is not valid";
     }
 
-
     // Password Validation
     if (values.password === "") { // Emptyness
       errors.password = "Password is required";
-      // console.log(errors.password);
     }
     else if (values.password.length < 4 || values.password.length > 10) {
       errors.password = "Password length should be between 4 and 10";
