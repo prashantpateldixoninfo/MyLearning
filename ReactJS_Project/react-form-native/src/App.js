@@ -1,32 +1,34 @@
 import './App.css';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const initialValue = { username: "", email: "", password: "" };
   const [formValues, setFormValues] = useState(initialValue);
   const [formErrors, setFormErrors] = useState({});
-
-  // console.log("formValues = ", formValues);
+  const [isSubmit, setIsSubmit] = useState(false);
 
   // const handleChange = () => {
   //   console.log("Prashant Patel");
   // }
 
   function handleChange(e) {
-    // console.log("Prashant Patel => ", e.target);
     const { name, value } = e.target;
-    // console.log("name => ", name);
-    // console.log("value => ", value);
     setFormValues({ ...formValues, [name]: value });
-    // console.log("formValues => ", formValues);
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // console.log("Submit ==> ", formValues);
     // Validate the formValues
     setFormErrors(validate(formValues));
+    setIsSubmit(true);
   }
+
+  useEffect(() => {
+    console.log(formErrors);
+    if (Object.keys(formErrors).length === 0 && isSubmit) {
+      console.log(formValues);
+    }
+  }, [formErrors]);
 
   function validate(values) {
     const errors = {};
@@ -63,7 +65,29 @@ function App() {
 
   return (
     <div className='container'>
-      <pre>{JSON.stringify(formValues, undefined, 2)}</pre>
+      {
+        Object.keys(formErrors).length === 0 && isSubmit ? 
+        (<div 
+          className='ui message success'
+          style = {
+            {
+              color: "green",
+              background: "yellow"
+            }
+          }>Signed in Successfully</div>) : 
+        (<div>
+          <div
+            className='ui message success'
+            style = {
+              {
+                color: "red",
+                background: "yellow"
+              }
+            }>Signed in Failed</div>
+          <pre>{JSON.stringify(formValues, undefined, 2)}</pre>
+        </div>
+        )
+      }
       <form onSubmit={handleSubmit}>
         <h1>Login Form</h1>
         <div className='ui divider'></div>
