@@ -24,7 +24,6 @@ function App() {
 
   const addContactHandler = (c) => {
     console.log("contacts => ", c);
-    // setContacts(c);
   }
 
   return (
