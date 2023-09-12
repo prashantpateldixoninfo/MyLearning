@@ -1,11 +1,12 @@
 body {
   background: rgb(2, 0, 36);
-  background: radial-gradient(
+  background-image: url("https://source.unsplash.com/random");
+  /* background: radial-gradient(
     circle,
     rgba(2, 0, 36, 1) 0%,
     rgba(30, 54, 59, 1) 0%,
     rgba(93, 93, 116, 1) 100%
-  );
+  ); */
 }
 
 .container {
@@ -23,7 +24,7 @@ body {
   border: 1px solid #dfdfdf;
   padding: 20px;
   border-radius: 5px;
-  background: #fff;
+  /* background: #fff; */
 }
 pre {
   width: 70%;
