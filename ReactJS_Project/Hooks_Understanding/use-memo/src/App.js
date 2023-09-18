@@ -34,12 +34,10 @@ function App() {
 }
 
 const DisplayName = React.memo(({name}) => {
-  console.log("name => ", name);
   return <p>{`My name is ${name}`}</p>  
 })
 
 function factorial(n) {
-  console.log("I am in factorial");
   let i = 0;
   while (i < 200000000)
     i++;
