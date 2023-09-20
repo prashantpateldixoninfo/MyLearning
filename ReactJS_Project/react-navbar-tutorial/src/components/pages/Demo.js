@@ -2,7 +2,9 @@ import React from "react";
 
 const Demo = () => {
     return (
-        <div>Demo</div>
+        <div className="page-heading">
+            <h1>Try For Free</h1>
+        </div>
     );
 }
 
