@@ -1,0 +1,18 @@
+/* CSS gives style to raw HTML */
+/* CSS stands for Cascading Style Sheets */
+/* CSS is used to give style our web pages */
+/* CSS is used to make websites responsive */
+/* HTML is used to structure the website */
+/* CSS takes responsibility of design */
+
+/*
+Selector       Property      Value
+   |             |             |
+   p       { color:           blue  }
+*/
+
+/*
+1) Inline CSS: CSS is added to the elements directly using style attribute
+2) Internal CSS: CSS is kept inside the head tags in <style> tags
+3) External CSS: CSS is kept seperately inside a .css style sheet
+*/

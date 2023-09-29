@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Box Model, Margin And Padding</title>
+    <link rel="stylesheet" href="cwh-css-20-BoxModel-Margin-Padding.css">
+</head>
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        background-color: rgb(148, 148, 204);
+    }
+    .container {
+        background-color: bisque;
+        border: 2px solid purple;
+        padding: 9px; /* We can set padding top, right, bottom and left individually */
+        /* padding: 1px 2px 3px 4px; */
+        margin: 20px; /* We can set margin top, right, bottom and left individually */
+        /* margin: 1px 2px 3px 4px; */
+        border-radius: 10px;
+        width: 233px;
+        /* box-sizing: border-box; */ /* It will fix the content in box size */
+    }
+    #firstId {
+        color: red;
+    }
+
+    #secondId {
+        color: green;
+    }
+
+    #thirdId {
+        color: blue;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h3>This is CSS Box Model, Margin and Padding Tutorial</h3>
+        <p id="firstId">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Alias tenetur eligendi debitis ut
+            voluptatibus placeat minima. Laborum excepturi quia dicta, neque repudiandae nobis.</p>
+    </div>
+    <div class="container">
+        <h3>This is CSS Box Model, Margin and Padding Tutorial</h3>
+        <p id="secondId">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Alias tenetur eligendi debitis ut
+            voluptatibus placeat minima. Laborum excepturi quia dicta, neque repudiandae nobis.</p>
+    </div>
+    <div class="container">
+        <h3>This is CSS Box Model, Margin and Padding Tutorial</h3>
+        <p id="thirdId">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Alias tenetur eligendi debitis ut
+            voluptatibus placeat minima. Laborum excepturi quia dicta, neque repudiandae nobis.</p>
+    </div>
+</body>
+
+</html>
