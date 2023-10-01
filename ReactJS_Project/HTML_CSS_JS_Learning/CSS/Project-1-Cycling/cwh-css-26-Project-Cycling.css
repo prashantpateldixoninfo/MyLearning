@@ -1,0 +1,117 @@
+   /* CSS Reset */
+   body {
+       margin: 0px;
+       padding: 0px;
+       background: url('snow-cycling.jpg');
+       font-family: 'Baloo Bhai';
+       /* font-size: 22px; */
+   }
+
+   .left {
+       /* border: 2px solid red; */
+       display: inline-block;
+       position: absolute;
+       left: 60px;
+       top: 20px;
+   }
+
+   .left img {
+       width: 100px;
+   }
+
+   .left div {
+       text-align: center;
+       color: darkblue;
+       background-color: blanchedalmond;
+       font-family: 'Baloo Bhai';
+       font-size: small;
+       font-weight: bold;
+       width: 100px;
+   }
+
+   .mid {
+       /* border: 2px solid blue; */
+       display: block;
+       width: 45%;
+       margin: 15px auto;
+       /* background-color: cornflowerblue; */
+   }
+
+   .navbar {
+       display: inline-block;
+       /* background-color:aquamarine; */
+   }
+
+   .navbar li {
+       display: inline-block;
+       font-size: 20px;
+       background-color: rgb(233, 195, 233, .6);
+   }
+
+   .navbar li a {
+       color: tomato;
+       text-decoration: none;
+       padding: 10px 13px;
+   }
+
+   .navbar li a:hover,
+   a:active {
+       text-decoration: underline;
+       color: orangered;
+   }
+
+   .right {
+       /* border: 2px solid green; */
+       display: inline-block;
+       position: absolute;
+       right: 34px;
+       top: 20px;
+   }
+
+   .btn {
+       margin: 0px 9px;
+       background-color: darkseagreen;
+       color: blue;
+       padding: 4px 14px;
+       border: 2px solid greenyellow;
+       border-radius: 10px;
+       font-size: 15px;
+       cursor: pointer;
+       font-family: 'Baloo Bhai';
+   }
+
+   .btn:hover {
+       background-color: chartreuse;
+   }
+
+   .container {
+       /* border: 2px solid orangered; */
+       margin: 106px 50px;
+       padding: 75px;
+       width: 33%;
+       border-radius: 28px;
+   }
+
+   .container h1 {
+       text-align: center;
+       color: coral;
+       font-size: 29px;
+   }
+
+   .container button {
+       display: block;
+       width: 90%;
+       margin: 20px auto;
+   }
+
+   .form-group input {
+       text-align: center;
+       display: block;
+       width: 350px;
+       padding: 1px;
+       border: 2px solid tomato;
+       margin: 3px auto;
+       font-size: 25px;
+       border-radius: 10px;
+       font-family: 'Baloo Bhai';
+   }
