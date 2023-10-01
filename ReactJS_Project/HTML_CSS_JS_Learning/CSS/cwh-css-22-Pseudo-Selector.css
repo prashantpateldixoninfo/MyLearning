@@ -1,0 +1,42 @@
+.container {
+    border: 2px solid tomato;
+    background-color: rgb(219, 243, 219);
+    padding: 34px;
+    margin: 34px auto;
+    width: 666px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    color: blue;
+    font-size: large;
+    background-color: tomato;
+}
+
+a:visited {
+    background-color: chartreuse;
+}
+
+a:active {
+    background-color: yellow;
+}
+
+.btn {
+    background-color: aquamarine;
+    font-weight: bold;
+    padding: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    border-radius: 4px;
+}
+
+.btn:hover {
+    color: darkgoldenrod;
+    background-color: blanchedalmond;
+    border: 2px solid black;
+}
