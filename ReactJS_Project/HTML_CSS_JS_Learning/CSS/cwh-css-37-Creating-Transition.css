@@ -1,0 +1,25 @@
+#box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    width: 200px;
+    background-color: tomato;
+    transition-property: background-color;
+    transition-duration: 3s;
+    transition-timing-function: ease-in-out;
+    transition-delay: 1s;
+
+    /* Transition short hand property in one line */
+    /* transition: background-color 1s ease-in-out 2s; */
+    transition: all 1s ease-in-out 2s;
+}
+
+#box:hover {
+    background-color: aqua;
+    height: 400px;
+    width: 400px;
+    border-radius: 100px;
+    border: 4px solid purple;
+    font-size: 45px;
+}

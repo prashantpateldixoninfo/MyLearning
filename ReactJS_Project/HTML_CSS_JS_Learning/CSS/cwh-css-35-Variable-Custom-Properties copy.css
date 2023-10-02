@@ -1,0 +1,25 @@
+:root {
+    /* Global variable */
+    --sec-box-color: purple;
+    --maxw: 233px;
+}
+
+.box {
+    --box-color: blue;
+    width: 200px;
+    height: 200px;
+    background-color: var(--box-color);
+    border: 2px solid red;
+    box-shadow: 3px 3px var(---sec-box-color);
+    margin: 2px 9px;
+}
+
+.container {
+    max-width: var(--maxw);
+    margin: auto;
+
+    background-color: var(--sec-box-color);
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}

@@ -1,0 +1,43 @@
+.container {
+    display: block;
+    width: 233px;
+    margin: auto;
+}
+
+input {
+    display: block;
+}
+
+input[type='text'] {
+    padding: 23px;
+    border: 2px solid red;
+}
+a[target] {
+    font-size: 34px;
+    color: violet;
+}
+a[target='_self'] {
+    font-size: 24px;
+    color: rgb(170, 23, 170);
+}
+/* This will apply to 3rd child */
+li:nth-child(3) {
+    font-size: 22px;
+    color: tomato;
+}
+/* This will apply to every second child */
+li:nth-child(2n+0) {
+    font-size: 22px;
+    color: purple;
+}
+
+/* Odd child */
+li:nth-child(odd) {
+    font-size: 22px;
+    color: blue;
+}
+/* Even child */
+li:nth-child(even) {
+    font-size: 22px;
+    color: tomato;
+}

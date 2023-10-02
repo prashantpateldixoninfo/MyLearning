@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Selectors</title>
+    <link rel="stylesheet" href="cwh-css-31-Selectors.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital@1&display=swap" rel="stylesheet">
+</head>
+<style>
+    h1 {
+        background-color: tomato;
+        color: black;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    /* Apply to all children(p) of div */
+    /* div p {
+        color: blue;
+        font-weight: bold;
+        background-color: yellow;
+    } */
+
+    /* If p is contained by any li which is contained by div */
+    /* div li p {
+        color: blue;
+        font-weight: bold;
+        background-color: yellow;
+    } */
+
+    /* Direct child(p) to div Or If p is right inside div then CSS will applied */
+    /* div > p { 
+        color: tomato;
+        font-weight: bold;
+        background-color: aqua;
+    } */
+
+    /* If div is previous sibling Or If p is right after div i.e. p is the next sibling of div */
+    div + p {
+        color: green;
+        background-color: yellowgreen;
+        font-weight: bold;
+    }
+</style>
+
+<body>
+    <h1>There is more on Selectors</h1>
+    <div class="container">
+        <div class="row">
+            <ul>
+                <li class="item"><p>This is anonther Paragraph in list</p></li>
+                <li>This will not affected</li>
+            </ul>
+            <p>This is Paragraph</p>
+        </div>
+        <p>This is another Paragraph</p>
+    </div>
+    <p>This is outermost Paragraph</p>
+</body>
+
+</html>
