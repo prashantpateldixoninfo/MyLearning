@@ -59,3 +59,6 @@ InterProcessCommunication/Signal/signal_184_alarm_func
 InterProcessCommunication/Signal/signal_187_alarm_from_cmd
 InterProcessCommunication/Signal/signal_189_open_user1
 InterProcessCommunication/Signal/signal_190_open_user1_user2
+.vscode
+.vscode\settings.json
+.vscode/settings.json
