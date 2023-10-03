@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Grid - Layout</title>
+    <link rel="stylesheet" href="cwh-css-44-CSS-Grid-Layout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital@1&display=swap" rel="stylesheet">
+</head>
+<style>
+    .container {
+        display: grid;
+        grid-gap: 1rem;
+        grid-template-areas:
+            'navbar navbar navbar navbar'
+            'section section section aside'
+            'footer footer footer footer';
+    }
+
+    .item {
+        background-color: yellowgreen;
+        border: 3px solid blue;
+        padding: 12px 23px;
+    }
+
+    #navbar {
+        grid-area: navbar;
+    }
+
+    #seciton {
+        grid-area: section;
+    }
+
+    #aside {
+        grid-area: aside;
+    }
+
+    footer {
+        grid-area: footer;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <div id="navbar" class="item">
+            Home About Contact Us
+        </div>
+        <div id="section" class="item">
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi aperiam reiciendis tempora aspernatur illum
+            fuga aliquam nisi officiis! A earum inventore autem natus?
+        </div>
+        <div id="aside" class="item">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere qui quod sunt?
+        </div>
+        <footer class="item">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis laudantium a dolorum?
+        </footer>
+    </div>
+</body>
+
+</html>

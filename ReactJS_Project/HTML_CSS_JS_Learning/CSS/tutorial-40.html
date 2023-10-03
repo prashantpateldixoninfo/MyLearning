@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Grid - Introduction</title>
+    <link rel="stylesheet" href="cwh-css-40-CSS-Grid-Introduction.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital@1&display=swap" rel="stylesheet">
+</head>
+<style>
+    .container {
+        display: grid;
+        /* grid-template-columns: 200px 300px 100px; */
+        /* grid-template-columns: 100px 200px auto; */
+        /* grid-template-columns: 1fr 4fr 1fr; */
+        grid-template-columns: repeat(5, auto);
+        grid-gap: 2rem;
+    }
+    .item {
+        /* height: 100px; */
+        /* width: 100px; */
+        background-color: coral;
+        padding: 15px 15px;
+        margin: 3px;
+        border: 2px solid blue;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <div class="item">This is item-1</div>
+        <div class="item">This is item-2</div>
+        <div class="item">This is item-3</div>
+        <div class="item">This is item-4</div>
+        <div class="item">This is item-5</div>
+        <div class="item">This is item-6</div>
+        <div class="item">This is item-7</div>
+        <div class="item">This is item-8</div>
+        <div class="item">This is item-9</div>
+    </div>
+</body>
+
+</html>

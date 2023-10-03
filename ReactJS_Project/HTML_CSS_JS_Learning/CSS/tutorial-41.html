@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Grid - Rows and Gaps</title>
+    <link rel="stylesheet" href="cwh-css-41-CSS-Grid-Rows-Gaps.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital@1&display=swap" rel="stylesheet">
+</head>
+<style>
+    .grid {
+        display: grid;
+        grid-template-rows: 1fr 3fr;
+        grid-auto-rows: 2fr;
+        grid-template-columns: 1fr 4fr 2fr;
+        grid-gap: 1rem;
+    }
+
+    .box {
+        background-color: tomato;
+        border: 2px solid blue;
+
+    }
+</style>
+
+<body>
+    <div class="grid">
+        <div class="box">This is box-1</div>
+        <div class="box">This is box-2</div>
+        <div class="box">This is box-3</div>
+        <div class="box">This is box-4</div>
+        <div class="box">This is box-5</div>
+        <div class="box">This is box-6</div>
+        <div class="box">This is box-7</div>
+        <div class="box">This is box-8</div>
+        <div class="box">This is box-9</div>
+        <div class="box">This is box-10</div>
+    </div>
+</body>
+
+</html>
