@@ -1,0 +1,30 @@
+//- index.pug
+doctype html
+html
+  head
+    title Prashant Dance Academy
+    style
+      include ../static/style.css
+  body
+    nav#navbar.top
+        ul
+            li #[a(href="/") Home ]
+            li #[a(href="/") About]
+            li #[a(href="/") Services]
+            li #[a(href="/") Class Info]
+            li #[a(href="/") Contact Us]
+    section#introSection
+        div.large Welcome to Prashant's Dance Academy
+        div.small Eat Sleep Dance and Repeat
+    
+    section#missionSection
+        h2 Our Mission
+
+    section#sponserSection
+        h2 Our Sponsers
+
+    footer#footer
+        | our footer here
+
+    script
+      include ../static/index.js

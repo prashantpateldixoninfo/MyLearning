@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@1,300&family=Ubuntu:ital@1&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@1,300&family=Ubuntu:ital@1&family=Yeon+Sung&display=swap'); */
+* {
+    font-family: 'Roboto Mono', monospace;
+    margin: 0px;
+    padding: 0px;
+}
+
+/* body::before{
+    opacity: 1;
+    content: "";
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    top: 0px;
+    position: absolute;
+    background: url('/static/bg.jpg') no-repeat center center;
+} */
+
+#navbar {
+    background-color: coral;
+    padding: 12px;
+}
+
+#navbar ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#navbar li {
+    list-style: none;
+}
+
+#navbar li a {
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 13px 30px;
+}
+
+#navbar li a:hover {
+    color:darkblue;
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+#introSection {
+    height: 300px;
+    color: white    ;
+    display: flex;
+    flex-direction: column;
+    font-size: 3rem;
+    justify-content: center;
+    align-items: center;
+    background-color: aqua;
+    background: center / contain no-repeat, #eee 35% url("../static/bg.jpg");
+    background-size: cover;
+    padding-bottom: 40px;
+}
+
+#introSection div.large {
+    color: crimson;
+    background-color: rgb(246, 222, 192, .2);
+    padding: 5px;
+}
+
+#introSection div.small {
+    font-size: 27px;
+    padding: 5px;
+}
+
+#sponserSection {
+    height: 300px;
+    background-color: chartreuse;
+}
+
+#sponserSection h2 {
+    text-align: center;
+    margin-top: 12px;
+}
+
+#footer {
+    height: 100px;
+    background-color: crimson;
+}
+
+
+
+
+/* h2 {
+    text-align: center;
+} */
+
+.container {
+    margin: 35px 0px;
+    /* background-color: yellowgreen; */
+    /* max-width: 100%; */
+}
+
+/* input,
+textarea {
+    display: block;
+    padding: 3px;
+    margin: 15px auto;
+    width: 60%;
+    outline: none;
+    border: 2px solid black;
+    border-radius: 5px;
+} */
+
+/* .btn {
+    margin: 4px auto;
+    display: block;
+    padding: 5px 12px;
+    background: #302d2d;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    border: 2px solid black;
+    border-radius: 9px;
+    cursor: pointer;
+    outline: none;
+} */
