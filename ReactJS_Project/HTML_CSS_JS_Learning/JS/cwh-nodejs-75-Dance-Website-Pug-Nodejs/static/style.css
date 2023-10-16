@@ -6,26 +6,30 @@
     padding: 0px;
 }
 
-/* body::before{
-    opacity: 1;
-    content: "";
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    top: 0px;
-    position: absolute;
-    background: url('/static/bg.jpg') no-repeat center center;
-} */
+#logo {
+    display: flex;
+    color: white;
+    align-items: center;
+    margin: 0 14px;
+    font-size: 28px;
+    margin-right: 40px;
+}
+
+#logo img {
+    height: 42px;
+    /* filter: invert(1); */
+}
 
 #navbar {
     background-color: coral;
-    padding: 12px;
+    padding: 13px 14px;
 }
 
 #navbar ul {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    /* justify-content: center; */
+    align-items: center;
 }
 
 #navbar li {
@@ -54,7 +58,7 @@
     justify-content: center;
     align-items: center;
     background-color: aqua;
-    background: center / contain no-repeat, #eee 35% url("../static/bg.jpg");
+    background: center / contain no-repeat, #eee 35% url("../static/img/bg.jpg");
     background-size: cover;
     padding-bottom: 40px;
 }
@@ -78,47 +82,64 @@
 #sponserSection h2 {
     text-align: center;
     margin-top: 12px;
+    font-size: 32px;
+}
+
+#missionSection {
+    margin: auto;
+    height: 326px;
+    width: 90%;
+    display: block;
+}
+
+#missionSection h2 {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 32px;
+}
+
+.card {
+    display: inline-block;
+    border: 2px solid black;
+    border-radius: 10px;
+    width: 25%;
+    margin: 18px 20px;
+    height: 210px;
+}
+
+.card h3 {
+    text-align: center;
+    margin: 0 12px;
+    margin-top: 15px;
+}
+
+.card-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-img {
+    height: 70px;
+    padding: 0 14px;
+    padding-top: 10px;
+    margin: 5px 9px;
+}
+
+.card-img img {
+    height: inherit;
+}
+
+.card-content {
+    padding: 0 10px;
+    padding-top: 10px;
+}
+
+.card-content p {
+    font-size: 15px;
 }
 
 #footer {
     height: 100px;
     background-color: crimson;
 }
-
-
-
-
-/* h2 {
-    text-align: center;
-} */
-
-.container {
-    margin: 35px 0px;
-    /* background-color: yellowgreen; */
-    /* max-width: 100%; */
-}
-
-/* input,
-textarea {
-    display: block;
-    padding: 3px;
-    margin: 15px auto;
-    width: 60%;
-    outline: none;
-    border: 2px solid black;
-    border-radius: 5px;
-} */
-
-/* .btn {
-    margin: 4px auto;
-    display: block;
-    padding: 5px 12px;
-    background: #302d2d;
-    color: white;
-    font-weight: bold;
-    font-size: 15px;
-    border: 2px solid black;
-    border-radius: 9px;
-    cursor: pointer;
-    outline: none;
-} */
