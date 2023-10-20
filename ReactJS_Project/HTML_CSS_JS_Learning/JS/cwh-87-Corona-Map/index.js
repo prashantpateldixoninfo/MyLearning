@@ -1,6 +1,6 @@
 function updateMap() {
     console.log("Updating map with realtime data")
-    fetch("/data.json")
+    fetch("data.json")
         .then(response => response.json())
         .then(rsp => {
             // console.log(rsp.data)
@@ -9,11 +9,11 @@ function updateMap() {
                 longitude = element.longitude;
 
                 cases = element.infected;
-                if (cases>255){
+                if (cases > 255) {
                     color = "rgb(255, 0, 0)";
                 }
 
-                else{
+                else {
                     color = `rgb(${cases}, 0, 0)`;
                 }
 
@@ -22,10 +22,10 @@ function updateMap() {
                     draggable: false,
                     color: color
                 }).setLngLat([longitude, latitude])
-                .addTo(map); 
+                    .addTo(map);
             });
         })
 }
 
 let interval = 20000;
-setInterval( updateMap, interval); 
+setInterval(updateMap, interval); 
