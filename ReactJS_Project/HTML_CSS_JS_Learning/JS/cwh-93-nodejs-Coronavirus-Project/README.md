@@ -5,6 +5,6 @@
     `1. Login as root (sudo su)`
     `2. Copy the content(index.html, bg.jpeg files) to /var/www/html/prashant`
     `3. vi /etc/nginx/sites-available/default`
-    `3. Change the root /var/www/html; code and replace with your own directory path. i.e /var/www/html/prashant `
-    `4. And Restart the nginx server --> systemctl restart nginx`
-    `5. Access the website from windows as 192.168.160.4`
+    `4. Change the root /var/www/html; code and replace with your own directory path. i.e /var/www/html/prashant `
+    `5. And Restart the nginx server --> systemctl restart nginx`
+    `6. Access the website from windows as 192.168.160.4`
