@@ -4,7 +4,7 @@ services:
     build: .
     image: mymovieworld
     #restart: always
-    deploy:
-      replicas: 2
+    #deploy:
+    #  replicas: 2
     ports:
       - 3333-3334:3333

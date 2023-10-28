@@ -51,7 +51,7 @@ docker-compose down
 docker stack deploy --compose-file=docker-compose.yaml movieapp-stack
 docker ps
 docker service ls
-docker stack rm movieapp-stack
+docker stack rm mymovieworld
 ```
 ### This will create 4 instances of Movie Application which run on 3333, 3334, 3335 and 3336 port and it has 2 replicas
    [http://localhost:3333](http://localhost:3333)
