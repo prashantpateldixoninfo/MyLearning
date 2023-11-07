@@ -1,33 +1,43 @@
-import React, { useState } from "react";
+import React from "react";
 
-export default function About() {
-  const [myStyle, setMyStyle] = useState({
-    color: "black",
-    backgroundColor: "white",
-  });
-
-  const [btntext, setBtnText] = useState("Enable Dark Mode")
-
-  const toggleStyle = () => {
-    if (myStyle.color === "white") {
-      setMyStyle({
-        color: "black",
-        backgroundColor: "white",
-      });
-      setBtnText("Enable Dark Mode");
-    } else {
-      setMyStyle({
-        color: "white",
-        backgroundColor: "black",
-        border: '1px solid white'
-      });
-      setBtnText("Enable Light Mode");
-    }
+export default function About(props) {
+  let myStyle = {
+    color: props.mode === "dark" ? "white" : "#042743",
+    background: props.mode === "dark" ? "rgb(36 74 104)" : "white",
   };
+
+  // const [myStyle, setMyStyle] = useState({
+  //   color: "black",
+  //   backgroundColor: "white",
+  // });
+
+  // const [btntext, setBtnText] = useState("Enable Dark Mode");
+
+  // const toggleStyle = () => {
+  //   if (myStyle.color === "white") {
+  //     setMyStyle({
+  //       color: "black",
+  //       backgroundColor: "white",
+  //     });
+  //     setBtnText("Enable Dark Mode");
+  //   } else {
+  //     setMyStyle({
+  //       color: "white",
+  //       backgroundColor: "black",
+  //       border: "1px solid white",
+  //     });
+  //     setBtnText("Enable Light Mode");
+  //   }
+  // };
 
   return (
     <div className="container" style={myStyle}>
-      <h1>About Us</h1>
+      <h1
+        className="my-3"
+        style={{ color: props.mode === "dark" ? "white" : "#042743" }}
+      >
+        About Us
+      </h1>
       <div className="accordion" id="accordionExample" style={myStyle}>
         <div className="accordion-item">
           <h2 className="accordion-header">
@@ -40,7 +50,7 @@ export default function About() {
               aria-controls="collapseOne"
               style={myStyle}
             >
-              Accordion Item #1
+              <strong style={myStyle}>Analyze your text</strong>
             </button>
           </h2>
           <div
@@ -49,14 +59,12 @@ export default function About() {
             data-bs-parent="#accordionExample"
           >
             <div className="accordion-body" style={myStyle}>
-              <strong>This is the first item's accordion body.</strong> It is
-              shown by default, until the collapse plugin adds the appropriate
-              classes that we use to style each element. These classes control
-              the overall appearance, as well as the showing and hiding via CSS
-              transitions. You can modify any of this with custom CSS or
-              overriding our default variables. It's also worth noting that just
-              about any HTML can go within the <code>.accordion-body</code>,
-              though the transition does limit overflow.
+              Text Analysis is about parsing texts in order to extract
+              machine-readable facts from them. The purpose of Text Analysis is
+              to create structured data out of free text content. The process
+              can be thought of as slicing and dicing heaps of unstructured,
+              heterogeneous documents into easy-to-manage and interpret data
+              pieces.
             </div>
           </div>
         </div>
@@ -71,7 +79,7 @@ export default function About() {
               aria-controls="collapseTwo"
               style={myStyle}
             >
-              Accordion Item #2
+              <strong>Free to use</strong>
             </button>
           </h2>
           <div
@@ -80,14 +88,8 @@ export default function About() {
             data-bs-parent="#accordionExample"
           >
             <div className="accordion-body" style={myStyle}>
-              <strong>This is the second item's accordion body.</strong> It is
-              hidden by default, until the collapse plugin adds the appropriate
-              classes that we use to style each element. These classes control
-              the overall appearance, as well as the showing and hiding via CSS
-              transitions. You can modify any of this with custom CSS or
-              overriding our default variables. It's also worth noting that just
-              about any HTML can go within the <code>.accordion-body</code>,
-              though the transition does limit overflow.
+              Try this free Product Description Generator that enables you to
+              create beautiful and effective product descriptions that sell.
             </div>
           </div>
         </div>
@@ -102,7 +104,7 @@ export default function About() {
               aria-controls="collapseThree"
               style={myStyle}
             >
-              Accordion Item #3
+              <strong>Browser compatible</strong>
             </button>
           </h2>
           <div
@@ -111,25 +113,22 @@ export default function About() {
             data-bs-parent="#accordionExample"
           >
             <div className="accordion-body" style={myStyle}>
-              <strong>This is the third item's accordion body.</strong> It is
-              hidden by default, until the collapse plugin adds the appropriate
-              classes that we use to style each element. These classes control
-              the overall appearance, as well as the showing and hiding via CSS
-              transitions. You can modify any of this with custom CSS or
-              overriding our default variables. It's also worth noting that just
-              about any HTML can go within the <code>.accordion-body</code>,
-              though the transition does limit overflow.
+              Browser compatibility means that your website can be 'translated'
+              effectively via a particular browser or operating system, such
+              that it can be accessed by and is fully functional for a user. A
+              site may behave perfectly in one browser but still have issues and
+              errors in others.
             </div>
           </div>
         </div>
       </div>
-      <button
+      {/* <button
         type="button"
         className="btn btn-primary my-3"
         onClick={toggleStyle}
       >
         {btntext}
-      </button>
+      </button> */}
     </div>
   );
 }
