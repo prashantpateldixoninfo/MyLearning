@@ -84,40 +84,18 @@ export class News extends Component {
       <div className="container my-3">
         <h2>NewsMonkey - Top Headlines</h2>
         <div className="row">
-          <div className="col-md-4">
-            <NewsItem
-              title="myTitle"
-              description="mydesc"
-              imgUrl="https://s.yimg.com/ny/api/res/1.2/bRmWzDNSXweMe1uAxLqe3Q--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyMDA7aD03OTU-/https://s.yimg.com/os/creatr-uploaded-images/2023-11/6ff84da0-898a-11ee-b9f7-a1145415d71d"
-              newsUrl = "TODO"
-            />
-          </div>
-          <div className="col-md-4">
-            <NewsItem
-              title="myTitle"
-              description="mydesc"
-              imgUrl="https://s.yimg.com/ny/api/res/1.2/bRmWzDNSXweMe1uAxLqe3Q--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyMDA7aD03OTU-/https://s.yimg.com/os/creatr-uploaded-images/2023-11/6ff84da0-898a-11ee-b9f7-a1145415d71d"
-              newsUrl = "TODO"
-            />
-          </div>
-          <div className="col-md-4">
-            <NewsItem
-              title="myTitle"
-              description="mydesc"
-              imgUrl="https://s.yimg.com/ny/api/res/1.2/bRmWzDNSXweMe1uAxLqe3Q--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyMDA7aD03OTU-/https://s.yimg.com/os/creatr-uploaded-images/2023-11/6ff84da0-898a-11ee-b9f7-a1145415d71d"
-              newsUrl = "TODO"
-            />
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-4">
-            <NewsItem
-              title="myTitle"
-              description="mydesc"
-              imgUrl="https://s.yimg.com/ny/api/res/1.2/bRmWzDNSXweMe1uAxLqe3Q--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyMDA7aD03OTU-/https://s.yimg.com/os/creatr-uploaded-images/2023-11/6ff84da0-898a-11ee-b9f7-a1145415d71d"
-              newsUrl = "TODO"
-            />
-          </div>
+          {this.state.articles.map((element) => {
+            return (
+              <div className="col-md-4" key={element.url}>
+                <NewsItem
+                  title={element.title.slice(0, 45)}
+                  description={element.description.slice(0, 88)}
+                  imgUrl={element.urlToImage}
+                  newsUrl={element.url}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     );
