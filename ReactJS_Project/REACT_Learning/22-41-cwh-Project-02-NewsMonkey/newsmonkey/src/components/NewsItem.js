@@ -7,7 +7,7 @@ export class NewsItem extends Component {
       <div className="my-3">
         <div className="card" style={{ width: "18rem" }}>
           <img
-            src={imgUrl ? imgUrl : require('./../images/noImg.png')}
+            src={imgUrl ? imgUrl : require("./../images/noImg.png")}
             className="card-img-top"
             alt="..."
           />
@@ -18,7 +18,7 @@ export class NewsItem extends Component {
               href={newsUrl}
               target="_blank"
               rel="noreferrer"
-              className="btn btn-sm btn-primary"
+              className="btn btn-sm btn-dark"
             >
               Read More
             </a>
