@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import NewsItem from "./NewsItem";
 import Spinner from "./Spinner";
+import PropTypes from "prop-types";
 
 export class News extends Component {
   articles = [
@@ -73,6 +74,19 @@ export class News extends Component {
         "It feels like the perfect night… to send another couple home. On Tuesday night’s “Dancing With the Stars,” each pair took on a Taylor Swift song. Mandy Moore, the lead choreographer on the “Eras Tour… [+927 chars]",
     },
   ];
+
+  static defaultProps = {
+    country: "us",
+    pageSize: 10,
+    category: "general",
+  };
+
+  static propTypes = {
+    country: PropTypes.string,
+    pageSize: PropTypes.number,
+    category: PropTypes.string,
+  };
+
   constructor() {
     super();
     this.state = {
@@ -83,7 +97,7 @@ export class News extends Component {
   }
 
   async componentDidMount() {
-    let url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=1&pagesize=${this.props.pageSize}`;
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=1&pagesize=${this.props.pageSize}`;
     this.setState({ loading: true });
     let data = await fetch(url);
     let parsedData = await data.json();
@@ -95,7 +109,7 @@ export class News extends Component {
   }
 
   handlePrevClick = async () => {
-    let url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=${
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=${
       this.state.page - 1
     }&pagesize=${this.props.pageSize}`;
     this.setState({ loading: true });
@@ -113,7 +127,7 @@ export class News extends Component {
       Math.ceil(this.state.totalArticles / this.props.pageSize) >
       this.state.page + 1
     ) {
-      let url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=${
+      let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=${
         this.state.page + 1
       }&pagesize=${this.props.pageSize}`;
       this.setState({ loading: true });
@@ -130,21 +144,22 @@ export class News extends Component {
   render() {
     return (
       <div className="container my-3">
-        <h1 className="text-center">NewsMonkey - Top Headlines</h1>
+        <h1 className="text-center" style={{margin: "30px 0px"}}>NewsMonkey - Top Headlines</h1>
         {this.state.loading && <Spinner />}
         <div className="row">
-          {!this.state.loading && this.state.articles.map((element) => {
-            return (
-              <div className="col-md-4" key={element.url}>
-                <NewsItem
-                  title={element.title ? element.title : ""}
-                  description={element.description ? element.description : ""}
-                  imgUrl={element.urlToImage}
-                  newsUrl={element.url}
-                />
-              </div>
-            );
-          })}
+          {!this.state.loading &&
+            this.state.articles.map((element) => {
+              return (
+                <div className="col-md-4" key={element.url}>
+                  <NewsItem
+                    title={element.title ? element.title : ""}
+                    description={element.description ? element.description : ""}
+                    imgUrl={element.urlToImage}
+                    newsUrl={element.url}
+                  />
+                </div>
+              );
+            })}
         </div>
         <div className="container d-flex justify-content-between">
           <button
