@@ -156,6 +156,9 @@ export class News extends Component {
                     description={element.description ? element.description : ""}
                     imgUrl={element.urlToImage}
                     newsUrl={element.url}
+                    auther={element.author ? element.author : "Unknown"}
+                    date={element.publishedAt ? new Date(element.publishedAt).toGMTString(): "No Date"}
+                    source={element.source.name ? element.source.name : "Unknown"}
                   />
                 </div>
               );
