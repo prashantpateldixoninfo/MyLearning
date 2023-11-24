@@ -2,13 +2,13 @@ import React, { Component } from "react";
 
 export class NewsItem extends Component {
   render() {
-    let { title, description, imgUrl, newsUrl, auther, date, source } =
+    let { title, description, imgUrl, newsUrl, auther, date, source, badgeColor } =
       this.props;
     return (
       <div className="my-3">
         <div className="card">
           <span
-            className="position-absolute top-0 translate-middle badge rounded-pill bg-danger"
+            className={`position-absolute top-0 translate-middle badge rounded-pill bg-${badgeColor}`}
             style={{ zIndex: 1, left: "90%" }}
           >
             {source}
@@ -22,7 +22,7 @@ export class NewsItem extends Component {
             <h5 className="card-title">{title}...</h5>
             <p className="card-text">{description}...</p>
             <p className="card-text">
-              <small className="text-muted">
+              <small className={`bg-light text-danger-emphasis`}>
                 By {auther} on {date}
               </small>
             </p>

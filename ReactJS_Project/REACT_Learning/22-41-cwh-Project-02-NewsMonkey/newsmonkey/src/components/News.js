@@ -90,61 +90,61 @@ export class News extends Component {
   constructor() {
     super();
     this.state = {
-      articles: this.articles,
-      loading: false,
       page: 1,
+      articles: [], //this.articles,
+      totalArticles: 0,
+      loading: false,
     };
   }
 
-  async componentDidMount() {
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=1&pagesize=${this.props.pageSize}`;
+  async updateNews(pageNo) {
+    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=${pageNo}&pagesize=${this.props.pageSize}`;
+
     this.setState({ loading: true });
     let data = await fetch(url);
     let parsedData = await data.json();
     this.setState({
+      page: pageNo,
       articles: parsedData.articles,
       totalArticles: parsedData.totalResults,
       loading: false,
     });
   }
 
+  async componentDidMount() {
+    this.updateNews(1);
+  }
+
   handlePrevClick = async () => {
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=${
-      this.state.page - 1
-    }&pagesize=${this.props.pageSize}`;
-    this.setState({ loading: true });
-    let data = await fetch(url);
-    let parsedData = await data.json();
-    this.setState({
-      page: this.state.page - 1,
-      articles: parsedData.articles,
-      loading: false,
-    });
+    this.updateNews(this.state.page - 1);
   };
 
   handleNextClick = async () => {
+    const nextPageNo = this.state.page + 1;
     if (
-      Math.ceil(this.state.totalArticles / this.props.pageSize) >
-      this.state.page + 1
+      Math.ceil(this.state.totalArticles / this.props.pageSize) > nextPageNo
     ) {
-      let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=9f8c2bef75eb45fa9d6c27cfe78a077e&page=${
-        this.state.page + 1
-      }&pagesize=${this.props.pageSize}`;
-      this.setState({ loading: true });
-      let data = await fetch(url);
-      let parsedData = await data.json();
-      this.setState({
-        page: this.state.page + 1,
-        articles: parsedData.articles,
-        loading: false,
-      });
+      this.updateNews(nextPageNo);
     }
+  };
+
+  handleBadgeColor = () => {
+    if (this.props.category === "business") return "primary p-2";
+    else if (this.props.category === "entertainment") return "warning p-2";
+    else if (this.props.category === "general") return "info p-2";
+    else if (this.props.category === "health") return "success p-2";
+    else if (this.props.category === "science") return "danger p-2";
+    else if (this.props.category === "sports") return "dark p-2";
+    else if (this.props.category === "technology") return "danger p-2";
+    else return "light p-2";
   };
 
   render() {
     return (
       <div className="container my-3">
-        <h1 className="text-center" style={{margin: "30px 0px"}}>NewsMonkey - Top Headlines</h1>
+        <h1 className="text-center" style={{ margin: "30px 0px" }}>
+          NewsMonkey - Top Headlines
+        </h1>
         {this.state.loading && <Spinner />}
         <div className="row">
           {!this.state.loading &&
@@ -157,8 +157,15 @@ export class News extends Component {
                     imgUrl={element.urlToImage}
                     newsUrl={element.url}
                     auther={element.author ? element.author : "Unknown"}
-                    date={element.publishedAt ? new Date(element.publishedAt).toGMTString(): "No Date"}
-                    source={element.source.name ? element.source.name : "Unknown"}
+                    date={
+                      element.publishedAt
+                        ? new Date(element.publishedAt).toGMTString()
+                        : "No Date"
+                    }
+                    source={
+                      element.source.name ? element.source.name : "Unknown"
+                    }
+                    badgeColor={this.handleBadgeColor()}
                   />
                 </div>
               );
