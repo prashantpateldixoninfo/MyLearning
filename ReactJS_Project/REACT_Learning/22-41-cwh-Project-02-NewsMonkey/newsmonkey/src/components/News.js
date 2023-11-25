@@ -87,14 +87,17 @@ export class News extends Component {
     category: PropTypes.string,
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       page: 1,
       articles: [], //this.articles,
       totalArticles: 0,
       loading: false,
     };
+    document.title = `${
+      this.props.category.charAt(0).toUpperCase() + this.props.category.slice(1)
+    } - NewsMonkey`;
   }
 
   async updateNews(pageNo) {
@@ -143,7 +146,10 @@ export class News extends Component {
     return (
       <div className="container my-3">
         <h1 className="text-center" style={{ margin: "30px 0px" }}>
-          NewsMonkey - Top Headlines
+          NewsMonkey - Top{" "}
+          {this.props.category.charAt(0).toUpperCase() +
+            this.props.category.slice(1)}{" "}
+          Headlines
         </h1>
         {this.state.loading && <Spinner />}
         <div className="row">
