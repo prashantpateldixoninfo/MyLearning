@@ -2,17 +2,31 @@ import React, { Component } from "react";
 
 export class NewsItem extends Component {
   render() {
-    let { title, description, imgUrl, newsUrl, auther, date, source, badgeColor } =
-      this.props;
+    let {
+      title,
+      description,
+      imgUrl,
+      newsUrl,
+      auther,
+      date,
+      source,
+      badgeColor,
+    } = this.props;
     return (
       <div className="my-3">
         <div className="card">
-          <span
-            className={`position-absolute top-0 translate-middle badge rounded-pill bg-${badgeColor}`}
-            style={{ zIndex: 1, left: "90%" }}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              position: "absolute",
+              right: 0,
+            }}
           >
-            {source}
-          </span>
+            <span className={`badge rounded-pill bg-${badgeColor}`}>
+              {source}
+            </span>
+          </div>
           <img
             src={imgUrl ? imgUrl : require("./../images/noImg.png")}
             className="card-img-top"
