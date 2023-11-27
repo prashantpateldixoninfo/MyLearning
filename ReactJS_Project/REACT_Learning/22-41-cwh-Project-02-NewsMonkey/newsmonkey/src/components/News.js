@@ -5,9 +5,7 @@ import PropTypes from "prop-types";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 const News = (props) => {
-  // document.title = `${
-  //   props.category.charAt(0).toUpperCase() + props.category.slice(1)
-  // } - NewsMonkey`;
+  document.title = `${props.category.charAt(0).toUpperCase() + props.category.slice(1)} - NewsMonkey`;            
 
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -31,6 +29,7 @@ const News = (props) => {
 
   useEffect(() => {
     updateNews();
+    // eslint-disable-next-line
   }, []);
 
   // const handlePrevClick = async () => {
@@ -45,9 +44,8 @@ const News = (props) => {
   // };
 
   const fetchMoreData = async () => {
+    const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${page + 1}&pagesize=${props.pageSize}`;
     setPage(page + 1);
-    const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pagesize=${props.pageSize}`;
-
     let data = await fetch(url);
     let parsedData = await data.json();
     setArticles(articles.concat(parsedData.articles));
@@ -67,18 +65,11 @@ const News = (props) => {
 
   return (
     <>
-      <h1 className="text-center" style={{ margin: "30px 0px" }}>
-        NewsMonkey - Top{" "}
-        {props.category.charAt(0).toUpperCase() + props.category.slice(1)}{" "}
-        Headlines
+      <h1 className="text-center" style={{ margin: "30px 0px", marginTop: "90px" }}>
+        NewsMonkey - Top {props.category.charAt(0).toUpperCase() + props.category.slice(1)} Headlines
       </h1>
       {loading && <Spinner />}
-      <InfiniteScroll
-        dataLength={articles.length}
-        next={fetchMoreData}
-        hasMore={articles.length !== totalResults}
-        loader={loading && <Spinner />}
-      >
+      <InfiniteScroll dataLength={articles.length} next={fetchMoreData} hasMore={articles.length !== totalResults} loader={loading && <Spinner />}>
         <div className="container">
           <div className="row">
             {articles.map((element) => {
@@ -90,14 +81,8 @@ const News = (props) => {
                     imgUrl={element.urlToImage}
                     newsUrl={element.url}
                     auther={element.author ? element.author : "Unknown"}
-                    date={
-                      element.publishedAt
-                        ? new Date(element.publishedAt).toGMTString()
-                        : "No Date"
-                    }
-                    source={
-                      element.source.name ? element.source.name : "Unknown"
-                    }
+                    date={element.publishedAt ? new Date(element.publishedAt).toGMTString() : "No Date"}
+                    source={element.source.name ? element.source.name : "Unknown"}
                     badgeColor={handleBadgeColor()}
                   />
                 </div>
