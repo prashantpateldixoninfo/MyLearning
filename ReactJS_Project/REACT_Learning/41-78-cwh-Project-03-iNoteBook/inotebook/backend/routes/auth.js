@@ -3,11 +3,12 @@ const { body, validationResult } = require("express-validator");
 const User = require("../models/User");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+var jwt = require("jsonwebtoken");
+const fetchuser = require("../middleware/fetchuser");
 
 const JWT_SECRET = "Hello-JWT";
 
-// Create a User using: POST "/api/auth/createuser". No login required
+// ROUTE 1: Create a User using: POST "/api/auth/createuser". No login required
 router.post("/createuser", [body("name").isLength({ min: 3 }), body("email").isEmail(), body("password").isLength({ min: 5 })], async (req, res) => {
   // If there are errors, return Bad request and the errors
   const errors = validationResult(req);
@@ -41,7 +42,7 @@ router.post("/createuser", [body("name").isLength({ min: 3 }), body("email").isE
   }
 });
 
-// Create a User using: POST "/api/auth/login".
+// ROUTE 2: Create a User using: POST "/api/auth/login". No login required
 router.post("/login", [body("email", "Enter a valid email").isEmail(), body("password", "Password cannot be blank").exists()], async (req, res) => {
   // If there are errors, return Bad request and the errors
   const errors = validationResult(req);
@@ -50,7 +51,7 @@ router.post("/login", [body("email", "Enter a valid email").isEmail(), body("pas
   }
   const { email, password } = req.body;
   try {
-    let user = await User.findOne({email});
+    let user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ error: "Please try to login with correct credentials" });
     }
@@ -65,6 +66,18 @@ router.post("/login", [body("email", "Enter a valid email").isEmail(), body("pas
     };
     const authToken = jwt.sign(data, JWT_SECRET);
     res.json({ authToken });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("Internal Server Error " + error.message);
+  }
+});
+
+// ROUTE 3: Get loggedin User Details using: POST "/api/auth/getuser". Login required
+router.post("/getuser", fetchuser, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId).select("-password");
+    res.send(user);
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Internal Server Error " + error.message);
