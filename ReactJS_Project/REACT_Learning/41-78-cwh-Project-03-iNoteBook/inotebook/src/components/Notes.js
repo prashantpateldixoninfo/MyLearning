@@ -16,7 +16,7 @@ export default function Notes() {
   const refClose = useRef(null);
 
   const updateNote = (currentNote) => {
-    console.log(note);
+    console.log("currentNote => " + JSON.stringify(currentNote));
     ref.current.click();
     setNote({ id: currentNote._id, etitle: currentNote.title, edescription: currentNote.description, etag: currentNote.tag });
   };
@@ -27,7 +27,7 @@ export default function Notes() {
     editNote(note.id, note.etitle, note.edescription, note.etag);
     refClose.current.click();
   };
-  
+
   const handleChange = (e) => {
     setNote({ ...note, [e.target.name]: e.target.value });
   };
@@ -75,7 +75,7 @@ export default function Notes() {
               <button ref={refClose} type="button" className="btn btn-secondary" data-bs-dismiss="modal">
                 Close
               </button>
-              <button type="button" className="btn btn-primary" onClick={handleClick}>
+              <button disabled={note.etitle.length < 5 || note.edescription.length < 5} type="button" className="btn btn-primary" onClick={handleClick}>
                 Update Note
               </button>
             </div>
@@ -85,6 +85,7 @@ export default function Notes() {
 
       <div className="row my-3">
         <h2>Your's Notes</h2>
+        <div className="container">{notes.length === 0 && "No notes to display"}</div>
         {notes.map((note) => {
           return <NoteItems key={note._id} updateNote={updateNote} note={note} />;
         })}
