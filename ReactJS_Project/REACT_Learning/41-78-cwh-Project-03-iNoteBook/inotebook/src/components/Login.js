@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const host = "http://localhost:5000";
 
-const Login = () => {
+const Login = (props) => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -25,12 +25,12 @@ const Login = () => {
     const json = await response.json();
     console.log(json);
     if (json.success) {
-      alert("Loged In Successfully");
       // Save the auth token and redirect
       localStorage.setItem("auth-token", json.authToken);
       navigate("/");
+      props.showAlert("Logged In Successfully", "success");
     } else {
-      alert("Invalid Credential : " + json.error);
+      props.showAlert("Invalid Details : " + json.error, "warning");
     }
   };
 

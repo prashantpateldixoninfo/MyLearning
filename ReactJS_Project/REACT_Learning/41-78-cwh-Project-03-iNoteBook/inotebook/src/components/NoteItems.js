@@ -3,7 +3,7 @@ import NoteContext from "../context/notes/NoteContext";
 
 const NoteItems = (props) => {
   const context = useContext(NoteContext);
-  const { deleteNote  } = context;
+  const { deleteNote } = context;
   const { note, updateNote } = props;
   return (
     <div className="col-md-3">
@@ -11,8 +11,19 @@ const NoteItems = (props) => {
         <div className="card-body">
           <div className="d-flex align-items-center">
             <h5 className="card-title">{note.title}</h5>
-            <i className="far fa-edit mx-2" onClick={() => {updateNote(note)}}></i>
-            <i className="far fa-trash-alt mx-2" onClick={()=> {deleteNote(note._id)}}></i>
+            <i
+              className="far fa-edit mx-2"
+              onClick={() => {
+                updateNote(note);
+              }}
+            ></i>
+            <i
+              className="far fa-trash-alt mx-2"
+              onClick={() => {
+                deleteNote(note._id);
+                props.showAlert("Deleted Successfully", "success");
+              }}
+            ></i>
           </div>
           <p className="card-text">{note.description}</p>
         </div>

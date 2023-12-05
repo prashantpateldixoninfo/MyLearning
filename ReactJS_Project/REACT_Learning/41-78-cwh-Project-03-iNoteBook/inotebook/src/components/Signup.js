@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 
 const host = "http://localhost:5000";
 
-const Signup = () => {
+const Signup = (props) => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (e.target[2].value !== e.target[3].value) {
-      alert("Password mismatch !!!");
+      props.showAlert("Password mismatch !!!", "info");
       return;
     }
     const user = {
@@ -30,11 +30,11 @@ const Signup = () => {
     const json = await response.json();
     console.log(json);
     if (json.success) {
-      alert("User Created Successfully");
+      props.showAlert("Account Created Successfully", "success");
       // Redirect to home page
       navigate("/");
     } else {
-      alert("Invalid User : " + json.error);
+      props.showAlert("Invalid Credential : " + json.error, "warning");
     }
   };
 
