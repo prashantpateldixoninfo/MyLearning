@@ -1,4 +1,4 @@
-export default reducer = (state = 0, action) => {
+const reducer = (state = 0, action) => {
   if (action === "deposit") {
     return state + action.payload;
   } else if (action === "withdraw") {
@@ -7,3 +7,5 @@ export default reducer = (state = 0, action) => {
     return state;
   }
 };
+
+export default reducer;
