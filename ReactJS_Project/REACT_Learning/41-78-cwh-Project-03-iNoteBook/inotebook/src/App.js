@@ -5,7 +5,7 @@ import Home from "./components/Home";
 import About from "./components/About";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
-import NoteState from "./context/notes/NoteState";
+import NoteState from "./context/notes/noteState";
 import Alert from "./components/Alert";
 import React, { useState } from "react";
 
@@ -30,7 +30,7 @@ function App() {
           <Alert alert={alert} />
           <div className="container">
             <Routes>
-              <Route exact path="/" element={<Home key="inotebook" />} />
+              <Route exact path="/" element={<Home showAlert={showAlert} key="inotebook" />} />
               <Route exact path="/home" element={<Home showAlert={showAlert} key="home" />} />
               <Route exact path="/about" element={<About key="about" />} />
               <Route exact path="/login" element={<Login showAlert={showAlert} key="login" />} />

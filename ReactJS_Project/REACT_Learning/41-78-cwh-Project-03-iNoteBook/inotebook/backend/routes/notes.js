@@ -10,7 +10,6 @@ router.get("/fetchallnotes", fetchuser, async (req, res) => {
     const notes = await Note.find({ user: req.user.id });
     res.json(notes);
   } catch (error) {
-    console.log(error.message);
     res.status(500).send("Internal Server Error " + error.message);
   }
 });
@@ -34,7 +33,6 @@ router.post("/addnote", fetchuser, [body("title", "Enter a valid title").isLengt
     const saveNotes = await note.save();
     res.json(note);
   } catch (error) {
-    console.log(error.message);
     res.status(500).send("Internal Server Error " + error.message);
   }
 });
@@ -67,7 +65,6 @@ router.put("/updatenote/:id", fetchuser, async (req, res) => {
     note = await Note.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true });
     res.json(note);
   } catch (error) {
-    console.log(error.message);
     res.status(500).send("Internal Server Error " + error.message);
   }
 });
@@ -88,7 +85,6 @@ router.delete("/deletenote/:id", fetchuser, async (req, res) => {
     note = await Note.findByIdAndDelete(req.params.id);
     res.json({ Success: "Note has been deleted successfully", note: note });
   } catch (error) {
-    console.log(error.message);
     res.status(500).send("Internal Server Error " + error.message);
   }
 });

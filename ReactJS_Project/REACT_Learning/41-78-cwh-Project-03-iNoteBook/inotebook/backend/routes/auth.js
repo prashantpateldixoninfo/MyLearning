@@ -37,7 +37,6 @@ router.post("/createuser", [body("name").isLength({ min: 3 }), body("email").isE
     const authToken = jwt.sign(data, JWT_SECRET);
     res.json({ success: true, authToken });
   } catch (error) {
-    console.log(error.message);
     res.status(500).send("Internal Server Error " + error.message);
   }
 });
@@ -67,7 +66,6 @@ router.post("/login", [body("email", "Enter a valid email").isEmail(), body("pas
     const authToken = jwt.sign(data, JWT_SECRET);
     res.json({ success: true, authToken });
   } catch (error) {
-    console.log(error.message);
     res.status(500).send("Internal Server Error " + error.message);
   }
 });
@@ -79,7 +77,6 @@ router.post("/getuser", fetchuser, async (req, res) => {
     const user = await User.findById(userId).select("-password");
     res.send(user);
   } catch (error) {
-    console.log(error.message);
     res.status(500).send("Internal Server Error " + error.message);
   }
 });

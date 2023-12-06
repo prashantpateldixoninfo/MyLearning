@@ -13,7 +13,6 @@ const Login = (props) => {
       email: e.target[0].value,
       password: e.target[1].value,
     };
-    console.log(auth);
 
     const response = await fetch(`${host}/api/auth/login`, {
       method: "POST",
@@ -23,7 +22,7 @@ const Login = (props) => {
       body: JSON.stringify(auth),
     });
     const json = await response.json();
-    console.log(json);
+
     if (json.success) {
       // Save the auth token and redirect
       localStorage.setItem("auth-token", json.authToken);
@@ -34,8 +33,9 @@ const Login = (props) => {
     }
   };
 
-  return (
-    <div>
+  return (  
+    <div className="mt-2">
+      <h2 className="my-3 p-3 text-success-emphasis bg-success-subtle border border-success-subtle rounded-3" style={{width: "20rem"}}><u>Login to iNoteBook</u></h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="email" className="form-label">
