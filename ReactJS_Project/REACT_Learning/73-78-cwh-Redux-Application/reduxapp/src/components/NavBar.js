@@ -1,8 +1,11 @@
 import { React } from "react";
+import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
 export default function NavBar() {
   let location = useLocation();
+
+  const amount = useSelector((state) => state.amount);
 
   return (
     <div>
@@ -36,7 +39,7 @@ export default function NavBar() {
               </li>
             </ul>
             <button disabled={true} className="btn btn-primary">
-              Your Balance : 10000
+              Your Balance : {amount}
             </button>
           </div>
         </div>
