@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 export default function NavBar() {
   let location = useLocation();
 
-  const amount = useSelector((state) => state.amount);
+  const amount = useSelector((state) => state.counter.value);
 
   return (
     <div>

@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
-import Shop from "./components/Shop";
+import { Counter } from "./redux/action-reducer/Counter";
 import Home from "./components/Home";
 import About from "./components/About";
 
@@ -11,7 +11,7 @@ function App() {
       <BrowserRouter>
         <NavBar />
         <div className="container">
-          <Shop />
+          <Counter />
         </div>
         <div className="container">
           <Routes>
