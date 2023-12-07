@@ -16,6 +16,8 @@
     Get the dispatch function with the useDispatch hook, and dispatch actions as needed
 
 
+![Redux Data Flow](public/redux-dataflow.gif)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
