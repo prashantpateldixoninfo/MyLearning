@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Navbar Using Flexbox</title>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Baloo+Bhai+2&family=Baloo+Thambi+2:wght@500&family=Poppins:wght@200&family=Roboto+Mono:ital,wght@1,300&family=Ubuntu:ital@1&family=Yeon+Sung&display=swap");
+        </style>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+                background-color: black;
+                font-family: "Baloo Bhai 2", sans-serif;
+            }
+
+            nav {
+                border: 2px solid tomato;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            nav .img {
+                border: 2px solid white;
+                margin-left: 50px;
+            }
+
+            nav ul {
+                border: 2px solid white;
+                list-style: none;
+                display: flex;
+                flex-direction: row;
+                column-gap: 20px;
+                flex: 3;
+                justify-content: flex-end;
+                margin-right: 30px;
+            }
+
+            nav ul li {
+                border: 2px solid green;
+            }
+
+            nav ul li a {
+                text-decoration: none;
+                font-weight: bold;
+                transition: color 0.3s;
+                color: white;
+            }
+
+            nav ul li a:hover {
+                color: #ffd700;
+            }
+            nav .img-speak {
+                border: 2px solid white;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Design this website's Navbar Using Flexbox -->
+        <nav>
+            <img class="img" src="UltraEditLogo.png" alt="UltraEdit" />
+            <ul>
+                <li><a href="/">Products</a></li>
+                <li><a href="/">Pricing</a></li>
+                <li><a href="/">Recources</a></li>
+                <li><a href="/">About us</a></li>
+            </ul>
+            <img class="img-speak" src="Speak.png" alt="Speak" />
+        </nav>
+    </body>
+</html>
