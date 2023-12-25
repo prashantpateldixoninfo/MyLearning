@@ -1,0 +1,17 @@
+{
+  "name": "veg-cart-backend",
+  "version": "1.0.0",
+  "description": "This project will take care of backend logic of veg-card",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "prashant",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
