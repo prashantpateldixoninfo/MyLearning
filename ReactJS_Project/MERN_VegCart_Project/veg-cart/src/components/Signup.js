@@ -40,13 +40,13 @@ const Signup = (props) => {
 
     const handleRadioButtonInput = (radioInput) => {
         setReadio(radioInput.target.value);
-        console.log(radioInput.target.value);
+        // console.log(radioInput.target.value);
     };
 
     return (
         <div className="container d-flex justify-content-center align-items-center">
             <form className="p-1 bg-white rounded shadow border border-2 border-info" style={{ width: "500px" }} onSubmit={handleSubmit}>
-                <h2 className="text-center text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3">Create vCart account</h2>
+                <h2 className="text-center text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3">Create vCart Account</h2>
                 <div className="mb-3">
                     <label className="form-label form-check-inline" htmlFor="user-buyer user-seller">
                         <b style={{ color: "blue" }}>User Type</b>
@@ -99,8 +99,8 @@ const Signup = (props) => {
                         <input type="password" className="form-control" id="passcode" name="passcode" minLength={5} required />
                     </div>
                 )}
-                <button type="submit" className="btn btn-primary">
-                    Submit
+                <button type="submit" className="btn btn-magick btn3d d-grid mx-auto">
+                    Create
                 </button>
             </form>
         </div>
