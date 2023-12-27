@@ -7,25 +7,35 @@ const Signup = (props) => {
     const navigate = useNavigate();
     const [radio, setReadio] = useState("buyer");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (formInput) => {
+        formInput.preventDefault();
 
-        if (e.target[2].value !== e.target[3].value) {
+        // console.log("handleSubmit =>", formInput);
+
+        if (formInput.target[4].value !== formInput.target[5].value) {
             props.showAlert("Password mismatch !!!", "info");
             return;
         }
-        const user = {
-            name: e.target[0].value,
-            email: e.target[1].value,
-            password: e.target[2].value,
+        if (formInput.target[1].checked && formInput.target[6].value !== "Dixon#321") {
+            props.showAlert("PassCode mismatch !!!", "info");
+            return;
+        }
+
+        const userInfo = {
+            name: formInput.target[2].value,
+            email: formInput.target[3].value,
+            password: formInput.target[4].value,
+            user_type: formInput.target[0].checked ? formInput.target[0].value : formInput.target[1].value,
         };
+
+        console.log("userInfo =>", userInfo);
 
         const response = await fetch(`${host}/api/auth/createuser`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(user),
+            body: JSON.stringify(userInfo),
         });
         const json = await response.json();
 
