@@ -44,3 +44,11 @@
 `Access to fetch at 'http://localhost:5000/api/auth/createuser' from origin 'http://localhost:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.`
 
     `npm install cors`
+
+### Add the script(`both`) in `package.json` file to start both frontend(ReactJS) and backend(NodeJS) together on single terminal.First install concurrently library And then run as `npm run both` from frontend.
+
+    `npm install concurrently`
+    `"scripts": {
+        ...,
+        "both": "concurrently \"npm run start\" \"nodemon backend/index.js\""
+    }`
