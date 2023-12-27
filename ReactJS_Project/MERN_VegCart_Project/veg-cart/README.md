@@ -14,18 +14,22 @@ You may also see any lint errors in the console.
 
 ### Added the Signup Page with below Form Inputs
 
-`User Type: <Buyer or Seller>`
-`Name: <min 5 chars>`
-`Email: <Valid email>`
-`Password: <min 5 chars>`
-`Re-Password: <min 5 chars>`
-`PassCode: <Only Applicable for Seller>`
+```
+    User Type: <Buyer or Seller>
+    Name: <min 5 chars>
+    Email: <Valid email>
+    Password: <min 5 chars>
+    Re-Password: <min 5 chars>
+    PassCode: <Only Applicable for Seller>
+```
 
 ### Added the Login Page template as below
 
-`Name: <min 5 chars>`
-`Email: <Valid email>`
-`Password: <min 5 chars>`
+```
+Name: <min 5 chars>
+Email: <Valid email>
+Password: <min 5 chars>
+```
 
 ### Added Home Page with random vegetable image with animation
 
