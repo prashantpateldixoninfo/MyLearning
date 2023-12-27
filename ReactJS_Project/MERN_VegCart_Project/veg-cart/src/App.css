@@ -20,3 +20,24 @@
     box-shadow: 0 0 0 1px #30cd00 inset, 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 1px 3px 1px rgba(0, 0, 0, 0.3);
     background-color: #78d739;
 }
+
+.rotating-image {
+    width: 250px;
+    height: 250px;
+    border: 2px solid white;
+    margin-top: 15px;
+    animation: rotate 15s linear 1;
+    animation-delay: 5s;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+        border: 2px solid greenyellow
+    }
+
+    100% {
+        transform: rotate(360deg);
+        border: 2px solid tomato
+    }
+}

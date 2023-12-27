@@ -44,7 +44,7 @@ const Signup = (props) => {
     };
 
     return (
-        <div className="container d-flex justify-content-center align-items-center">
+        <div className="container d-flex justify-content-center align-items-center my-2">
             <form className="p-1 bg-white rounded shadow border border-2 border-info" style={{ width: "500px" }} onSubmit={handleSubmit}>
                 <h2 className="text-center text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3">Create vCart Account</h2>
                 <div className="mb-3">
@@ -99,7 +99,7 @@ const Signup = (props) => {
                         <input type="password" className="form-control" id="passcode" name="passcode" minLength={5} required />
                     </div>
                 )}
-                <button type="submit" className="btn btn-magick btn3d d-grid mx-auto">
+                <button type="submit" className="btn btn-magick btn3d d-grid mx-auto mb-1">
                     Create
                 </button>
             </form>

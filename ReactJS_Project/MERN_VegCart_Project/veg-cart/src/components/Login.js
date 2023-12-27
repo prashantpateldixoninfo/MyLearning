@@ -35,7 +35,7 @@ const Login = (props) => {
 
     return (
         <div>
-            <div className="container d-flex justify-content-center align-items-center">
+            <div className="container d-flex justify-content-center align-items-center my-2">
                 <form className="p-1 bg-white rounded shadow border border-2 border-info" style={{ width: "500px" }} onSubmit={handleSubmit}>
                     <h2 className="text-center text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3">vCart Login</h2>
 
@@ -57,7 +57,7 @@ const Login = (props) => {
                         </label>
                         <input type="password" className="form-control" id="password" name="password" minLength={5} required />
                     </div>
-                    <button type="submit" className="btn btn-primary btn3d d-grid mx-auto">
+                    <button type="submit" className="btn btn-primary btn3d d-grid mx-auto mb-1">
                         Login
                     </button>
                 </form>
