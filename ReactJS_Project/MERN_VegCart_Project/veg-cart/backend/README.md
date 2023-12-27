@@ -2,8 +2,10 @@
 
 ### `Install express and nodemon library`
 
-`npm install express`
-`npm install --save-dev nodemon`
+```
+npm install express
+npm install --save-dev nodemon
+```
 
 ### `Add the code of expressJS to lauch the application and start under veg-cart\backend> folder`
 
@@ -19,9 +21,11 @@
 
 ### `Install express-validator, bcrypt and jsonwebtoken`
 
-`npm install express-validator`
-`npm install bcrypt`
-`npm install jsonwebtoken`
+```
+npm install express-validator
+npm install bcrypt
+npm install jsonwebtoken
+```
 
 ### `Write the code in auth.js file regarding the 'createuser' route path and add the route path mapping in index.js file.`
 
@@ -47,7 +51,7 @@ RESPONSE: {
 
 `npm install cors`
 
-### `Add the script(`both`) in `package.json`file to start both frontend(ReactJS) and backend(NodeJS) together on single terminal.First install concurrently library And then run as`npm run both` from frontend.`
+### `Add the script('both') in 'package.json' file to start both frontend(ReactJS) and backend(NodeJS) together on single terminal.First install concurrently library And then run as 'npm run both' from frontend.`
 
 ```
 npm install concurrently
