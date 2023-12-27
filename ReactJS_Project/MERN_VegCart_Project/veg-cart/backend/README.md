@@ -38,3 +38,9 @@
         "success": true,
         "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU4YmY0OTIyMzg4NmJlYmEyMmUxMGRlIn0sImlhdCI6MTcwMzY3MDkzMH0.jXNB2YKQd6DjYlNff9ReE4NJDybwb9PjhealDaIrDE0"
     }`
+
+### Install cors library, During GUI testing, policy restrict to pass the request to server. After cors instalaltion, test the Signup feature through browser(ReactJS code).
+
+`Access to fetch at 'http://localhost:5000/api/auth/createuser' from origin 'http://localhost:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.`
+
+    `npm install cors`
