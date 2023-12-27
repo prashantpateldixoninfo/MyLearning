@@ -9,11 +9,15 @@ npm install --save-dev nodemon
 
 ### `Add the code of expressJS to lauch the application and start under veg-cart\backend> folder`
 
-`nodemon index.js`
+```
+nodemon index.js
+```
 
 ### `Install the mongoose library`
 
-`npm install mongoose`
+```
+npm install mongoose
+```
 
 ### `Create the db.js file and give the MongoDB path for connection`
 
@@ -47,9 +51,11 @@ RESPONSE: {
 
 ### `Install cors library, During GUI testing, policy restrict to pass the request to server. After cors instalaltion, test the Signup feature through browser(ReactJS code).`
 
-`Access to fetch at 'http://localhost:5000/api/auth/createuser' from origin 'http://localhost:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.`
+```
+Access to fetch at 'http://localhost:5000/api/auth/createuser' from origin 'http://localhost:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
 
-`npm install cors`
+npm install cors
+```
 
 ### `Add the script('both') in 'package.json' file to start both frontend(ReactJS) and backend(NodeJS) together on single terminal.First install concurrently library And then run as 'npm run both' from frontend.`
 
