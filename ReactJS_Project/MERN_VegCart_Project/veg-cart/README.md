@@ -12,7 +12,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### Added the Signup Page with below Form Inputs
+### `Added the Signup Page with below Form Inputs`
 
 ```
     User Type: <Buyer or Seller>
@@ -23,7 +23,7 @@ You may also see any lint errors in the console.
     PassCode: <Only Applicable for Seller>
 ```
 
-### Added the Login Page template as below
+### `Added the Login Page template as below`
 
 ```
 Name: <min 5 chars>
@@ -31,10 +31,10 @@ Email: <Valid email>
 Password: <min 5 chars>
 ```
 
-### Added Home Page with random vegetable image with animation
+### `Added Home Page with random vegetable image with animation`
 
-### Added Alert message in Signup page, therefore on Success/Failure get notification
+### `Added Alert message in Signup page, therefore on Success/Failure get notification`
 
-### Started implementing backend code for Signup page
+### `Started implementing backend code for Signup page`
 
 [backend-code](https://github.com/prashantpateldixoninfo/MyLearning/tree/main/ReactJS_Project/MERN_VegCart_Project/veg-cart/backend) with [README.md](https://github.com/prashantpateldixoninfo/MyLearning/blob/main/ReactJS_Project/MERN_VegCart_Project/veg-cart/backend/README.md) file
