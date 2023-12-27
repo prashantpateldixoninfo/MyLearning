@@ -14,3 +14,5 @@
     `npm install mongoose`
 
 ### Create the db.js file and give the MongoDB path for connection
+
+### Create the Schema/template for user, which will store the user data(schema) in MongoDB
