@@ -26,7 +26,6 @@ PassCode: <Only Applicable for Seller>
 ### `Added the Login Page template as below`
 
 ```
-Name: <min 5 chars>
 Email: <Valid email>
 Password: <min 5 chars>
 ```
@@ -38,3 +37,5 @@ Password: <min 5 chars>
 ### `Started implementing backend code for Signup page`
 
 [backend-code](https://github.com/prashantpateldixoninfo/MyLearning/tree/main/ReactJS_Project/MERN_VegCart_Project/veg-cart/backend) with [README.md](https://github.com/prashantpateldixoninfo/MyLearning/blob/main/ReactJS_Project/MERN_VegCart_Project/veg-cart/backend/README.md) file
+
+### `Added Login page code in ReactJS`

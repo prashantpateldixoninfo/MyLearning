@@ -38,14 +38,13 @@ npm install jsonwebtoken
 ```
 POST: http://localhost:5000/api/auth/createuser
 BODY: {
-    "name": "Amol",
-    "email": "amol.gadekar@dixoninfo.com",
+    "name": "Prashant",
+    "email": "prashant@buyer.com",
     "password": "12345",
     "user_type": "buyer"
 }
 RESPONSE: {
-    "success": true,
-    "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU4YmY0OTIyMzg4NmJlYmEyMmUxMGRlIn0sImlhdCI6MTcwMzY3MDkzMH0.jXNB2YKQd6DjYlNff9ReE4NJDybwb9PjhealDaIrDE0"
+    "success": true
 }
 ```
 
@@ -65,5 +64,21 @@ npm install concurrently
 "scripts": {
     ...,
     "both": "concurrently \"npm run start\" \"nodemon backend/index.js\""
+}
+```
+
+### `Write the user login code in auth.js file. Create the auth-token for login session and store the suth-token into localStorage of browser`
+
+### `Use ThunderClient/Postman to test login.`
+
+```
+POST: http://localhost:5000/api/auth/login
+BODY: {
+    "email": "prashant@buyer.com",
+    "password": "12345",
+}
+RESPONSE: {
+    "success": true,
+    "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU4ZDAzNjliOGQxMmIyZWE2ZGMxYWM0In0sImlhdCI6MTcwMzc0MTg3OX0.QCpRR4fbfIIT0NjMauJJxBrAHzHJX85yMAXSk-Kqrq0"
 }
 ```

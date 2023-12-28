@@ -109,7 +109,7 @@ const Signup = (props) => {
                         <input type="password" className="form-control" id="passcode" name="passcode" minLength={5} required />
                     </div>
                 )}
-                <button type="submit" className="btn btn-magick btn3d d-grid mx-auto mb-1">
+                <button type="submit" className="btn btn-magick btn3d d-grid mx-auto mb-2">
                     Create
                 </button>
             </form>

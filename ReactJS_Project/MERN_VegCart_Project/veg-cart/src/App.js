@@ -30,7 +30,7 @@ function App() {
                         <Route exact path="/" element={<Home key="home" />} />
                         <Route exact path="/home" element={<Home key="home" />} />
                         <Route exact path="/signup" element={<Signup showAlert={showAlert} key="signup" />} />
-                        <Route exact path="/login" element={<Login key="login" />} />
+                        <Route exact path="/login" element={<Login showAlert={showAlert} key="login" />} />
                     </Routes>
                 </div>
             </BrowserRouter>

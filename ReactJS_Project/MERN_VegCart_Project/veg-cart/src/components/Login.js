@@ -24,7 +24,7 @@ const Login = (props) => {
         const json = await response.json();
 
         if (json.success) {
-            // Save the auth token and redirect
+            // Save the auth token in local storage and redirect to home page
             localStorage.setItem("auth-token", json.authToken);
             navigate("/");
             props.showAlert("Logged In Successfully", "success");
@@ -38,13 +38,6 @@ const Login = (props) => {
             <div className="container d-flex justify-content-center align-items-center my-2">
                 <form className="p-1 bg-white rounded shadow border border-2 border-info" style={{ width: "500px" }} onSubmit={handleSubmit}>
                     <h2 className="text-center text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3">vCart Login</h2>
-
-                    <div className="mb-3">
-                        <label htmlFor="name" className="form-label">
-                            <b style={{ color: "blue" }}>Name</b>
-                        </label>
-                        <input type="text" className="form-control" id="name" name="name" required />
-                    </div>
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label">
                             <b style={{ color: "blue" }}>Email address</b>
@@ -57,7 +50,7 @@ const Login = (props) => {
                         </label>
                         <input type="password" className="form-control" id="password" name="password" minLength={5} required />
                     </div>
-                    <button type="submit" className="btn btn-primary btn3d d-grid mx-auto mb-1">
+                    <button type="submit" className="btn btn-primary btn3d d-grid mx-auto mb-2">
                         Login
                     </button>
                 </form>
