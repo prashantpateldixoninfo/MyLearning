@@ -1,7 +1,7 @@
 import { React } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-export default function NavBarSeller() {
+export default function NavBarBuyer() {
     let navigate = useNavigate();
     let location = useLocation();
 
@@ -32,8 +32,8 @@ export default function NavBarSeller() {
                         <div className="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li className="nav-item">
-                                    <Link className={`nav-link ${location.pathname === "/seller" ? "active" : ""}`} to="/seller">
-                                        Seller
+                                    <Link className={`nav-link ${location.pathname === "/buyer" ? "active" : ""}`} to="/buyer">
+                                        Buyer
                                     </Link>
                                 </li>
                             </ul>
