@@ -60,13 +60,14 @@ router.post("/login", [body("email", "Enter a valid email").isEmail(), body("pas
         if (!passwordCompare) {
             return res.status(400).json({ success: false, error: "Please try to login with correct credentials" });
         }
+
         const data = {
             user: {
                 id: user.id,
             },
         };
         const authToken = jwt.sign(data, JWT_SECRET);
-        res.json({ success: true, authToken });
+        res.json({ success: true, authToken, user_type: user.user_type });
     } catch (error) {
         res.status(500).send("Internal Server Error " + error.message);
     }

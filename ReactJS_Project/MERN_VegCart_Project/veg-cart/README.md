@@ -39,3 +39,5 @@ Password: <min 5 chars>
 [backend-code](https://github.com/prashantpateldixoninfo/MyLearning/tree/main/ReactJS_Project/MERN_VegCart_Project/veg-cart/backend) with [README.md](https://github.com/prashantpateldixoninfo/MyLearning/blob/main/ReactJS_Project/MERN_VegCart_Project/veg-cart/backend/README.md) file
 
 ### `Added Login page code in ReactJS`
+
+### `Added new pages Buyer and Seller and redirect the page based on user_type`

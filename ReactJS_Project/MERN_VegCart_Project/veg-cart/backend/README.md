@@ -80,5 +80,16 @@ BODY: {
 RESPONSE: {
     "success": true,
     "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU4ZDAzNjliOGQxMmIyZWE2ZGMxYWM0In0sImlhdCI6MTcwMzc0MTg3OX0.QCpRR4fbfIIT0NjMauJJxBrAHzHJX85yMAXSk-Kqrq0"
+
+}
+```
+
+### `Added user_type in login response, therefore application can decide the page`
+
+```
+RESPONSE: {
+    "success": true,
+    "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU4ZDAzNjliOGQxMmIyZWE2ZGMxYWM0In0sImlhdCI6MTcwMzc0MTg3OX0.QCpRR4fbfIIT0NjMauJJxBrAHzHJX85yMAXSk-Kqrq0",
+    "user_type": "seller"
 }
 ```

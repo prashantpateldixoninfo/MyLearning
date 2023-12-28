@@ -6,6 +6,8 @@ import NavBar from "./components/NavBar";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import Alert from "./components/Alert";
+import Buyer from "./components/Buyer";
+import Seller from "./components/Seller";
 
 function App() {
     const [alert, setAlert] = useState(null);
@@ -29,6 +31,8 @@ function App() {
                     <Routes>
                         <Route exact path="/" element={<Home key="home" />} />
                         <Route exact path="/home" element={<Home key="home" />} />
+                        <Route exact path="/buyer" element={<Buyer key="buyer" />} />
+                        <Route exact path="/seller" element={<Seller key="seller" />} />
                         <Route exact path="/signup" element={<Signup showAlert={showAlert} key="signup" />} />
                         <Route exact path="/login" element={<Login showAlert={showAlert} key="login" />} />
                     </Routes>

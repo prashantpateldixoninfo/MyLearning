@@ -26,7 +26,11 @@ const Login = (props) => {
         if (json.success) {
             // Save the auth token in local storage and redirect to home page
             localStorage.setItem("auth-token", json.authToken);
-            navigate("/");
+            if (json.user_type === "buyer") {
+                navigate("/buyer");
+            } else {
+                navigate("/seller");
+            }
             props.showAlert("Logged In Successfully", "success");
         } else {
             props.showAlert("Invalid Details : " + json.error, "warning");
