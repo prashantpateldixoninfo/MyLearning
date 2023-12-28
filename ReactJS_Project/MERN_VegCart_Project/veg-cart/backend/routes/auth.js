@@ -30,13 +30,14 @@ router.post("/createuser", [body("name").isLength({ min: 3 }), body("email").isE
             user_type: req.body.user_type,
         });
 
-        const data = {
-            user: {
-                id: user.id,
-            },
-        };
-        const authToken = jwt.sign(data, JWT_SECRET);
-        res.json({ success: true, authToken });
+        // const data = {
+        //     user: {
+        //         id: user.id,
+        //     },
+        // };
+        // const authToken = jwt.sign(data, JWT_SECRET);
+        // res.json({ success: true, authToken });
+        res.json({ success: true });
     } catch (error) {
         res.status(500).send("Internal Server Error " + error.message);
     }

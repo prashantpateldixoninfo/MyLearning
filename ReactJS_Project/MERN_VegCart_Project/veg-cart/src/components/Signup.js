@@ -5,7 +5,7 @@ const host = "http://localhost:5000";
 
 const Signup = (props) => {
     const navigate = useNavigate();
-    const [radio, setReadio] = useState("buyer");
+    const [userTyper, setUserType] = useState("buyer");
 
     const handleSubmit = async (formInput) => {
         formInput.preventDefault();
@@ -49,7 +49,7 @@ const Signup = (props) => {
     };
 
     const handleRadioButtonInput = (radioInput) => {
-        setReadio(radioInput.target.value);
+        setUserType(radioInput.target.value);
         // console.log(radioInput.target.value);
     };
 
@@ -101,7 +101,7 @@ const Signup = (props) => {
                     </label>
                     <input type="password" className="form-control" id="cpassword" name="cpassword" minLength={5} required />
                 </div>
-                {radio === "seller" && (
+                {userTyper === "seller" && (
                     <div className="mb-3">
                         <label htmlFor="passcode" className="form-label">
                             <b style={{ color: "blue" }}>PassCode</b>
