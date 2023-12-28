@@ -41,3 +41,5 @@ Password: <min 5 chars>
 ### `Added Login page code in ReactJS`
 
 ### `Added new pages Buyer and Seller and redirect the page based on user_type`
+
+### `Split original NavBar to NavBarHome and NavBarSeller. And these NavBars will display based on token availibilty in localStorage`
