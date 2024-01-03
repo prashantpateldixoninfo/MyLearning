@@ -43,7 +43,7 @@ function App() {
         if (loadingState) {
             return [...Array(4)].map((item, index) => {
                 return (
-                    <div className="card">
+                    <div className="card" key={index}>
                         <div className="cardImage">
                             <img src={logo} alt="logo" width="80px" height="80px" />
                             <div>The React App</div>
@@ -62,9 +62,9 @@ function App() {
                 );
             });
         } else {
-            return [...Array(4)].map((index, item) => {
+            return [...Array(4)].map((item, index) => {
                 return (
-                    <div className="cardSkeleton">
+                    <div className="cardSkeleton" key={index}>
                         <div className="cardSkeletonImage">
                             <Skeleton width="80px" height="80px" variant="circle" />
                             <Skeleton width="100%" height="20px" />
