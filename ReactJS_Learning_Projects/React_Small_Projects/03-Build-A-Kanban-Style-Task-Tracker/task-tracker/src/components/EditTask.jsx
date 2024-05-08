@@ -21,14 +21,15 @@ const EditTask = ({ task, taskList, setTaskList }) => {
         const updatedTasks = taskList.map((task, index) => {
             if (index === taskIndex) {
                 // update the task
-                return (task = { projectName, taskDescription });
+                return (task = { projectName, taskDescription, timestamp: task.timestamp, duration: task.duration });
             } else {
                 // no change in task
                 return task;
             }
         });
-        setTaskList(updatedTasks);
-        // setTaskList([...taskList, { projectName, taskDescription }]);
+        localStorage.setItem("taskList", JSON.stringify(updatedTasks));
+        window.location.reload();
+        // setTaskList(updatedTasks);
         setEditModal(false);
     };
 
