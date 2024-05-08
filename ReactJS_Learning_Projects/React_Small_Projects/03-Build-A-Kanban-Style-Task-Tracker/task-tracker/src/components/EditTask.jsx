@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const EditTask = ({ task, index, taskList, setTaskList }) => {
-    // console.log("task=", task, "index=", index, "taskList=", taskList);
+const EditTask = ({ task, taskList, setTaskList }) => {
     const [editModal, setEditModal] = useState(false);
-    const [projectName, setProjectName] = useState(task.projectName);
-    const [taskDescription, setTaskDescription] = useState(task.taskDescription);
-    // const [projectName, setProjectName] = useState("");
-    // const [taskDescription, setTaskDescription] = useState("");
+    // Instead of initializing here, use useEffect hook.
+    // const [projectName, setProjectName] = useState(task.projectName);
+    // const [taskDescription, setTaskDescription] = useState(task.taskDescription);
+    const [projectName, setProjectName] = useState("");
+    const [taskDescription, setTaskDescription] = useState("");
+
+    useEffect(() => {
+        setProjectName(task.projectName);
+        setTaskDescription(task.taskDescription);
+    }, [task.projectName, task.taskDescription]);
 
     const handleUpdate = (e) => {
         e.preventDefault();
