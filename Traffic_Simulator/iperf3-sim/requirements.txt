@@ -1,0 +1,4 @@
+colorama
+pathlib
+pyfiglet
+xlwings

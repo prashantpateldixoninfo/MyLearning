@@ -2,6 +2,8 @@
 
 # dependencies
 /Logs
+/venv
+/__pycache__
 
 
 # testing

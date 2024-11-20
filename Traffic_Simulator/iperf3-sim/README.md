@@ -1,10 +1,7 @@
 ## Prequisites
 
-    python3.10+
-    pip install colorama
-    pip install pathlib
-    pip install pyfiglet
-    pip install xlwings
+    python3.10+ &
+    Run "python setup_preparation.py". It will create virtual environment(venv folder) for python and install all required packages from requirements.txt file.
 
 ## Run the dixon_wifi_traffic_automation.py file to collect the traffic losses based on Bitrate, Packet Length and Timing Variation.
 
