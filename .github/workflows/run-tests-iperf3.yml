@@ -1,4 +1,4 @@
-name: Run Tests in iperf3-sim Subdirectory
+name: Run Tests for Traffic_Simulator/iperf3-sim/
 
 on:
     push:
@@ -19,7 +19,7 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v4
               with:
-                  python-version: "3.9"
+                  python-version: "3.10"
 
             - name: Navigate to iperf3-sim directory
               working-directory: Traffic_Simulator/iperf3-sim
@@ -28,3 +28,10 @@ jobs:
                   source venv/bin/activate
                   pip install -r requirements.txt
                   pytest --cov=setup_venv_and_libraries --cov-report=term-missing --cov-report=html --cov-report=xml
+
+            - name: Upload coverage to Codecov
+              uses: codecov/codecov-action@v3
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }} # Add this in your repo's secrets
+                  files: ./coverage.xml # Ensure your coverage report is named coverage.xml
+                  flags: unittests
