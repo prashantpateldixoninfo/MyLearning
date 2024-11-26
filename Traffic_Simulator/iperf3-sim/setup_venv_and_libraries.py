@@ -13,7 +13,8 @@ def create_virtualenv(env_name="venv"):
 
 
 def get_installed_packages(env_name="venv"):
-    """Get a set of installed packages without versions using pip freeze."""
+    """Get a set of installed packages witpython -m pytest test_setup_venv_and_libraries.py --cov=setup_venv_and_libraries --cov-report=term
+    hout versions using pip freeze."""
     pip_path = (
         os.path.join(env_name, "Scripts", "pip")
         if os.name == "nt"
@@ -67,7 +68,7 @@ def check_and_install_dependencies(
 
 
 def activate_virtualenv(env_name="venv"):
-    """Provide instructions to activate the virtual environment."""
+    """Activate the virtual environment."""
     activate_script = (
         os.path.join(env_name, "Scripts", "activate")
         if os.name == "nt"
@@ -76,8 +77,9 @@ def activate_virtualenv(env_name="venv"):
     print(
         f"To activate the virtual environment, run:\nsource {activate_script}"
         if os.name != "nt"
-        else f"{activate_script}"
+        else f"To activate the virtual environment, run:\n {activate_script}"
     )
+    print(f"To deactivate the virtual environment, run:\n deactivate")
 
 
 if __name__ == "__main__":
