@@ -82,23 +82,6 @@ def test_check_and_install_dependencies(
     )
 
 
-# def test_activate_virtualenv():
-#     """Test activating the virtual environment."""
-#     print("Hello World")
-#     with mock.patch("builtins.print") as mock_print:
-#         setup_script.activate_virtualenv("test_env")
-
-#         activate_script = (
-#             os.path.join("test_env", "Scripts", "activate")
-#             if os.name == "nt"
-#             else os.path.join("test_env", "bin", "activate")
-#         )
-#         expected_print = f"To activate the virtual environment, run:\n{'source ' if os.name != 'nt' else ''}{activate_script}"
-#         print(f"expected_print = {expected_print}")
-#         # mock_print.assert_any_call(expected_print)
-#         # mock_print.assert_any_call( "To deactivate the virtual environment, run:\n deactivate")
-
-
 def test_activate_virtualenv():
     """Test activating the virtual environment."""
 
