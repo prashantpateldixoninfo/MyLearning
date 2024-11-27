@@ -29,9 +29,15 @@ jobs:
                   pip install -r requirements.txt
                   pytest --cov=setup_venv_and_libraries --cov-report=term-missing --cov-report=html --cov-report=xml
 
+            - name: Verify Coverage File
+              run: ls -l ./Traffic_Simulator/iperf3-sim
+
+            - name: Find Coverage File
+              run: find . -name "coverage.xml"
+
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v3
               with:
                   token: ${{ secrets.CODECOV_TOKEN }} # Add this in your repo's secrets
-                  files: ./coverage.xml # Ensure your coverage report is named coverage.xml
+                  files: ./Traffic_Simulator/iperf3-sim/coverage.xml
                   flags: unittests
