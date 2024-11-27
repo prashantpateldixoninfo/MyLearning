@@ -1,8 +1,8 @@
 # Iperf3 Simulator
 
 [![Tests](https://github.com/prashantpateldixoninfo/MyLearning/actions/workflows/run-tests-iperf3.yml/badge.svg)](https://github.com/prashantpateldixoninfo/MyLearning/actions/workflows/run-tests-iperf3.yml/badge.svg)
-[![Tests](https://github.com/prashantpateldixoninfo/MyLearning/workflows/run-tests-iperf3.yml/badge.svg)](https://github.com/prashantpateldixoninfo/MyLearning/workflows/run-tests-iperf3.yml/badge.svg)
-[![Tests](https://github.com/prashantpateldixoninfo/MyLearning/actions/workflows/run-tests-iperf3.yml/badge.svg)](https://github.com/prashantpateldixoninfo/MyLearning/actions/workflows/run-tests-iperf3.yml/badge.svg)
+[![Tests](https://github.com/username/MyLearning/actions/workflows/run-tests-iperf3.yml/badge.svg)](https://github.com/username/MyLearning/actions/workflows/run-tests-iperf3.yml/badge.svg)
+[![codecov](https://codecov.io/gh/prashantpateldixoninfo/MyLearning/branch/main/graph/badge.svg)](https://codecov.io/gh/prashantpateldixoninfo/MyLearning)
 [![codecov](https://codecov.io/gh/username/repo/branch/main/graph/badge.svg)](https://codecov.io/gh/username/repo)
 
 This project simulates traffic using iperf3. Below are the test and code coverage stats:
