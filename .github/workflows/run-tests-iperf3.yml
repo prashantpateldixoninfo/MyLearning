@@ -1,4 +1,4 @@
-name: Run Tests for Traffic_Simulator/iperf3-sim/
+name: Run Tests for iperf3
 
 on:
     push:
@@ -28,12 +28,6 @@ jobs:
                   source venv/bin/activate
                   pip install -r requirements.txt
                   pytest --cov=setup_venv_and_libraries --cov-report=term-missing --cov-report=html --cov-report=xml
-
-            - name: Verify Coverage File
-              run: ls -l
-
-            - name: Find Coverage File
-              run: find . -name "coverage.xml"
 
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v3

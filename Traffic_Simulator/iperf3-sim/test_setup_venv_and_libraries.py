@@ -95,7 +95,7 @@ def test_activate_virtualenv():
             if os.name == "nt"
             else os.path.join("test_env", "bin", "activate")
         )
-        expected_print = f"To activate the virtual environment, run:\n{'source ' if os.name != 'nt' else ''}{activate_script}"
+        expected_print = f"To activate the virtual environment, run:\n {'source ' if os.name != 'nt' else ''}{activate_script}"
         deactivate_print = "To deactivate the virtual environment, run:\n deactivate"
 
         # Debug output for comparison

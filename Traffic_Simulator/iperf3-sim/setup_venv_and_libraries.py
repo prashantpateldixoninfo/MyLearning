@@ -75,7 +75,7 @@ def activate_virtualenv(env_name="venv"):
         else os.path.join(env_name, "bin", "activate")
     )
     print(
-        f"To activate the virtual environment, run:\nsource {activate_script}"
+        f"To activate the virtual environment, run:\n source {activate_script}"
         if os.name != "nt"
         else f"To activate the virtual environment, run:\n {activate_script}"
     )
