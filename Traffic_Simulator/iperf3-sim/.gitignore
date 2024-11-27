@@ -9,7 +9,6 @@
 /.pytest_cache
 /htmlcov
 /.coverage
-/coverage.xml
 
 
 # production
