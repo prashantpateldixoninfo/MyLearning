@@ -30,7 +30,7 @@ jobs:
                   pytest --cov=setup_venv_and_libraries --cov-report=term-missing --cov-report=html --cov-report=xml
 
             - name: Verify Coverage File
-              run: ls -l ./Traffic_Simulator/iperf3-sim
+              run: ls -l
 
             - name: Find Coverage File
               run: find . -name "coverage.xml"
