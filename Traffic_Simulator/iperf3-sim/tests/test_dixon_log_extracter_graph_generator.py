@@ -7,7 +7,7 @@ from pathlib import Path
 # Add the src directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
-from dixon_log_extracter_graph_generator import (
+from dixon_log_extracter_graph_generator import (  # type: ignore
     extract_iperf_data_from_file,
     get_excel_sheet_info,
     get_file_name_and_path,

@@ -4,6 +4,7 @@ import pytest
 import xlwings as xw
 from unittest import mock
 
+
 # Add the src directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
@@ -43,8 +44,13 @@ def test_data():
 
 def test_create_blank_excel(test_file_path):
     """Test if a blank Excel file is created."""
+    if os.path.exists(test_file_path):
+        os.remove(test_file_path)  # Ensure the file doesn't exist initially
+
     create_blank_excel(test_file_path)
-    assert os.path.exists(test_file_path), "Excel file was not created."
+
+    # Assert if the file has been created
+    assert os.path.exists(test_file_path), "The Excel file was not created."
 
 
 def test_populate_data(test_file_path, test_data):

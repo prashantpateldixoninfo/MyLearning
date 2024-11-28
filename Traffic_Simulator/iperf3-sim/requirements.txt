@@ -2,5 +2,6 @@ colorama
 pathlib
 pyfiglet
 xlwings
+openpyxl
 pytest
 pytest-cov

@@ -1,16 +1,34 @@
-import xlwings as xw
 import os
+import sys
+
+try:
+    import xlwings as xw
+
+    excel_available = True
+except ImportError:
+    excel_available = False
+
+from openpyxl import Workbook
 
 
 # Function to create a blank Excel file and save it in the background
 def create_blank_excel(file_path):
-    app = xw.App(visible=False)
-    try:
-        workbook = app.books.add()
-        workbook.save(file_path)
-        workbook.close()
-    finally:
-        app.quit()
+    """Create a blank Excel file. Uses xlwings on Windows, openpyxl on Linux."""
+    if sys.platform == "win32" and excel_available:
+        # Use xlwings on Windows
+        app = xw.App(visible=False)
+        try:
+            workbook = app.books.add()
+            workbook.save(file_path)
+            workbook.close()
+        finally:
+            app.quit()
+    else:
+        # Use openpyxl on Linux
+        wb = Workbook()
+        wb.save(file_path)
+
+    print(f"Blank Excel file created at: {file_path}")
 
 
 # Function to populate the Excel file with flexible data inputs from a dictionary
