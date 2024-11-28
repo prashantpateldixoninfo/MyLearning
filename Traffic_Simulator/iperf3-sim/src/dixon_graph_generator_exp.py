@@ -99,7 +99,7 @@ def display_chart(file_path):
     sheet = workbook.sheets[0]  # Assuming we work with the first sheet
 
 
-if __name__ == "__main__":
+def main():
     # Define file path and data dictionary
     file_path = os.path.join(os.getcwd(), "line_chart_example_final.xlsx")
     data_dict = {
@@ -119,3 +119,7 @@ if __name__ == "__main__":
     populate_data(file_path, data_dict)
     add_chart(file_path, 0, chart_title)
     display_chart(file_path)
+
+
+if __name__ == "__main__":
+    main()

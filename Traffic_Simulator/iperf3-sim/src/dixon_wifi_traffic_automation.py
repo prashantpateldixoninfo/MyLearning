@@ -10,6 +10,9 @@ from datetime import datetime
 from pathlib import Path
 import pyfiglet
 
+iperf3_dir = Path().absolute()
+iperf3_path = iperf3_dir / "iperf3.exe"
+
 
 def test_automation_logo(log_filename):
     # Messages
@@ -531,8 +534,6 @@ if __name__ == "__main__":
         input(Fore.YELLOW + "Enter your SSID Password: " + Style.RESET_ALL)
         or "Airtel@123"
     )
-    iperf3_dir = Path().absolute()
-    iperf3_path = iperf3_dir / "iperf3.exe"
 
     # Start Time of Session
     session_con_time_start = datetime.now()

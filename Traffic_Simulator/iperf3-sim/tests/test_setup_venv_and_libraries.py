@@ -1,8 +1,12 @@
 import os
-import subprocess
 import sys
+import subprocess
 from unittest import mock
 import pytest
+
+# Add the src directory to the Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+
 import setup_venv_and_libraries as setup_script
 
 

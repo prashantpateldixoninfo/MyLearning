@@ -7,8 +7,10 @@
 
 # testing
 /.pytest_cache
-/htmlcov
 /.coverage
+/tests/__pycache__
+/tests/.coverage
+/htmlcov
 /coverage.xml
 
 
