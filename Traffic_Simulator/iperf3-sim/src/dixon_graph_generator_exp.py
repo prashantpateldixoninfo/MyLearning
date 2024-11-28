@@ -5,6 +5,12 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.chart import LineChart, Reference
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, PatternFill
+from openpyxl.drawing.text import (
+    CharacterProperties,
+    Paragraph,
+    ParagraphProperties,
+    Text,
+)
 
 try:
     import xlwings as xw
@@ -185,13 +191,18 @@ def add_chart(file_path, sheet_num, chart_title):
         finally:
             app.quit()
     else:
-        # openpyxl implementation
+        # openpyxl implementation (Linux and non-Windows platforms)
         wb = load_workbook(file_path)
         sheet = wb.worksheets[sheet_num]
 
         # Create a LineChart
         chart = LineChart()
+
+        # Set the chart title explicitly using Text objects
         chart.title = chart_title
+        chart_title_obj = Text()
+        chart_title_obj.text = chart_title
+        chart.title.tx = chart_title_obj
 
         # Set data for the chart
         data = Reference(sheet, min_col=2, min_row=1, max_col=3, max_row=11)
@@ -209,6 +220,11 @@ def add_chart(file_path, sheet_num, chart_title):
 
         # Save the workbook
         wb.save(file_path)
+
+        # Debug: Print chart title to verify
+        print(
+            f"Chart title (openpyxl): {chart.title.tx.text if chart.title.tx else 'No Title'}"
+        )
 
 
 def display_chart(file_path):
