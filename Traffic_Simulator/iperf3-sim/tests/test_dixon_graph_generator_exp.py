@@ -159,9 +159,20 @@ def test_add_chart(test_file_path):
         charts = sheet._charts
         assert len(charts) > 0, "Chart was not added to the sheet"
 
-        # Check chart title
+        # Check chart title (handle different structures)
         chart = charts[0]
-        actual_title = chart.title.tx.rich[0].p[0].t
+        if chart.title is not None:
+            if chart.title.tx is not None:
+                actual_title = (
+                    chart.title.tx.rich.text
+                    if hasattr(chart.title.tx.rich, "text")
+                    else chart.title.tx.rich[0].p[0].t
+                )
+            else:
+                actual_title = chart.title.tx or chart.title.tx.text
+        else:
+            actual_title = None
+
         assert (
             actual_title == chart_title
         ), f"Chart title is incorrect. Expected '{chart_title}', got '{actual_title}'"
