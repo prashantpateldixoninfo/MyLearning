@@ -8,8 +8,8 @@ try:
 except ImportError:
     excel_available = False
 
+import openpyxl
 from openpyxl import Workbook
-from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 
@@ -122,11 +122,11 @@ def populate_data(file_path, data_dict):
             max_col=len(headers),
         ):
             for cell in row:
-                cell.border = Workbook.styles.Border(
-                    left=Workbook.styles.Side(style="thin"),
-                    right=Workbook.styles.Side(style="thin"),
-                    top=Workbook.styles.Side(style="thin"),
-                    bottom=Workbook.styles.Side(style="thin"),
+                cell.border = openpyxl.styles.Border(
+                    left=openpyxl.styles.Side(style="thin"),
+                    right=openpyxl.styles.Side(style="thin"),
+                    top=openpyxl.styles.Side(style="thin"),
+                    bottom=openpyxl.styles.Side(style="thin"),
                 )
 
         # Auto-size columns (openpyxl doesn't have auto-size, so we estimate width)
