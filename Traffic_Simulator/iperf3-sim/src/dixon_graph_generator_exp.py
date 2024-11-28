@@ -1,5 +1,10 @@
 import os
 import sys
+import openpyxl
+from openpyxl import Workbook, load_workbook
+from openpyxl.chart import LineChart, Reference
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font, PatternFill
 
 try:
     import xlwings as xw
@@ -7,11 +12,6 @@ try:
     excel_available = True
 except ImportError:
     excel_available = False
-
-import openpyxl
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill
-from openpyxl.utils import get_column_letter
 
 
 # Function to create a blank Excel file and save it in the background
@@ -154,34 +154,61 @@ def populate_data(file_path, data_dict):
 
 # Function to add a chart to the Excel file and display it to the user
 def add_chart(file_path, sheet_num, chart_title):
-    app = xw.App(visible=False)
-    try:
-        workbook = app.books.open(file_path)
-        sheet = workbook.sheets[sheet_num]  # Assuming we work with the first sheet
+    if sys.platform == "win32" and excel_available:
+        # xlwings implementation
+        app = xw.App(visible=False)
+        try:
+            workbook = app.books.open(file_path)
+            sheet = workbook.sheets[sheet_num]
 
-        # Add a 2-D Line Chart (Lines with Markers) for the data
-        chart = sheet.charts.add()
-        chart.chart_type = "line_markers"
-        chart.set_source_data(sheet.range("B1:C11"))
-        chart.name = chart_title
-        chart.api[1].HasTitle = True
-        chart.api[1].ChartTitle.Text = chart_title
-        chart.api[1].ApplyLayout(2)
+            # Add a 2-D Line Chart (Lines with Markers) for the data
+            chart = sheet.charts.add()
+            chart.chart_type = "line_markers"
+            chart.set_source_data(sheet.range("B1:C11"))
+            chart.name = chart_title
+            chart.api[1].HasTitle = True
+            chart.api[1].ChartTitle.Text = chart_title
+            chart.api[1].ApplyLayout(2)
 
-        # Set x-axis to use manual labels from column A
-        chart.api[1].Axes(1).CategoryNames = sheet.range("A2:A11").value
+            # Set x-axis to use manual labels from column A
+            chart.api[1].Axes(1).CategoryNames = sheet.range("A2:A11").value
+
+            # Position chart from E2 to L11
+            chart.top = sheet.range("E2").top
+            chart.left = sheet.range("E2").left
+            chart.width = sheet.range("E2:L2").width
+            chart.height = sheet.range("E2:E11").height
+
+            # Save and close the workbook
+            workbook.save()
+            workbook.close()
+        finally:
+            app.quit()
+    else:
+        # openpyxl implementation
+        wb = load_workbook(file_path)
+        sheet = wb.worksheets[sheet_num]
+
+        # Create a LineChart
+        chart = LineChart()
+        chart.title = chart_title
+
+        # Set data for the chart
+        data = Reference(sheet, min_col=2, min_row=1, max_col=3, max_row=11)
+        chart.add_data(data, titles_from_data=True)
+
+        # Set categories (x-axis labels)
+        categories = Reference(sheet, min_col=1, min_row=2, max_row=11)
+        chart.set_categories(categories)
 
         # Position chart from E2 to L11
-        chart.top = sheet.range("E2").top
-        chart.left = sheet.range("E2").left
-        chart.width = sheet.range("E2:L2").width
-        chart.height = sheet.range("E2:E11").height
+        chart.anchor = "E2"
 
-        # Save and close the workbook
-        workbook.save()
-        workbook.close()
-    finally:
-        app.quit()
+        # Add the chart to the sheet
+        sheet.add_chart(chart, "E2")
+
+        # Save the workbook
+        wb.save(file_path)
 
 
 def display_chart(file_path):

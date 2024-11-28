@@ -134,21 +134,34 @@ def test_add_chart(test_file_path):
     chart_title = "Bitrate Comparison"
     add_chart(test_file_path, 0, chart_title)
 
-    app = xw.App(visible=False)
-    try:
-        workbook = app.books.open(test_file_path)
-        sheet = workbook.sheets[0]
+    if sys.platform == "win32" and excel_available:
+        app = xw.App(visible=False)
+        try:
+            workbook = app.books.open(test_file_path)
+            sheet = workbook.sheets[0]
 
-        # Check if chart exists
-        assert len(sheet.charts) > 0, "Chart was not added to the sheet."
+            # Check if chart exists
+            assert len(sheet.charts) > 0, "Chart was not added to the sheet."
 
-        # Verify chart title
-        chart = sheet.charts[0]
-        assert chart.name == chart_title, "Chart title is incorrect."
+            # Verify chart title
+            chart = sheet.charts[0]
+            assert chart.name == chart_title, "Chart title is incorrect."
 
-    finally:
-        workbook.close()
-        app.quit()
+        finally:
+            workbook.close()
+            app.quit()
+    else:
+        # Check for chart in openpyxl
+        wb = load_workbook(test_file_path)
+        sheet = wb.active
+
+        # Verify that the chart is created
+        charts = sheet._charts
+        assert len(charts) > 0, "Chart was not added to the sheet"
+
+        # Check chart title
+        chart = charts[0]
+        assert chart.title == chart_title, "Chart title is incorrect."
 
 
 def test_display_chart(test_file_path):
