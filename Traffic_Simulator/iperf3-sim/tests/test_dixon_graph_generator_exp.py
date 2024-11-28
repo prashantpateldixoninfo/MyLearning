@@ -161,7 +161,10 @@ def test_add_chart(test_file_path):
 
         # Check chart title
         chart = charts[0]
-        assert chart.title == chart_title, "Chart title is incorrect."
+        actual_title = chart.title.tx.rich[0].p[0].t
+        assert (
+            actual_title == chart_title
+        ), f"Chart title is incorrect. Expected '{chart_title}', got '{actual_title}'"
 
 
 def test_display_chart(test_file_path):
