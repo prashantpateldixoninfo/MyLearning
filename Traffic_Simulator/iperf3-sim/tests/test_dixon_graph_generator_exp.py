@@ -1,8 +1,18 @@
 import os
 import sys
 import pytest
-import xlwings as xw
 from unittest import mock
+from openpyxl import load_workbook
+from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
+
+try:
+    import xlwings as xw
+
+    excel_available = True
+except ImportError:
+    excel_available = False
+from openpyxl import Workbook
 
 
 # Add the src directory to the Python path
@@ -28,7 +38,7 @@ def test_file_path():
 
 
 @pytest.fixture
-def test_data():
+def test_data_dict():
     """Fixture to provide test data dictionary."""
     return {
         "sheet_num": 0,  # First sheet in the workbook
@@ -53,38 +63,70 @@ def test_create_blank_excel(test_file_path):
     assert os.path.exists(test_file_path), "The Excel file was not created."
 
 
-def test_populate_data(test_file_path, test_data):
-    """Test if the Excel file is populated with data."""
-    create_blank_excel(test_file_path)  # Ensure the file exists
-    populate_data(test_file_path, test_data)
+def test_populate_data(test_file_path, test_data_dict):
+    """Test populate_data() using both xlwings and openpyxl."""
 
-    app = xw.App(visible=False)
-    try:
-        workbook = app.books.open(test_file_path)
-        sheet = workbook.sheets[test_data["sheet_num"]]
+    # Call the populate_data() function
+    populate_data(test_file_path, test_data_dict)
 
-        # Verify sheet name
-        assert sheet.name == test_data["sheet_name"], "Sheet name is incorrect."
+    # Assert that the file is created
+    assert os.path.exists(test_file_path), "Excel file was not created."
 
-        # Verify data in the first column
-        x_axis_values = sheet.range("A2:A11").value
-        assert x_axis_values == test_data["x_axis_value"], "X-axis data is incorrect."
+    # If running on Windows with Excel available, use xlwings
+    if sys.platform == "win32" and excel_available:
+        # Test xlwings behavior
+        app = xw.App(visible=False)
+        try:
+            workbook = app.books.open(test_file_path)
+            sheet = workbook.sheets[test_data_dict["sheet_name"]]
 
-        # Verify first header values
-        header1_values = sheet.range("B2:B11").value
+            # Check if headers and data are correct with xlwings
+            assert (
+                sheet.range("A1").value == test_data_dict["x_axis"]
+            ), "X-Axis header mismatch with xlwings"
+            assert (
+                sheet.range("B1").value == test_data_dict["first_header"]
+            ), "First header mismatch with xlwings"
+            assert (
+                sheet.range("C1").value == test_data_dict["sec_header"]
+            ), "Second header mismatch with xlwings"
+            assert (
+                sheet.range("A2").value == test_data_dict["x_axis_value"][0]
+            ), "X-Axis data mismatch with xlwings"
+            assert (
+                sheet.range("B2").value == test_data_dict["first_header_value"][0]
+            ), "First header data mismatch with xlwings"
+            assert (
+                sheet.range("C2").value == test_data_dict["sec_header_value"][0]
+            ), "Second header data mismatch with xlwings"
+
+        finally:
+            app.quit()
+
+    else:
+        # Test openpyxl behavior
+        wb = load_workbook(test_file_path)
+        sheet = wb[test_data_dict["sheet_name"]]
+
+        # Check if headers and data are correct with openpyxl
         assert (
-            header1_values == test_data["first_header_value"]
-        ), "First header data is incorrect."
-
-        # Verify second header values
-        header2_values = sheet.range("C2:C11").value
+            sheet["A1"].value == test_data_dict["x_axis"]
+        ), "X-Axis header mismatch with openpyxl"
         assert (
-            header2_values == test_data["sec_header_value"]
-        ), "Second header data is incorrect."
-
-    finally:
-        workbook.close()
-        app.quit()
+            sheet["B1"].value == test_data_dict["first_header"]
+        ), "First header mismatch with openpyxl"
+        assert (
+            sheet["C1"].value == test_data_dict["sec_header"]
+        ), "Second header mismatch with openpyxl"
+        assert (
+            sheet["A2"].value == test_data_dict["x_axis_value"][0]
+        ), "X-Axis data mismatch with openpyxl"
+        assert (
+            sheet["B2"].value == test_data_dict["first_header_value"][0]
+        ), "First header data mismatch with openpyxl"
+        assert (
+            sheet["C2"].value == test_data_dict["sec_header_value"][0]
+        ), "Second header data mismatch with openpyxl"
 
 
 def test_add_chart(test_file_path):

@@ -9,6 +9,9 @@ except ImportError:
     excel_available = False
 
 from openpyxl import Workbook
+from openpyxl import load_workbook
+from openpyxl.styles import Font, PatternFill
+from openpyxl.utils import get_column_letter
 
 
 # Function to create a blank Excel file and save it in the background
@@ -33,13 +36,58 @@ def create_blank_excel(file_path):
 
 # Function to populate the Excel file with flexible data inputs from a dictionary
 def populate_data(file_path, data_dict):
-    app = xw.App(visible=False)
-    try:
-        workbook = app.books.open(file_path)
-        sheet = workbook.sheets[data_dict["sheet_num"]]
-        sheet.name = data_dict["sheet_name"]
+    if sys.platform == "win32" and excel_available:
+        app = xw.App(visible=False)
+        try:
+            workbook = app.books.open(file_path)
+            sheet = workbook.sheets[data_dict["sheet_num"]]
+            sheet.name = data_dict["sheet_name"]
 
-        # Insert headers and data based on dictionary keys
+            # Insert headers and data based on dictionary keys
+            headers = [
+                data_dict["x_axis"],
+                data_dict["first_header"],
+                data_dict["sec_header"],
+            ]
+            data = [
+                data_dict["x_axis_value"],
+                data_dict["first_header_value"],
+                data_dict["sec_header_value"],
+            ]
+
+            for col, (header, values) in enumerate(zip(headers, data), start=1):
+                header_cell = sheet.range((1, col))
+                data_range = sheet.range((2, col), (len(values) + 1, col))
+
+                # Write header and data
+                header_cell.value = header
+                data_range.value = [[v] for v in values]
+
+                # Format header: blue color text on white background, bold
+                header_cell.api.Font.Color = 0xFF0000  # Blue text
+                header_cell.api.Font.Bold = True
+
+            # Apply grid lines around the entire data range
+            data_range = sheet.range(
+                (1, 1), (len(data_dict["x_axis_value"]) + 1, len(headers))
+            )
+            data_range.api.Borders.LineStyle = 1
+
+            # Auto-fit columns
+            sheet.autofit()
+
+            # Save and close the workbook
+            workbook.save()
+            workbook.close()
+        finally:
+            app.quit()
+    else:
+        # Create a new workbook and select the active sheet
+        wb = Workbook()
+        sheet = wb.active
+        sheet.title = data_dict["sheet_name"]
+
+        # Insert headers
         headers = [
             data_dict["x_axis"],
             data_dict["first_header"],
@@ -51,32 +99,57 @@ def populate_data(file_path, data_dict):
             data_dict["sec_header_value"],
         ]
 
+        # Write headers to the first row
+        for col, header in enumerate(headers, start=1):
+            cell = sheet.cell(row=1, column=col)
+            cell.value = header
+            # Apply header style (blue text, bold)
+            cell.font = Font(color="0000FF", bold=True)
+            cell.fill = PatternFill(
+                start_color="FFFFFF", end_color="FFFFFF", fill_type="solid"
+            )
+
+        # Write data starting from the second row
         for col, (header, values) in enumerate(zip(headers, data), start=1):
-            header_cell = sheet.range((1, col))
-            data_range = sheet.range((2, col), (len(values) + 1, col))
+            for row, value in enumerate(values, start=2):
+                sheet.cell(row=row, column=col, value=value)
 
-            # Write header and data
-            header_cell.value = header
-            data_range.value = [[v] for v in values]
+        # Apply gridlines (openpyxl automatically adds borders to cells)
+        for row in sheet.iter_rows(
+            min_row=1,
+            max_row=len(data_dict["x_axis_value"]) + 1,
+            min_col=1,
+            max_col=len(headers),
+        ):
+            for cell in row:
+                cell.border = Workbook.styles.Border(
+                    left=Workbook.styles.Side(style="thin"),
+                    right=Workbook.styles.Side(style="thin"),
+                    top=Workbook.styles.Side(style="thin"),
+                    bottom=Workbook.styles.Side(style="thin"),
+                )
 
-            # Format header: blue color text on white background, bold
-            header_cell.api.Font.Color = 0xFF0000  # Blue text
-            header_cell.api.Font.Bold = True
+        # Auto-size columns (openpyxl doesn't have auto-size, so we estimate width)
+        for col in range(1, len(headers) + 1):
+            max_length = 0
+            column = get_column_letter(col)
+            for row in sheet.iter_rows(
+                min_row=1,
+                max_row=len(data_dict["x_axis_value"]) + 1,
+                min_col=col,
+                max_col=col,
+            ):
+                for cell in row:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(cell.value)
+                    except:
+                        pass
+            adjusted_width = max_length + 2
+            sheet.column_dimensions[column].width = adjusted_width
 
-        # Apply grid lines around the entire data range
-        data_range = sheet.range(
-            (1, 1), (len(data_dict["x_axis_value"]) + 1, len(headers))
-        )
-        data_range.api.Borders.LineStyle = 1
-
-        # Auto-fit columns
-        sheet.autofit()
-
-        # Save and close the workbook
-        workbook.save()
-        workbook.close()
-    finally:
-        app.quit()
+        # Save the workbook to the file
+        wb.save(file_path)
 
 
 # Function to add a chart to the Excel file and display it to the user
