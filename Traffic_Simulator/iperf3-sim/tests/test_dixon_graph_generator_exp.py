@@ -129,31 +129,6 @@ def test_populate_data(test_file_path, test_data_dict):
         ), "Second header data mismatch with openpyxl"
 
 
-def extract_chart_title(chart):
-    """Extract the title text from an openpyxl chart."""
-    if chart.title and chart.title.tx and chart.title.tx.rich:
-        rich_text = chart.title.tx.rich
-
-        # Print the raw title structure to understand what we're working with
-        print("Raw Title Structure:", rich_text)
-
-        # Concatenate all paragraph text elements
-        title_text = "".join(
-            paragraph.p[0].t
-            for paragraph in rich_text
-            if isinstance(paragraph, Paragraph)
-        )
-
-        # Print the extracted title for debugging
-        print("Extracted Title:", title_text)
-
-        return title_text
-
-    # If title extraction fails, print a debug message
-    print("Chart title could not be extracted.")
-    return None
-
-
 def test_add_chart(test_file_path):
     """Test if a chart is added to the Excel file."""
     chart_title = "Bitrate Comparison"
@@ -182,18 +157,17 @@ def test_add_chart(test_file_path):
 
         # Verify that the chart is created
         charts = sheet._charts
-        assert len(charts) > 0, "Chart was not added to the sheet"
+        assert len(charts) > 0, "Chart was not added to the sheet."
 
-        # Extract and verify chart title
-        chart = charts[0]
-        actual_title = extract_chart_title(chart)
-
-        # Print the actual title being compared
+        # Debug: Print actual title for verification
+        print(f"Expected Title: {chart_title}")
+        actual_title = charts[0].title
         print(f"Actual Title: {actual_title}")
 
+        # Check chart title
         assert (
             actual_title == chart_title
-        ), f"Chart title is incorrect. Expected '{chart_title}', got '{actual_title}'"
+        ), f"Chart title is incorrect. Expected '{chart_title}', got '{actual_title}'."
 
 
 def test_display_chart(test_file_path):
