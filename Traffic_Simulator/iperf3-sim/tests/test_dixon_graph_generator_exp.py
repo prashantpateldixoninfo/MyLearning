@@ -2,17 +2,7 @@ import os
 import sys
 import pytest
 from unittest import mock
-from openpyxl import load_workbook
-from openpyxl.styles import Font
-from openpyxl.utils import get_column_letter
-
-try:
-    import xlwings as xw
-
-    excel_available = True
-except ImportError:
-    excel_available = False
-from openpyxl import Workbook
+import xlwings as xw
 
 
 # Add the src directory to the Python path
@@ -73,7 +63,7 @@ def test_populate_data(test_file_path, test_data_dict):
     assert os.path.exists(test_file_path), "Excel file was not created."
 
     # If running on Windows with Excel available, use xlwings
-    if sys.platform == "win32" and excel_available:
+    if sys.platform == "win32":
         # Test xlwings behavior
         app = xw.App(visible=False)
         try:
@@ -103,38 +93,13 @@ def test_populate_data(test_file_path, test_data_dict):
         finally:
             app.quit()
 
-    else:
-        # Test openpyxl behavior
-        wb = load_workbook(test_file_path)
-        sheet = wb[test_data_dict["sheet_name"]]
-
-        # Check if headers and data are correct with openpyxl
-        assert (
-            sheet["A1"].value == test_data_dict["x_axis"]
-        ), "X-Axis header mismatch with openpyxl"
-        assert (
-            sheet["B1"].value == test_data_dict["first_header"]
-        ), "First header mismatch with openpyxl"
-        assert (
-            sheet["C1"].value == test_data_dict["sec_header"]
-        ), "Second header mismatch with openpyxl"
-        assert (
-            sheet["A2"].value == test_data_dict["x_axis_value"][0]
-        ), "X-Axis data mismatch with openpyxl"
-        assert (
-            sheet["B2"].value == test_data_dict["first_header_value"][0]
-        ), "First header data mismatch with openpyxl"
-        assert (
-            sheet["C2"].value == test_data_dict["sec_header_value"][0]
-        ), "Second header data mismatch with openpyxl"
-
 
 def test_add_chart(test_file_path):
     """Test if a chart is added to the Excel file."""
     chart_title = "Bitrate Comparison"
     add_chart(test_file_path, 0, chart_title)
 
-    if sys.platform == "win32" and excel_available:
+    if sys.platform == "win32":
         app = xw.App(visible=False)
         try:
             workbook = app.books.open(test_file_path)
@@ -150,24 +115,6 @@ def test_add_chart(test_file_path):
         finally:
             workbook.close()
             app.quit()
-    else:
-        # Check for chart in openpyxl
-        wb = load_workbook(test_file_path)
-        sheet = wb.active
-
-        # Verify that the chart is created
-        charts = sheet._charts
-        assert len(charts) > 0, "Chart was not added to the sheet."
-
-        # Debug: Print actual title for verification
-        print(f"Expected Title: {chart_title}")
-        actual_title = charts[0].title
-        print(f"Actual Title: {actual_title}")
-
-        # Check chart title # TODO
-        # assert (
-        #     actual_title == chart_title
-        # ), f"Chart title is incorrect. Expected '{chart_title}', got '{actual_title}'."
 
 
 def test_display_chart(test_file_path):

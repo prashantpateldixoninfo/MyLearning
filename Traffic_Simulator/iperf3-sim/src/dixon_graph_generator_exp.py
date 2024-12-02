@@ -1,23 +1,12 @@
 import os
 import sys
-import openpyxl
-from openpyxl import Workbook, load_workbook
-from openpyxl.chart import LineChart, Reference
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Font, PatternFill
-
-try:
-    import xlwings as xw
-
-    excel_available = True
-except ImportError:
-    excel_available = False
+import xlwings as xw
 
 
 # Function to create a blank Excel file and save it in the background
 def create_blank_excel(file_path):
     """Create a blank Excel file. Uses xlwings on Windows, openpyxl on Linux."""
-    if sys.platform == "win32" and excel_available:
+    if sys.platform == "win32":
         # Use xlwings on Windows
         app = xw.App(visible=False)
         try:
@@ -26,17 +15,13 @@ def create_blank_excel(file_path):
             workbook.close()
         finally:
             app.quit()
-    else:
-        # Use openpyxl on Linux
-        wb = Workbook()
-        wb.save(file_path)
 
     print(f"Blank Excel file created at: {file_path}")
 
 
 # Function to populate the Excel file with flexible data inputs from a dictionary
 def populate_data(file_path, data_dict):
-    if sys.platform == "win32" and excel_available:
+    if sys.platform == "win32":
         app = xw.App(visible=False)
         try:
             workbook = app.books.open(file_path)
@@ -81,80 +66,11 @@ def populate_data(file_path, data_dict):
             workbook.close()
         finally:
             app.quit()
-    else:
-        # Create a new workbook and select the active sheet
-        wb = Workbook()
-        sheet = wb.active
-        sheet.title = data_dict["sheet_name"]
-
-        # Insert headers
-        headers = [
-            data_dict["x_axis"],
-            data_dict["first_header"],
-            data_dict["sec_header"],
-        ]
-        data = [
-            data_dict["x_axis_value"],
-            data_dict["first_header_value"],
-            data_dict["sec_header_value"],
-        ]
-
-        # Write headers to the first row
-        for col, header in enumerate(headers, start=1):
-            cell = sheet.cell(row=1, column=col)
-            cell.value = header
-            # Apply header style (blue text, bold)
-            cell.font = Font(color="0000FF", bold=True)
-            cell.fill = PatternFill(
-                start_color="FFFFFF", end_color="FFFFFF", fill_type="solid"
-            )
-
-        # Write data starting from the second row
-        for col, (header, values) in enumerate(zip(headers, data), start=1):
-            for row, value in enumerate(values, start=2):
-                sheet.cell(row=row, column=col, value=value)
-
-        # Apply gridlines (openpyxl automatically adds borders to cells)
-        for row in sheet.iter_rows(
-            min_row=1,
-            max_row=len(data_dict["x_axis_value"]) + 1,
-            min_col=1,
-            max_col=len(headers),
-        ):
-            for cell in row:
-                cell.border = openpyxl.styles.Border(
-                    left=openpyxl.styles.Side(style="thin"),
-                    right=openpyxl.styles.Side(style="thin"),
-                    top=openpyxl.styles.Side(style="thin"),
-                    bottom=openpyxl.styles.Side(style="thin"),
-                )
-
-        # Auto-size columns (openpyxl doesn't have auto-size, so we estimate width)
-        for col in range(1, len(headers) + 1):
-            max_length = 0
-            column = get_column_letter(col)
-            for row in sheet.iter_rows(
-                min_row=1,
-                max_row=len(data_dict["x_axis_value"]) + 1,
-                min_col=col,
-                max_col=col,
-            ):
-                for cell in row:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(cell.value)
-                    except:
-                        pass
-            adjusted_width = max_length + 2
-            sheet.column_dimensions[column].width = adjusted_width
-
-        # Save the workbook to the file
-        wb.save(file_path)
 
 
 # Function to add a chart to the Excel file and display it to the user
 def add_chart(file_path, sheet_num, chart_title):
-    if sys.platform == "win32" and excel_available:
+    if sys.platform == "win32":
         # xlwings implementation (Windows only)
         app = xw.App(visible=False)
         try:
@@ -184,33 +100,6 @@ def add_chart(file_path, sheet_num, chart_title):
             workbook.close()
         finally:
             app.quit()
-    else:
-        # openpyxl implementation (Linux and non-Windows platforms)
-        wb = load_workbook(file_path)
-        sheet = wb.worksheets[sheet_num]
-
-        # Create a LineChart
-        chart = LineChart()
-
-        # Set the chart title directly as a string
-        chart.title = chart_title
-
-        # Set data for the chart
-        data = Reference(sheet, min_col=2, min_row=1, max_col=3, max_row=11)
-        chart.add_data(data, titles_from_data=True)
-
-        # Set categories (x-axis labels)
-        categories = Reference(sheet, min_col=1, min_row=2, max_row=11)
-        chart.set_categories(categories)
-
-        # Position chart from E2 to L11
-        chart.anchor = "E2"
-
-        # Add the chart to the sheet
-        sheet.add_chart(chart, "E2")
-
-        # Save the workbook
-        wb.save(file_path)
 
 
 def display_chart(file_path):
