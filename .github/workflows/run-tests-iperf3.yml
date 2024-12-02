@@ -9,7 +9,7 @@ on:
             - "Traffic_Simulator/iperf3-sim/**"
 
 jobs:
-    test:
+    iper3-script:
         runs-on: windows-latest
 
         steps:
@@ -25,7 +25,7 @@ jobs:
               working-directory: Traffic_Simulator/iperf3-sim
               run: |
                   python -m venv venv
-                  source venv/bin/activate
+                  .\venv\Scripts\activate
                   pip install -r requirements.txt
                   pytest
 
