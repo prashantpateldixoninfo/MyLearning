@@ -6,7 +6,7 @@ import xlwings as xw
 # Function to create a blank Excel file and save it in the background
 def create_blank_excel(file_path):
     """Create a blank Excel file. Uses xlwings on Windows, openpyxl on Linux."""
-    if sys.platform == "win32":
+    if sys.platform == "win32" and os.environ.get("CI") != "true":
         # Use xlwings on Windows
         app = xw.App(visible=False)
         try:
@@ -21,7 +21,7 @@ def create_blank_excel(file_path):
 
 # Function to populate the Excel file with flexible data inputs from a dictionary
 def populate_data(file_path, data_dict):
-    if sys.platform == "win32":
+    if sys.platform == "win32" and os.environ.get("CI") != "true":
         app = xw.App(visible=False)
         try:
             workbook = app.books.open(file_path)
@@ -70,7 +70,7 @@ def populate_data(file_path, data_dict):
 
 # Function to add a chart to the Excel file and display it to the user
 def add_chart(file_path, sheet_num, chart_title):
-    if sys.platform == "win32":
+    if sys.platform == "win32" and os.environ.get("CI") != "true":
         # xlwings implementation (Windows only)
         app = xw.App(visible=False)
         try:
