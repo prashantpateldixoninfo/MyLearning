@@ -1,12 +1,26 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 
-@app.route("/api/data")
+# Shared data store
+shared_data = {}
+
+
+@app.route("/submit", methods=["POST"])
+def submit_data():
+    data = request.json
+    shared_data["input"] = data.get("input")
+    print(f"Received data: {shared_data['input']}")
+    return jsonify({"status": "success", "received": shared_data["input"]}), 200
+
+
+@app.route("/get_data", methods=["GET"])
 def get_data():
-    return jsonify({"key": "Hello from the backend!"})
+    if "input" in shared_data:
+        return jsonify({"data": shared_data["input"]}), 200
+    return jsonify({"status": "error", "message": "No data available"}), 404
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5000)

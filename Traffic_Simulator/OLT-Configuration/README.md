@@ -38,7 +38,7 @@ project/
    python backend/api.py
 
 2. Run the GUI application:
-   python -m gui/main_window.py
+   python -m gui.main_window.py
 
 ### Running Tests
 
