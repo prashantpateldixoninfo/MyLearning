@@ -18,6 +18,7 @@ def submit_data():
 @app.route("/get_data", methods=["GET"])
 def get_data():
     if "input" in shared_data:
+        print(f"Sending data: {shared_data['input']}")
         return jsonify({"data": shared_data["input"]}), 200
     return jsonify({"status": "error", "message": "No data available"}), 404
 
