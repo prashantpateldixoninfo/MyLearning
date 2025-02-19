@@ -1,5 +1,4 @@
 from qtpy.QtWidgets import (
-    QApplication,
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
@@ -8,42 +7,35 @@ from qtpy.QtWidgets import (
     QMessageBox,
 )
 import requests
-from shared.config import BACKEND_URL
 from qtpy.QtCore import Qt
+from shared.config import BACKEND_URL
 
 
-class MainWindow(QWidget):
-    def __init__(self):
+class SecondPage(QWidget):
+    """Second Page with Huawei OLT Configuration"""
+
+    def __init__(self, stack):
         super().__init__()
+        self.stack = stack
         self.init_ui()
 
     def init_ui(self):
-        # Create input and output text areas
         self.input_text = QTextEdit(self)
         self.input_text.setFixedSize(100, 25)
         self.input_text.setStyleSheet(
-            """
-            background-color: #e6f3ff;
-            border: 2px solid #1e90ff;
-        """
+            "background-color: #e6f3ff; border: 2px solid #1e90ff;"
         )
         self.input_text.setPlaceholderText("Enter Serial Number")
-        self.input_text.textChanged.connect(
-            self.update_button_style
-        )  # Enable hover effect dynamically
+        self.input_text.textChanged.connect(self.update_button_style)
 
         self.output_text = QTextEdit(self)
         self.output_text.setFixedSize(200, 25)
         self.output_text.setStyleSheet(
-            """
-            background-color: #ffffe0;
-            border: 2px solid #1e90ff;
-        """
+            "background-color: #ffffe0; border: 2px solid #1e90ff;"
         )
         self.output_text.setReadOnly(True)
         self.output_text.setPlaceholderText("Result...")
 
-        # Submit button
         self.submit_button = QPushButton("Submit")
         self.submit_button.setFixedSize(100, 30)
         self.default_button_style = """
@@ -65,9 +57,28 @@ class MainWindow(QWidget):
         """
         )
 
-        self.submit_button.setStyleSheet(self.default_button_style)  # Set initial style
+        self.submit_button.setStyleSheet(self.default_button_style)
         self.submit_button.clicked.connect(self.send_data)
         self.submit_button.clicked.connect(self.fetch_data)
+
+        back_button = QPushButton("Back")
+        back_button.setFixedSize(100, 30)
+        back_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #FFA07A;
+                border: 2px solid #1e90ff;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+                padding: 5px;
+            }
+            QPushButton:hover {
+                background-color: #FF6347;
+            }
+        """
+        )
+        back_button.clicked.connect(self.go_back)
 
         # Layouts
         h_layout = QHBoxLayout()
@@ -77,12 +88,9 @@ class MainWindow(QWidget):
         v_layout = QVBoxLayout()
         v_layout.addLayout(h_layout)
         v_layout.addWidget(self.submit_button, alignment=Qt.AlignCenter)
+        v_layout.addWidget(back_button, alignment=Qt.AlignCenter)
 
         self.setLayout(v_layout)
-
-        # Window settings
-        self.setWindowTitle("Huawei OLT Configuration")
-        self.resize(500, 300)
 
     def update_button_style(self):
         """Enable hover effect only when input field is not empty."""
@@ -119,35 +127,23 @@ class MainWindow(QWidget):
                 data = response.json().get("data", "No data found")
                 self.output_text.setPlainText(f"Passed: {data}")
                 self.output_text.setStyleSheet(
-                    """
-                    background-color: #4CAF50;
-                    border: 2px solid #1e90ff;
-                """
+                    "background-color: #4CAF50; border: 2px solid #1e90ff;"
                 )
             else:
                 QMessageBox.critical(
                     self, "Error", "Failed: Your Data is not processed"
                 )
-                self.output_text.setPlainText(f"Failed: Your Data is not processed")
+                self.output_text.setPlainText("Failed: Your Data is not processed")
                 self.output_text.setStyleSheet(
-                    """
-                    background-color: #FF7F7F;
-                    border: 2px solid #1e90ff;
-                """
+                    "background-color: #FF7F7F; border: 2px solid #1e90ff;"
                 )
         except requests.exceptions.RequestException as e:
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
             self.output_text.setPlainText(f"An error occurred: {e}")
             self.output_text.setStyleSheet(
-                """
-                background-color: #FF0000;
-                border: 2px solid #1e90ff;
-            """
+                "background-color: #FF0000; border: 2px solid #1e90ff;"
             )
 
-
-if __name__ == "__main__":
-    app = QApplication([])
-    window = MainWindow()
-    window.show()
-    app.exec_()
+    def go_back(self):
+        """Go back to First Page"""
+        self.stack.setCurrentIndex(0)

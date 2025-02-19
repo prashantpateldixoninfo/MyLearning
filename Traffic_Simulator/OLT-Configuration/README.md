@@ -8,7 +8,11 @@ This project demonstrates how to create a simple Python GUI using Tkinter that i
 
 project/
 ├── gui/
-│ ├── main_window.py
+│ ├── **init**.py
+| ├── main.py
+| ├── main_page.py
+| ├── first_page.py
+| ├── second_page.py
 ├── backend/
 │ ├── api.py
 ├── shared/
@@ -38,7 +42,7 @@ project/
    python backend/api.py
 
 2. Run the GUI application:
-   python -m gui.main_window.py
+   python -m gui.main
 
 ### Running Tests
 
