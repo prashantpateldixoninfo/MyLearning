@@ -9,8 +9,11 @@ from qtpy.QtWidgets import (
 )
 import requests
 from qtpy.QtCore import Qt
-
-BACKEND_URL = "http://127.0.0.1:8000"
+import sys
+import os
+# Add the parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from shared.config import BACKEND_URL
 
 
 class ONTConfiguration(QWidget):
