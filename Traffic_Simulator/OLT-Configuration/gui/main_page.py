@@ -1,5 +1,5 @@
-from gui.first_page import FirstPage
-from gui.second_page import SecondPage
+from olt_page import OLTConfiguration
+from ont_page import ONTConfiguration
 from qtpy.QtWidgets import QWidget, QVBoxLayout, QStackedWidget
 
 
@@ -15,8 +15,8 @@ class MainPage(QWidget):
         self.resize(500, 300)
 
         self.stack = QStackedWidget()
-        self.page1 = FirstPage(self.stack)
-        self.page2 = SecondPage(self.stack)
+        self.page1 = OLTConfiguration(self.stack)
+        self.page2 = ONTConfiguration(self.stack)
 
         self.stack.addWidget(self.page1)
         self.stack.addWidget(self.page2)

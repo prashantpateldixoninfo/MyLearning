@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project demonstrates how to create a simple Python GUI using Tkinter that interacts with a Flask backend.
+This project demonstrates how to create a simple Python GUI using qtpy that interacts with a fastAPI backend.
 
 ## Project Structure
 
@@ -11,15 +11,20 @@ project/
 │ ├── **init**.py
 | ├── main.py
 | ├── main_page.py
-| ├── first_page.py
-| ├── second_page.py
+| ├── olt_page.py
+| ├── ont_page.py
+| ├── requirements.txt
 ├── backend/
-│ ├── api.py
+│ ├── **init**.py
+| ├── main.py
+| ├── olt_telnet.py
+| ├── olt_config.py
+| ├── ont_config.py
+| ├── requirements.txt
 ├── shared/
 │ ├── config.py
 ├── tests/
 │ ├── test_backend.py
-├── requirements.txt
 ├── README.md
 ├── .gitignore
 
@@ -29,20 +34,25 @@ project/
    git clone <https://github.com/prashantpateldixoninfo/MyLearning/tree/main/Traffic_Simulator/OLT-Configuration>
    cd OLT-Configuration
 
-2. Create a virtual environment:
+2. Create a virtual environment for backend(One Time):
+   cd backend
    python -m venv venv
-   venv\Scripts\activate # On Linux use `source venv/bin/activate`
+   venv\Scripts\activate
+   pip install -r requirements.txt # Do for any library update
 
-3. Install dependencies:
-   pip install -r requirements.txt
+3. Create a virtual environment for gui(One Time):
+   cd gui
+   python -m venv venv
+   venv\Scripts\activate
+   pip install -r requirements.txt # Do for any library update
 
 ### Running the Application
 
-1. Start the backend server:
-   python backend/api.py
+1. Start the backend server from OLT-Configuration\backend:
+   python -m main
 
-2. Run the GUI application:
-   python -m gui.main
+2. Run the GUI application from OLT-Configuration\gui:
+   python -m main
 
 ### Running Tests
 
