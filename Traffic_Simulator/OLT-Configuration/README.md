@@ -103,7 +103,3 @@ python -m unittest discover
     ```sh
     pip install -r requirements.txt
     ```
-
-```
-
-```

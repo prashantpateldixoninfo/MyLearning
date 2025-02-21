@@ -12,14 +12,12 @@ import requests
 import re
 import sys
 import os
+
 # Add the parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from shared.config import BACKEND_URL
 
-
 class OLTConfiguration(QWidget):
-    """First Page with Next Button to Navigate to the Second Page"""
-
     def __init__(self, stack):
         super().__init__()
         self.stack = stack
@@ -30,78 +28,59 @@ class OLTConfiguration(QWidget):
 
         # === OLT Connection Block ===
         olt_connection_group = QGroupBox("OLT Connection")
-        olt_connection_group.setStyleSheet(
-            "QGroupBox { font-weight: bold; font-size: 14px; }"
-        )
+        olt_connection_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 14px; }")
         olt_layout = QVBoxLayout()
 
         # Input Fields for OLT Connection
-        self.ip_input = QLineEdit()
-        self.ip_input.setPlaceholderText("IP Address")
-
-        self.user_input = QLineEdit()
-        self.user_input.setPlaceholderText("User")
-
-        self.password_input = QLineEdit()
-        self.password_input.setPlaceholderText("Password")
+        self.ip_input = QLineEdit(placeholderText="IP Address")
+        self.user_input = QLineEdit(placeholderText="User")
+        self.password_input = QLineEdit(placeholderText="Password")
         self.password_input.setEchoMode(QLineEdit.Password)  # Hide password input
 
         olt_layout.addWidget(self.ip_input)
         olt_layout.addWidget(self.user_input)
         olt_layout.addWidget(self.password_input)
 
-        # Output Field and Submit Button
-        self.olt_output = QTextEdit()
-        self.olt_output.setPlaceholderText("OLT Connection Output...")
+        self.olt_output = QTextEdit(placeholderText="OLT Connection Output...")
         self.olt_output.setReadOnly(True)
 
-        self.olt_submit_btn = QPushButton("Submit")
-        self.olt_submit_btn.clicked.connect(self.submit_credentials)
+        self.connect_btn = QPushButton("Connect")
+        self.disconnect_btn = QPushButton("Disconnect")
+        self.connect_btn.clicked.connect(self.connect_olt)
+        self.disconnect_btn.clicked.connect(self.disconnect_olt)
 
         olt_button_layout = QHBoxLayout()
-        olt_button_layout.addWidget(self.olt_output)
-        olt_button_layout.addWidget(self.olt_submit_btn)
+        olt_button_layout.addWidget(self.disconnect_btn)
+        olt_button_layout.addWidget(self.connect_btn)
 
+
+        olt_layout.addWidget(self.olt_output)
         olt_layout.addLayout(olt_button_layout)
         olt_connection_group.setLayout(olt_layout)
-
         main_layout.addWidget(olt_connection_group)
 
         # === OLT Port Setting Block ===
         olt_port_group = QGroupBox("OLT Port Setting")
-        olt_port_group.setStyleSheet(
-            "QGroupBox { font-weight: bold; font-size: 14px; }"
-        )
+        olt_port_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 14px; }")
         olt_port_layout = QVBoxLayout()
 
-        # Input Fields for OLT Port Setting
-        self.olt_port_input = QLineEdit()
-        self.olt_port_input.setPlaceholderText("OLT Port")
-
-        self.vlan_input = QLineEdit()
-        self.vlan_input.setPlaceholderText("VLAN")
-
-        self.upstream_input = QLineEdit()
-        self.upstream_input.setPlaceholderText("Upstream Port")
+        self.olt_port_input = QLineEdit(placeholderText="OLT Port (Frame/Slot/Port)")
+        self.vlan_input = QLineEdit(placeholderText="VLAN (1-65535)")
+        self.upstream_input = QLineEdit(placeholderText="Upstream Port (Frame/Slot/Port)")
 
         olt_port_layout.addWidget(self.olt_port_input)
         olt_port_layout.addWidget(self.vlan_input)
         olt_port_layout.addWidget(self.upstream_input)
 
-        # Output Field and Submit Button
-        self.olt_port_output = QTextEdit()
-        self.olt_port_output.setPlaceholderText("OLT Port Setting Output...")
+        self.olt_port_output = QTextEdit(placeholderText="OLT Port Setting Output...")
         self.olt_port_output.setReadOnly(True)
 
-        self.olt_port_submit_btn = QPushButton("Submit")
+        self.port_submit_btn = QPushButton("Submit")
+        self.port_submit_btn.clicked.connect(self.config_port_settings)
 
-        olt_port_button_layout = QHBoxLayout()
-        olt_port_button_layout.addWidget(self.olt_port_output)
-        olt_port_button_layout.addWidget(self.olt_port_submit_btn)
-
-        olt_port_layout.addLayout(olt_port_button_layout)
+        olt_port_layout.addWidget(self.olt_port_output)
+        olt_port_layout.addWidget(self.port_submit_btn)
         olt_port_group.setLayout(olt_port_layout)
-
         main_layout.addWidget(olt_port_group)
 
         # === Next Button ===
@@ -131,7 +110,7 @@ class OLTConfiguration(QWidget):
         """Switch to Second Page"""
         self.stack.setCurrentIndex(1)
 
-    def validate_inputs(self, ip, username, password):
+    def validate_credentials(self, ip, username, password):
         """Validate IP Address, Username, and Password"""
         ip_pattern = r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
 
@@ -144,13 +123,13 @@ class OLTConfiguration(QWidget):
 
         return None
 
-    def submit_credentials(self):
+    def connect_olt(self):
         """Collect, validate, and send data to the backend"""
         ip = self.ip_input.text().strip()
         username = self.user_input.text().strip()
         password = self.password_input.text().strip()
 
-        validation_error = self.validate_inputs(ip, username, password)
+        validation_error = self.validate_credentials(ip, username, password)
         if validation_error:
             self.olt_output.setText(validation_error)
             self.olt_output.setStyleSheet("color: red;")
@@ -158,13 +137,67 @@ class OLTConfiguration(QWidget):
 
         data = {"ip": ip, "username": username, "password": password}
         try:
-            response = requests.post(f"{BACKEND_URL}/connect", json=data)
+            response = requests.post(f"{BACKEND_URL}/olt/connect", json=data)
             if response.status_code == 200:
                 self.olt_output.setText(f"Success: {response.json().get('message')}")
                 self.olt_output.setStyleSheet("color: green;")
             else:
-                self.olt_output.setText(f"Error: {response.json().get('error')}")
+                self.olt_output.setText(f"Error: {response.json().get('detail')}")
                 self.olt_output.setStyleSheet("color: red;")
         except requests.exceptions.RequestException as e:
             self.olt_output.setText(f"Connection Error: {e}")
             self.olt_output.setStyleSheet("color: red;")
+
+    def disconnect_olt(self):
+        ip = self.ip_input.text().strip()
+        data = {"ip": ip}
+        try:
+            response = requests.post(f"{BACKEND_URL}/olt/disconnect", json=data)
+            if response.status_code == 200:
+                self.olt_output.setText("Disconnected successfully.")
+                self.olt_output.setStyleSheet("color: green;")
+            else:
+                print(f"400 bad request: {response.json()}")
+                self.olt_output.setText(f"Error: {response.json().get('detail')}")
+                self.olt_output.setStyleSheet("color: red;")
+        except requests.exceptions.RequestException as e:
+            self.olt_output.setText(f"Disconnection Error: {e}")
+            self.olt_output.setStyleSheet("color: red;")
+
+
+    def validate_port_settings(self, olt_port, vlan_id, uplink_port):
+        port_pattern = r"^\d{1,2}/\d{1,2}/\d{1,2}$"
+        vlan_pattern = r"^\d{1,5}$"
+
+        if not re.match(port_pattern, olt_port):
+            return "Invalid OLT Port format! Use Frame/Slot/Port."
+        if not re.match(vlan_pattern, vlan_id) or not (1 <= int(vlan_id) <= 65535):
+            return "Invalid VLAN ID! Range: 1-65535."
+        if not re.match(port_pattern, uplink_port):
+            return "Invalid Upstream Port format! Use Frame/Slot/Port."
+        return None
+
+    def config_port_settings(self):
+        olt_port = self.olt_port_input.text().strip()
+        vlan_id = self.vlan_input.text().strip()
+        upstream_port = self.upstream_input.text().strip()
+
+        validation_error = self.validate_port_settings(olt_port, vlan_id, upstream_port)
+        if validation_error:
+            self.olt_port_output.setText(validation_error)
+            self.olt_port_output.setStyleSheet("color: red;")
+            return
+
+        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port}
+        try:
+            response = requests.post(f"{BACKEND_URL}/olt/configure_port", json=data)
+            if response.status_code == 200:
+                self.olt_port_output.setText(f"Success: {response.json().get('message')}")
+                self.olt_port_output.setStyleSheet("color: green;")
+            else:
+                self.olt_port_output.setText(f"Error: {response.json().get('error')}")
+                self.olt_port_output.setStyleSheet("color: red;")
+        except requests.exceptions.RequestException as e:
+            self.olt_port_output.setText(f"Connection Error: {e}")
+            self.olt_port_output.setStyleSheet("color: red;")
+

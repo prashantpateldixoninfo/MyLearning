@@ -11,6 +11,8 @@ class OLTConnection(BaseModel):
     username: str = Field(..., min_length=1)
     password: str = Field(..., min_length=4)
 
+class DisconnectRequest(BaseModel):
+    ip: str
 
 class OLTCommand(BaseModel):
     ip: str
@@ -20,11 +22,19 @@ class OLTCommand(BaseModel):
 @olt_router.post("/connect")
 async def connect(olt: OLTConnection):
     """Connect to OLT"""
+    print("Connecting to OLT", olt.ip, olt.username, olt.password)
     tn, message = connect_to_olt(olt.ip, olt.username, olt.password)
     if tn:
         return {"message": message}
     raise HTTPException(status_code=400, detail=message)
 
+@olt_router.post("/disconnect")
+async def disconnect_olt(request: DisconnectRequest):
+    """Disconnect the Telnet session for the given OLT IP."""
+    ip = request.ip  # Extract the IP from the request body
+    if close_telnet_session(ip):
+        return {"message": f"Disconnected from OLT {ip} successfully."}
+    raise HTTPException(status_code=400, detail=f"No active session found for OLT {ip}.")
 
 @olt_router.post("/execute")
 async def execute_command(command: OLTCommand):
@@ -44,10 +54,3 @@ async def execute_command(command: OLTCommand):
             status_code=500, detail=f"Command execution failed: {str(e)}"
         )
 
-
-@olt_router.post("/close")
-async def close_session(ip: str):
-    """Close OLT Telnet session"""
-    if close_telnet_session(ip):
-        return {"message": "Telnet session closed successfully."}
-    raise HTTPException(status_code=400, detail="No active session found.")

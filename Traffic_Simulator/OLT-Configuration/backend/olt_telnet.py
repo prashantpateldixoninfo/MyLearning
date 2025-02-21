@@ -50,7 +50,7 @@ def connect_to_olt(ip: str, username: str, password: str):
         return tn, "Connected to OLT successfully!"
 
     except Exception as e:
-        return None, f"Telnet connection failed: {str(e)}"
+        return None, f"Telnet connection failed for IP <{ip}>: {str(e)}"
 
 
 def close_telnet_session(ip: str):
