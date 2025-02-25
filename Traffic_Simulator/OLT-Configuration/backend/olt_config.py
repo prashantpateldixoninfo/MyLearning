@@ -55,9 +55,9 @@ async def display_olt_connection(session: SessionStatusRequest):
     ip = session.ip
     status, msg = (lambda d: (d["status"], d["message"]))(check_telnet_status(ip))
     if status == "Active":
-        return {f"{msg}"}
+        return {"message": f"{msg} {ip} OLT"}
     elif status == "Inactive":
-        raise HTTPException(status_code=400, detail=f"No active session found for OLT {ip}.")
+        raise HTTPException(status_code=400, detail=f"{msg} {ip} OLT")
     
 
 @olt_router.post("/disconnect_telnet")
@@ -65,7 +65,7 @@ async def disconnect_olt(request: DisconnectRequest):
     """Disconnect the Telnet session for the given OLT IP."""
     ip = request.ip  # Extract the IP from the request body
     if close_telnet_session(ip):
-        return {"message": f"Disconnected from OLT {ip} successfully."}
+        return {"message": f"Disconnected from OLT {ip}"}
     raise HTTPException(status_code=400, detail=f"No active session found for OLT {ip}. Unable to Delete")
 
 @olt_router.post("/execute")
@@ -148,82 +148,97 @@ async def configure_olt_port(config: PortConfigRequest):
     """
     Configures the OLT port with VLAN and upstream port settings.
     """
-    print(f"Backend Configuring OLT Port: {config.olt_port}, VLAN: {config.vlan_id}, Upstream: {config.upstream_port}, IP: {config.ip}")
+    try:
+        print(f"Backend Configuring OLT Port: {config.olt_port}, VLAN: {config.vlan_id}, Upstream: {config.upstream_port}, IP: {config.ip}")
 
-    # Construct Huawei CLI commands
-    olt_slot, olt_port = config.olt_port.rsplit("/", 1)
-    upstream_slot, upstream_port = config.upstream_port.rsplit("/", 1)
-    commands = [
-        f"interface gpon {olt_slot}",
-        f"port {olt_port} ont-auto-find enable",
-        f"quit",
-        f"vlan {config.vlan_id} smart",
-        f"port vlan {config.vlan_id} {upstream_slot} {upstream_port}",
-    ]
+        # Construct Huawei CLI commands
+        olt_slot, olt_port = config.olt_port.rsplit("/", 1)
+        upstream_slot, upstream_port = config.upstream_port.rsplit("/", 1)
+        commands = [
+            f"interface gpon {olt_slot}",
+            f"port {olt_port} ont-auto-find enable",
+            "quit",
+            f"vlan {config.vlan_id} smart",
+            f"port vlan {config.vlan_id} {upstream_slot} {upstream_port}"
+        ]
 
-    output = []
-    print(f"Backend Executing commands: {commands}")
-    # Run Telnet commands asynchronously
-    loop = asyncio.get_running_loop()
-    output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
+        print(f"Backend Executing commands: {commands}")
+        
+        # Run Telnet commands asynchronously
+        loop = asyncio.get_running_loop()
+        output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
 
-    print(f"Backend Executed Commands Output: {output}")
-
-    return {"message": "Port configuration applied successfully!", "output": output}
+        print(f"Backend Executed Commands Output: {output}")
+        return {"message": "Port configuration applied!", "output": output}
+    
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=f"During port configuration | Reason: {e.detail}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"During port configuration | Reason: {str(e)}")
 
 @olt_router.post("/display_port_setting")
-async def configure_olt_port(config: PortConfigRequest):
+async def display_olt_port_status(config: PortConfigRequest):
     """
     Display the OLT port with VLAN and upstream port settings.
     """
-    print(f"Backend Display OLT Port: {config.olt_port}, VLAN: {config.vlan_id}, Upstream: {config.upstream_port}")
+    try:
+        print(f"Backend Display OLT Port: {config.olt_port}, VLAN: {config.vlan_id}, Upstream: {config.upstream_port}")
 
-    # Construct Huawei CLI commands
-    olt_slot, olt_port = config.olt_port.rsplit("/", 1)
-    upstream_slot, upstream_port = config.upstream_port.rsplit("/", 1)
-    commands = [
-        f"display vlan {config.vlan_id}",
-        f"display port vlan {config.upstream_port}",
-        f"display ont autofind all"
-    ]
+        # Construct Huawei CLI commands
+        olt_slot, olt_port = config.olt_port.rsplit("/", 1)
+        upstream_slot, upstream_port = config.upstream_port.rsplit("/", 1)
+        commands = [
+            f"display vlan {config.vlan_id}",
+            f"display port vlan {config.upstream_port}",
+            f"display ont autofind all"
+        ]
 
-    output = []
-    print(f"Backend Executing commands: {commands}")
-    # Run Telnet commands asynchronously
-    loop = asyncio.get_running_loop()
-    output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
+        print(f"Backend Executing commands: {commands}")
+        
+        # Run Telnet commands asynchronously
+        loop = asyncio.get_running_loop()
+        output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
 
-    print(f"Backend Executed Commands Output: {output}")
-
-    return {"message": "Displaying the port configuratuons!", "output": output}
+        print(f"Backend Executed Commands Output: {output}")
+        return {"message": "Displaying the port configurations!", "output": output}
+  
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=f"During port status | Reason: {e.detail}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"During port status | Reason: {str(e)}")
 
 @olt_router.post("/delete_port_setting")
-async def configure_olt_port(config: PortConfigRequest):
+async def unconfig_olt_port(config: PortConfigRequest):
     """
     UnConfigures the OLT port with VLAN and upstream port settings.
     """
-    print(f"Backend UnConfiguring OLT Port: {config.olt_port}, VLAN: {config.vlan_id}, Upstream: {config.upstream_port}")
+    try:
+        print(f"Backend UnConfiguring OLT Port: {config.olt_port}, VLAN: {config.vlan_id}, Upstream: {config.upstream_port}")
 
-    # Construct Huawei CLI commands
-    olt_slot, olt_port = config.olt_port.rsplit("/", 1)
-    upstream_slot, upstream_port = config.upstream_port.rsplit("/", 1)
-    commands = [
-        f"interface eth {upstream_slot}",
-        f"native-vlan {upstream_port} vlan 1",
-        "quit",
-        f"undo port vlan {config.vlan_id} {upstream_slot} {upstream_port}",
-        f"undo vlan {config.vlan_id}\n",
-        f"interface gpon {olt_slot}",
-        f"port {olt_port} ont-auto-find disable",
-        "quit\n"
-    ]
+        # Construct Huawei CLI commands
+        olt_slot, olt_port = config.olt_port.rsplit("/", 1)
+        upstream_slot, upstream_port = config.upstream_port.rsplit("/", 1)
+        commands = [
+            f"interface eth {upstream_slot}",
+            f"native-vlan {upstream_port} vlan 1",
+            "quit",
+            f"undo port vlan {config.vlan_id} {upstream_slot} {upstream_port}",
+            f"undo vlan {config.vlan_id}",
+            f"interface gpon {olt_slot}",
+            f"port {olt_port} ont-auto-find disable",
+            "quit"
+        ]
 
-    output = []
-    print(f"Backend Executing commands: {commands}")
-    # Run Telnet commands asynchronously
-    loop = asyncio.get_running_loop()
-    output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
+        print(f"Backend Executing commands: {commands}")
+        
+        # Run Telnet commands asynchronously
+        loop = asyncio.get_running_loop()
+        output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
 
-    print(f"Backend Executed Commands Output: {output}")
-
-    return {"message": "Port configuration deleted successfully!", "output": output}
+        print(f"Backend Executed Commands Output: {output}")
+        return {"message": "Port configuration deleted!", "output": output}
+    
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=f"During port unconfiguration | Reason: {e.detail}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"During port unconfiguration | Reason: {str(e)}")

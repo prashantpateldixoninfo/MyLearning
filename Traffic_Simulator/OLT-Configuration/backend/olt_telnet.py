@@ -39,15 +39,15 @@ def connect_to_olt(ip: str, username: str, password: str):
 
         response = tn.read_until(b">", timeout=5).decode("ascii")
 
-        if "incorrect" in response.lower():
+        if "invalid" in response.lower():
             tn.close()
-            return None, "Invalid credentials."
+            return None, f"Telnet connection failed for IP {ip} | Reason: Username or password invalid."
 
         telnet_sessions[ip] = (tn, time.time())  # Store session with timestamp
-        return tn, "Connected to OLT successfully!"
+        return tn, f"Connected to OLT {ip}"
 
     except Exception as e:
-        return None, f"Telnet connection failed for IP <{ip}>: {str(e)}"
+        return None, f"Telnet connection failed for IP {ip} | Reason: {str(e)}"
 
 def close_telnet_session(ip: str):
     """Close a Telnet session"""
@@ -61,5 +61,5 @@ def close_telnet_session(ip: str):
 def check_telnet_status(ip: str):
     """Check if a Telnet session is active for a given IP."""
     if ip in telnet_sessions:
-        return {"status": "Active", "message": f"Session active for {ip}"}
-    return {"status": "Inactive", "message": f"No active session for {ip}"}
+        return {"status": "Active", "message": f"Session is active for"}
+    return {"status": "Inactive", "message": f"No active session found for"}

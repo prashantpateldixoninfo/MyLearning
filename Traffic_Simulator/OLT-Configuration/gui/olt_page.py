@@ -6,6 +6,7 @@ from qtpy.QtWidgets import (
     QPushButton,
     QTextEdit,
     QGroupBox,
+    QCheckBox,
 )
 from qtpy.QtCore import Qt
 import requests
@@ -21,6 +22,7 @@ class OLTConfiguration(QWidget):
     def __init__(self, stack):
         super().__init__()
         self.stack = stack
+        self.debug_enabled = False 
         self.init_ui()
 
     def init_ui(self):
@@ -78,6 +80,11 @@ class OLTConfiguration(QWidget):
         self.olt_port_output = QTextEdit(placeholderText="OLT Port Setting Output...")
         self.olt_port_output.setReadOnly(True)
 
+        # Create Checkbox
+        self.port_checkbox = QCheckBox("Debug")
+        self.port_checkbox.setChecked(False)
+        self.port_checkbox.stateChanged.connect(self.on_checkbox_toggle)
+
         self.port_config_btn = QPushButton("Config")
         self.port_display_btn = QPushButton("Status")
         self.port_delete_btn = QPushButton("Delete")
@@ -90,7 +97,13 @@ class OLTConfiguration(QWidget):
         port_setting_btn_layout.addWidget(self.port_display_btn)
         port_setting_btn_layout.addWidget(self.port_config_btn)
 
+        # Create a layout to position the checkbox at the bottom-right
+        checkbox_layout = QHBoxLayout()
+        checkbox_layout.addStretch()  # Push checkbox to the right
+        checkbox_layout.addWidget(self.port_checkbox)
+
         olt_port_layout.addWidget(self.olt_port_output)
+        olt_port_layout.addLayout(checkbox_layout)
         olt_port_layout.addLayout(port_setting_btn_layout)
         olt_port_group.setLayout(olt_port_layout)
         main_layout.addWidget(olt_port_group)
@@ -122,18 +135,45 @@ class OLTConfiguration(QWidget):
         """Switch to Second Page"""
         self.stack.setCurrentIndex(1)
 
+    def on_checkbox_toggle(self, state):
+        """Store checkbox state in a class variable."""
+        self.debug_enabled = state == 2  # Qt.Checked = 2, Qt.Unchecked = 0
+        print(f"Checkbox State Updated: {self.debug_enabled}")  # Prints True/False
+
+
+    def validate_ip(self, ip):
+        """Validate IP Address format and range."""
+        ip_pattern = r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$"
+
+        # Check if IP matches the pattern
+        match = re.match(ip_pattern, ip)
+        if not ip or not match:
+            return "Invalid IP Address format!"
+
+        # Ensure all octets are in the range 0-255
+        if all(0 <= int(octet) <= 255 for octet in match.groups()):
+            return None  # Valid IP, return None (no error)
+        else:
+            return "Invalid IP Address range!"
+
     def validate_credentials(self, ip, username, password):
         """Validate IP Address, Username, and Password"""
-        ip_pattern = r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
 
-        if not ip or not re.match(ip_pattern, ip):
-            return "Invalid IP Address format!"
+        # Validate IP using validate_ip function
+        ip_error = self.validate_ip(ip)
+        if ip_error:
+            return ip_error  # Return error message if IP is invalid
+
+        # Validate Username
         if not username:
             return "Username cannot be empty!"
+
+        # Validate Password
         if len(password) < 4:
             return "Password must be at least 4 characters long!"
 
-        return None
+        return None  # Everything is valid
+
 
     def connect_olt_session(self):
         """Collect, validate, and send data to the backend"""
@@ -144,7 +184,7 @@ class OLTConfiguration(QWidget):
         validation_error = self.validate_credentials(ip, username, password)
         if validation_error:
             self.olt_output.setText(validation_error)
-            self.olt_output.setStyleSheet("color: red;")
+            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
             return
 
         data = {"ip": ip, "username": username, "password": password}
@@ -152,45 +192,57 @@ class OLTConfiguration(QWidget):
             response = requests.post(f"{BACKEND_URL}/olt/connect_telnet", json=data)
             if response.status_code == 200:
                 self.olt_output.setText(f"Success: {response.json().get('message')}")
-                self.olt_output.setStyleSheet("color: green;")
+                self.olt_output.setStyleSheet("font-weight: bold; color: green;")
             else:
                 self.olt_output.setText(f"Error: {response.json().get('detail')}")
-                self.olt_output.setStyleSheet("color: red;")
+                self.olt_output.setStyleSheet("font-weight: bold; color: red;")
         except requests.exceptions.RequestException as e:
             self.olt_output.setText(f"Connection Error: {e}")
-            self.olt_output.setStyleSheet("color: red;")
+            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
 
     def display_olt_session(self):
         ip = self.ip_input.text().strip()
+        
+        validation_error = self.validate_credentials(ip, "username", "password")
+        if validation_error:
+            self.olt_output.setText(validation_error)
+            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
+            return
+    
         data = {"ip": ip}
         try:
             response = requests.post(f"{BACKEND_URL}/olt/display_telnet", json=data)
             if response.status_code == 200:
-                self.olt_output.setText(f"Active session is available for {ip}.")
-                self.olt_output.setStyleSheet("color: green;")
+                self.olt_output.setText(f"Success: {response.json().get('message')}")
+                self.olt_output.setStyleSheet("font-weight: bold; color: green;")
             else:
-                print(f"400 bad request: {response.json()}")
                 self.olt_output.setText(f"Error: {response.json().get('detail')}")
-                self.olt_output.setStyleSheet("color: red;")
+                self.olt_output.setStyleSheet("font-weight: bold; color: red;")
         except requests.exceptions.RequestException as e:
             self.olt_output.setText(f"Displaying Error: {e}")
-            self.olt_output.setStyleSheet("color: red;")
+            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
 
     def disconnect_olt_session(self):
         ip = self.ip_input.text().strip()
+
+        validation_error = self.validate_credentials(ip, "username", "password")
+        if validation_error:
+            self.olt_output.setText(validation_error)
+            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
+            return
+
         data = {"ip": ip}
         try:
             response = requests.post(f"{BACKEND_URL}/olt/disconnect_telnet", json=data)
             if response.status_code == 200:
-                self.olt_output.setText("Disconnected successfully.")
-                self.olt_output.setStyleSheet("color: green;")
+                self.olt_output.setText(f"Success: {response.json().get('message')}")
+                self.olt_output.setStyleSheet("font-weight: bold; color: green;")
             else:
-                print(f"400 bad request: {response.json()}")
                 self.olt_output.setText(f"Error: {response.json().get('detail')}")
-                self.olt_output.setStyleSheet("color: red;")
+                self.olt_output.setStyleSheet("font-weight: bold; color: red;")
         except requests.exceptions.RequestException as e:
             self.olt_output.setText(f"Disconnection Error: {e}")
-            self.olt_output.setStyleSheet("color: red;")
+            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
 
 
     def validate_port_settings(self, olt_port, vlan_id, uplink_port):
@@ -223,8 +275,15 @@ class OLTConfiguration(QWidget):
             response = requests.post(f"{BACKEND_URL}/olt/configure_port_setting", json=data)
             print(f"Response: {response.json()}")
             if response.status_code == 200:
-                self.olt_port_output.setText(f"Success: {response.json().get('message')}")
-                self.olt_port_output.setStyleSheet("color: green;")
+                # Use HTML formatting inside QTextEdit
+                message = response.json().get("message")
+                formatted_text = f"""
+                    <p style="color: green; font-weight: bold;">Success: {message}</p>
+                """
+                self.olt_port_output.setHtml(formatted_text)
+                if self.debug_enabled:
+                    self.olt_port_output.append(f"{response.json().get('output')}")
+                    self.olt_port_output.setStyleSheet("color: blue;")
             else:
                 self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
                 self.olt_port_output.setStyleSheet("color: red;")
@@ -256,8 +315,9 @@ class OLTConfiguration(QWidget):
                     <p style="color: green; font-weight: bold;">Success: {message}</p>
                 """
                 self.olt_port_output.setHtml(formatted_text)
-                self.olt_port_output.append(f"{response.json().get('output')}")
-                self.olt_port_output.setStyleSheet("color: blue;")
+                if self.debug_enabled:
+                    self.olt_port_output.append(f"{response.json().get('output')}")
+                    self.olt_port_output.setStyleSheet("color: blue;")
             else:
                 self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
                 self.olt_port_output.setStyleSheet("color: red;")
@@ -281,10 +341,15 @@ class OLTConfiguration(QWidget):
         print(f"UnConfiguring OLT Port: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
         try:
             response = requests.post(f"{BACKEND_URL}/olt/delete_port_setting", json=data)
-            print(f"Response: {response.json()}")
             if response.status_code == 200:
-                self.olt_port_output.setText(f"Success: {response.json().get('message')}")
-                self.olt_port_output.setStyleSheet("color: green;")
+                message = response.json().get("message")
+                formatted_text = f"""
+                    <p style="color: green; font-weight: bold;">Success: {message}</p>
+                """
+                self.olt_port_output.setHtml(formatted_text)
+                if self.debug_enabled:
+                    self.olt_port_output.append(f"{response.json().get('output')}")
+                    self.olt_port_output.setStyleSheet("color: blue;")
             else:
                 self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
                 self.olt_port_output.setStyleSheet("color: red;")
