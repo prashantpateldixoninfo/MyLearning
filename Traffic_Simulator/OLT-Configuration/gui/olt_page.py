@@ -44,20 +44,23 @@ class OLTConfiguration(QWidget):
         self.olt_output = QTextEdit(placeholderText="OLT Connection Output...")
         self.olt_output.setReadOnly(True)
 
-        self.connect_btn = QPushButton("Connect")
-        self.disconnect_btn = QPushButton("Disconnect")
-        self.connect_btn.clicked.connect(self.connect_olt)
-        self.disconnect_btn.clicked.connect(self.disconnect_olt)
+        self.connect_telnet_btn = QPushButton("Connect")
+        self.display_telnet_btn = QPushButton("Status")
+        self.disconnect_telnet_btn = QPushButton("Disconnect")
+        self.connect_telnet_btn.clicked.connect(self.connect_olt_session)
+        self.display_telnet_btn.clicked.connect(self.display_olt_session)
+        self.disconnect_telnet_btn.clicked.connect(self.disconnect_olt_session)
 
         olt_button_layout = QHBoxLayout()
-        olt_button_layout.addWidget(self.disconnect_btn)
-        olt_button_layout.addWidget(self.connect_btn)
-
+        olt_button_layout.addWidget(self.disconnect_telnet_btn)
+        olt_button_layout.addWidget(self.display_telnet_btn)
+        olt_button_layout.addWidget(self.connect_telnet_btn)
 
         olt_layout.addWidget(self.olt_output)
         olt_layout.addLayout(olt_button_layout)
         olt_connection_group.setLayout(olt_layout)
         main_layout.addWidget(olt_connection_group)
+
 
         # === OLT Port Setting Block ===
         olt_port_group = QGroupBox("OLT Port Setting")
@@ -75,11 +78,20 @@ class OLTConfiguration(QWidget):
         self.olt_port_output = QTextEdit(placeholderText="OLT Port Setting Output...")
         self.olt_port_output.setReadOnly(True)
 
-        self.port_submit_btn = QPushButton("Submit")
-        self.port_submit_btn.clicked.connect(self.config_port_settings)
+        self.port_config_btn = QPushButton("Config")
+        self.port_display_btn = QPushButton("Status")
+        self.port_delete_btn = QPushButton("Delete")
+        self.port_config_btn.clicked.connect(self.config_port_settings)
+        self.port_display_btn.clicked.connect(self.display_port_settings)
+        self.port_delete_btn.clicked.connect(self.delete_port_settings)
+
+        port_setting_btn_layout = QHBoxLayout()
+        port_setting_btn_layout.addWidget(self.port_delete_btn)
+        port_setting_btn_layout.addWidget(self.port_display_btn)
+        port_setting_btn_layout.addWidget(self.port_config_btn)
 
         olt_port_layout.addWidget(self.olt_port_output)
-        olt_port_layout.addWidget(self.port_submit_btn)
+        olt_port_layout.addLayout(port_setting_btn_layout)
         olt_port_group.setLayout(olt_port_layout)
         main_layout.addWidget(olt_port_group)
 
@@ -123,7 +135,7 @@ class OLTConfiguration(QWidget):
 
         return None
 
-    def connect_olt(self):
+    def connect_olt_session(self):
         """Collect, validate, and send data to the backend"""
         ip = self.ip_input.text().strip()
         username = self.user_input.text().strip()
@@ -137,7 +149,7 @@ class OLTConfiguration(QWidget):
 
         data = {"ip": ip, "username": username, "password": password}
         try:
-            response = requests.post(f"{BACKEND_URL}/olt/connect", json=data)
+            response = requests.post(f"{BACKEND_URL}/olt/connect_telnet", json=data)
             if response.status_code == 200:
                 self.olt_output.setText(f"Success: {response.json().get('message')}")
                 self.olt_output.setStyleSheet("color: green;")
@@ -148,11 +160,27 @@ class OLTConfiguration(QWidget):
             self.olt_output.setText(f"Connection Error: {e}")
             self.olt_output.setStyleSheet("color: red;")
 
-    def disconnect_olt(self):
+    def display_olt_session(self):
         ip = self.ip_input.text().strip()
         data = {"ip": ip}
         try:
-            response = requests.post(f"{BACKEND_URL}/olt/disconnect", json=data)
+            response = requests.post(f"{BACKEND_URL}/olt/display_telnet", json=data)
+            if response.status_code == 200:
+                self.olt_output.setText(f"Active session is available for {ip}.")
+                self.olt_output.setStyleSheet("color: green;")
+            else:
+                print(f"400 bad request: {response.json()}")
+                self.olt_output.setText(f"Error: {response.json().get('detail')}")
+                self.olt_output.setStyleSheet("color: red;")
+        except requests.exceptions.RequestException as e:
+            self.olt_output.setText(f"Displaying Error: {e}")
+            self.olt_output.setStyleSheet("color: red;")
+
+    def disconnect_olt_session(self):
+        ip = self.ip_input.text().strip()
+        data = {"ip": ip}
+        try:
+            response = requests.post(f"{BACKEND_URL}/olt/disconnect_telnet", json=data)
             if response.status_code == 200:
                 self.olt_output.setText("Disconnected successfully.")
                 self.olt_output.setStyleSheet("color: green;")
@@ -181,6 +209,7 @@ class OLTConfiguration(QWidget):
         olt_port = self.olt_port_input.text().strip()
         vlan_id = self.vlan_input.text().strip()
         upstream_port = self.upstream_input.text().strip()
+        ip = self.ip_input.text().strip()
 
         validation_error = self.validate_port_settings(olt_port, vlan_id, upstream_port)
         if validation_error:
@@ -188,14 +217,76 @@ class OLTConfiguration(QWidget):
             self.olt_port_output.setStyleSheet("color: red;")
             return
 
-        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port}
+        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port, "ip": ip}
+        print(f"Configuring OLT Port: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
         try:
-            response = requests.post(f"{BACKEND_URL}/olt/configure_port", json=data)
+            response = requests.post(f"{BACKEND_URL}/olt/configure_port_setting", json=data)
+            print(f"Response: {response.json()}")
             if response.status_code == 200:
                 self.olt_port_output.setText(f"Success: {response.json().get('message')}")
                 self.olt_port_output.setStyleSheet("color: green;")
             else:
-                self.olt_port_output.setText(f"Error: {response.json().get('error')}")
+                self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
+                self.olt_port_output.setStyleSheet("color: red;")
+        except requests.exceptions.RequestException as e:
+            self.olt_port_output.setText(f"Connection Error: {e}")
+            self.olt_port_output.setStyleSheet("color: red;")
+
+    def display_port_settings(self):
+        olt_port = self.olt_port_input.text().strip()
+        vlan_id = self.vlan_input.text().strip()
+        upstream_port = self.upstream_input.text().strip()
+        ip = self.ip_input.text().strip()
+
+        validation_error = self.validate_port_settings(olt_port, vlan_id, upstream_port)
+        if validation_error:
+            self.olt_port_output.setText(validation_error)
+            self.olt_port_output.setStyleSheet("color: red;")
+            return
+
+        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port, "ip": ip}
+        print(f"Display Configuring OLT Port: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
+        try:
+            response = requests.post(f"{BACKEND_URL}/olt/display_port_setting", json=data)
+            print(f"Response: {response.json()}")
+            if response.status_code == 200:
+                # Use HTML formatting inside QTextEdit
+                message = response.json().get("message")
+                formatted_text = f"""
+                    <p style="color: green; font-weight: bold;">Success: {message}</p>
+                """
+                self.olt_port_output.setHtml(formatted_text)
+                self.olt_port_output.append(f"{response.json().get('output')}")
+                self.olt_port_output.setStyleSheet("color: blue;")
+            else:
+                self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
+                self.olt_port_output.setStyleSheet("color: red;")
+        except requests.exceptions.RequestException as e:
+            self.olt_port_output.setText(f"Connection Error: {e}")
+            self.olt_port_output.setStyleSheet("color: red;")
+
+    def delete_port_settings(self):
+        olt_port = self.olt_port_input.text().strip()
+        vlan_id = self.vlan_input.text().strip()
+        upstream_port = self.upstream_input.text().strip()
+        ip = self.ip_input.text().strip()
+
+        validation_error = self.validate_port_settings(olt_port, vlan_id, upstream_port)
+        if validation_error:
+            self.olt_port_output.setText(validation_error)
+            self.olt_port_output.setStyleSheet("color: red;")
+            return
+
+        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port, "ip": ip}
+        print(f"UnConfiguring OLT Port: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
+        try:
+            response = requests.post(f"{BACKEND_URL}/olt/delete_port_setting", json=data)
+            print(f"Response: {response.json()}")
+            if response.status_code == 200:
+                self.olt_port_output.setText(f"Success: {response.json().get('message')}")
+                self.olt_port_output.setStyleSheet("color: green;")
+            else:
+                self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
                 self.olt_port_output.setStyleSheet("color: red;")
         except requests.exceptions.RequestException as e:
             self.olt_port_output.setText(f"Connection Error: {e}")
