@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from olt_telnet import connect_to_olt, telnet_sessions, close_telnet_session, check_telnet_status
 import time
+import re
 
 olt_router = APIRouter()
 executor = ThreadPoolExecutor()
@@ -159,7 +160,10 @@ async def configure_olt_port(config: PortConfigRequest):
             f"port {olt_port} ont-auto-find enable",
             "quit",
             f"vlan {config.vlan_id} smart",
-            f"port vlan {config.vlan_id} {upstream_slot} {upstream_port}"
+            f"port vlan {config.vlan_id} {upstream_slot} {upstream_port}",
+            f"interface eth {upstream_slot}",
+            f"native-vlan {upstream_port} vlan {config.vlan_id}",
+            "quit",
         ]
 
         print(f"Backend Executing commands: {commands}")
@@ -176,8 +180,8 @@ async def configure_olt_port(config: PortConfigRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"During port configuration | Reason: {str(e)}")
 
-@olt_router.post("/display_port_setting")
-async def display_olt_port_status(config: PortConfigRequest):
+@olt_router.post("/display_port_status_details")
+async def display_port_status_details(config: PortConfigRequest):
     """
     Display the OLT port with VLAN and upstream port settings.
     """
@@ -200,7 +204,65 @@ async def display_olt_port_status(config: PortConfigRequest):
         output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
 
         print(f"Backend Executed Commands Output: {output}")
-        return {"message": "Displaying the port configurations!", "output": output}
+        return {"message": "Displaying the port configurations in details!", "output": output}
+  
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=f"During port status | Reason: {e.detail}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"During port status | Reason: {str(e)}")
+
+def extract_vlan_info(output):
+    """Extract F/S/P, Native VLAN, and State from the given text."""
+    pattern = r"\s*(\d+ /\d+/\d+)\s+(\d+)\s+(\w+)"
+    
+    match = re.search(pattern, output)
+    if match:
+        olt_port, native_vlan, state = match.groups()
+        return {
+            "F/S/P": olt_port.strip(),
+            "Native VLAN": native_vlan.strip(),
+            "State": state.strip()
+        }
+    return None
+
+@olt_router.post("/display_port_status_summary")
+async def display_port_status_summary(config: PortConfigRequest):
+    """
+    Display the OLT port with VLAN and upstream port settings.
+    """
+    try:
+        print(f"Backend Display OLT Port: {config.olt_port}, VLAN: {config.vlan_id}, Upstream: {config.upstream_port}")
+
+        # Construct Huawei CLI commands
+        olt_slot, olt_port = config.olt_port.rsplit("/", 1)
+        upstream_slot, upstream_port = config.upstream_port.rsplit("/", 1)
+        commands = [
+            f"display vlan {config.vlan_id}",
+            f"display port vlan {config.upstream_port}",
+            f"display ont autofind all"
+        ]
+
+        print(f"Backend Executing commands: {commands}")
+        
+        # Run Telnet commands asynchronously
+        loop = asyncio.get_running_loop()
+        output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
+
+        print(f"Backend Executed Commands Output: {output}")
+        # Extract information
+        vlan_info = extract_vlan_info(output)
+        print(f"Extracted VLAN Info: {vlan_info}")
+
+        if vlan_info:
+            output_string = "\n".join([
+                f"F/S/P: {vlan_info.get('F/S/P', 'N/A')}",
+                f"Native VLAN: {vlan_info.get('Native VLAN', 'N/A')}",
+                f"State: {vlan_info.get('State', 'N/A')}"
+            ])
+        else:
+            output_string = "No VLAN information found."
+        print(f"Output String:\n{output_string}")
+        return {"message": "Displaying the port configurations as summary!", "output": output_string}
   
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=f"During port status | Reason: {e.detail}")

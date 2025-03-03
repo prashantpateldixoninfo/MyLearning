@@ -291,7 +291,7 @@ class OLTConfiguration(QWidget):
             self.olt_port_output.setText(f"Connection Error: {e}")
             self.olt_port_output.setStyleSheet("color: red;")
 
-    def display_port_settings(self):
+    def display_port_settings_details(self):
         olt_port = self.olt_port_input.text().strip()
         vlan_id = self.vlan_input.text().strip()
         upstream_port = self.upstream_input.text().strip()
@@ -304,9 +304,9 @@ class OLTConfiguration(QWidget):
             return
 
         data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port, "ip": ip}
-        print(f"Display Configuring OLT Port: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
+        print(f"Display OLT Port Status as Details: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
         try:
-            response = requests.post(f"{BACKEND_URL}/olt/display_port_setting", json=data)
+            response = requests.post(f"{BACKEND_URL}/olt/display_port_status_details", json=data)
             print(f"Response: {response.json()}")
             if response.status_code == 200:
                 # Use HTML formatting inside QTextEdit
@@ -315,15 +315,54 @@ class OLTConfiguration(QWidget):
                     <p style="color: green; font-weight: bold;">Success: {message}</p>
                 """
                 self.olt_port_output.setHtml(formatted_text)
-                if self.debug_enabled:
-                    self.olt_port_output.append(f"{response.json().get('output')}")
-                    self.olt_port_output.setStyleSheet("color: blue;")
+                self.olt_port_output.append(f"{response.json().get('output')}")
+                self.olt_port_output.setStyleSheet("color: blue;")
             else:
                 self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
                 self.olt_port_output.setStyleSheet("color: red;")
         except requests.exceptions.RequestException as e:
             self.olt_port_output.setText(f"Connection Error: {e}")
             self.olt_port_output.setStyleSheet("color: red;")
+
+    def display_port_settings_summary(self):
+        olt_port = self.olt_port_input.text().strip()
+        vlan_id = self.vlan_input.text().strip()
+        upstream_port = self.upstream_input.text().strip()
+        ip = self.ip_input.text().strip()
+
+        validation_error = self.validate_port_settings(olt_port, vlan_id, upstream_port)
+        if validation_error:
+            self.olt_port_output.setText(validation_error)
+            self.olt_port_output.setStyleSheet("color: red;")
+            return
+
+        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port, "ip": ip}
+        print(f"Display OLT Port Summary: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
+        try:
+            response = requests.post(f"{BACKEND_URL}/olt/display_port_status_summary", json=data)
+            print(f"Response: {response.json()}")
+            if response.status_code == 200:
+                # Use HTML formatting inside QTextEdit
+                message = response.json().get("message")
+                formatted_text = f"""
+                    <p style="color: green; font-weight: bold;">Success: {message}</p>
+                """
+                self.olt_port_output.setHtml(formatted_text)
+                self.olt_port_output.append(f"{response.json().get('output')}")
+                self.olt_port_output.setStyleSheet("color: blue;")
+            else:
+                self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
+                self.olt_port_output.setStyleSheet("color: red;")
+        except requests.exceptions.RequestException as e:
+            self.olt_port_output.setText(f"Connection Error: {e}")
+            self.olt_port_output.setStyleSheet("color: red;")
+
+    def display_port_settings(self):
+        if self.debug_enabled:
+            self.display_port_settings_details()
+        else:
+            self.display_port_settings_summary()
+        
 
     def delete_port_settings(self):
         olt_port = self.olt_port_input.text().strip()
