@@ -68,14 +68,14 @@ class OLTConfiguration(QWidget):
         olt_port_group = QGroupBox("OLT Port Setting")
         olt_port_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 14px; }")
         olt_port_layout = QVBoxLayout()
-
-        self.olt_port_input = QLineEdit(placeholderText="OLT Port (Frame/Slot/Port)")
+  
+        self.uplink_input = QLineEdit(placeholderText="Uplink Port (Frame/Slot/Port)")
         self.vlan_input = QLineEdit(placeholderText="VLAN (1-65535)")
-        self.upstream_input = QLineEdit(placeholderText="Upstream Port (Frame/Slot/Port)")
-
-        olt_port_layout.addWidget(self.olt_port_input)
+        self.olt_port_input = QLineEdit(placeholderText="OLT PON Port (Frame/Slot/Port)")
+        
+        olt_port_layout.addWidget(self.uplink_input)
         olt_port_layout.addWidget(self.vlan_input)
-        olt_port_layout.addWidget(self.upstream_input)
+        olt_port_layout.addWidget(self.olt_port_input)
 
         self.olt_port_output = QTextEdit(placeholderText="OLT Port Setting Output...")
         self.olt_port_output.setReadOnly(True)
@@ -254,23 +254,23 @@ class OLTConfiguration(QWidget):
         if not re.match(vlan_pattern, vlan_id) or not (1 <= int(vlan_id) <= 65535):
             return "Invalid VLAN ID! Range: 1-65535."
         if not re.match(port_pattern, uplink_port):
-            return "Invalid Upstream Port format! Use Frame/Slot/Port."
+            return "Invalid Uplink Port format! Use Frame/Slot/Port."
         return None
 
     def config_port_settings(self):
         olt_port = self.olt_port_input.text().strip()
         vlan_id = self.vlan_input.text().strip()
-        upstream_port = self.upstream_input.text().strip()
+        uplink_port = self.uplink_input.text().strip()
         ip = self.ip_input.text().strip()
 
-        validation_error = self.validate_port_settings(olt_port, vlan_id, upstream_port)
+        validation_error = self.validate_port_settings(olt_port, vlan_id, uplink_port)
         if validation_error:
             self.olt_port_output.setText(validation_error)
             self.olt_port_output.setStyleSheet("color: red;")
             return
 
-        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port, "ip": ip}
-        print(f"Configuring OLT Port: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
+        data = {"ip": ip, "uplink_port": uplink_port, "vlan_id": vlan_id, "pon_port": olt_port}
+        print(f"Configuring IP: {ip}, Uplink Port: {uplink_port}, VLAN: {vlan_id}, OLT Port: {olt_port}")
         try:
             response = requests.post(f"{BACKEND_URL}/olt/configure_port_setting", json=data)
             print(f"Response: {response.json()}")
@@ -294,17 +294,17 @@ class OLTConfiguration(QWidget):
     def display_port_settings_details(self):
         olt_port = self.olt_port_input.text().strip()
         vlan_id = self.vlan_input.text().strip()
-        upstream_port = self.upstream_input.text().strip()
+        uplink_port = self.uplink_input.text().strip()
         ip = self.ip_input.text().strip()
 
-        validation_error = self.validate_port_settings(olt_port, vlan_id, upstream_port)
+        validation_error = self.validate_port_settings(olt_port, vlan_id, uplink_port)
         if validation_error:
             self.olt_port_output.setText(validation_error)
             self.olt_port_output.setStyleSheet("color: red;")
             return
 
-        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port, "ip": ip}
-        print(f"Display OLT Port Status as Details: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
+        data = {"ip": ip, "uplink_port": uplink_port, "vlan_id": vlan_id, "pon_port": olt_port}
+        print(f"Display IP: {ip}, Uplink Port: {uplink_port}, VLAN: {vlan_id}, OLT Port: {olt_port}")
         try:
             response = requests.post(f"{BACKEND_URL}/olt/display_port_status_details", json=data)
             print(f"Response: {response.json()}")
@@ -327,17 +327,17 @@ class OLTConfiguration(QWidget):
     def display_port_settings_summary(self):
         olt_port = self.olt_port_input.text().strip()
         vlan_id = self.vlan_input.text().strip()
-        upstream_port = self.upstream_input.text().strip()
+        uplink_port = self.uplink_input.text().strip()
         ip = self.ip_input.text().strip()
 
-        validation_error = self.validate_port_settings(olt_port, vlan_id, upstream_port)
+        validation_error = self.validate_port_settings(olt_port, vlan_id, uplink_port)
         if validation_error:
             self.olt_port_output.setText(validation_error)
             self.olt_port_output.setStyleSheet("color: red;")
             return
 
-        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port, "ip": ip}
-        print(f"Display OLT Port Summary: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
+        data = {"ip": ip, "uplink_port": uplink_port, "vlan_id": vlan_id, "pon_port": olt_port}
+        print(f"Display Summary IP: {ip}, Uplink Port: {uplink_port}, VLAN: {vlan_id}, OLT Port: {olt_port}")
         try:
             response = requests.post(f"{BACKEND_URL}/olt/display_port_status_summary", json=data)
             print(f"Response: {response.json()}")
@@ -367,17 +367,17 @@ class OLTConfiguration(QWidget):
     def delete_port_settings(self):
         olt_port = self.olt_port_input.text().strip()
         vlan_id = self.vlan_input.text().strip()
-        upstream_port = self.upstream_input.text().strip()
+        uplink_port = self.uplink_input.text().strip()
         ip = self.ip_input.text().strip()
 
-        validation_error = self.validate_port_settings(olt_port, vlan_id, upstream_port)
+        validation_error = self.validate_port_settings(olt_port, vlan_id, uplink_port)
         if validation_error:
             self.olt_port_output.setText(validation_error)
             self.olt_port_output.setStyleSheet("color: red;")
             return
 
-        data = {"olt_port": olt_port, "vlan_id": vlan_id, "upstream_port": upstream_port, "ip": ip}
-        print(f"UnConfiguring OLT Port: {olt_port}, VLAN: {vlan_id}, Upstream: {upstream_port}, IP: {ip}")
+        data = {"ip": ip, "uplink_port": uplink_port, "vlan_id": vlan_id, "pon_port": olt_port}
+        print(f"UnConfiguring IP: {ip}, Uplink Port: {uplink_port}, VLAN: {vlan_id}, OLT Port: {olt_port}")
         try:
             response = requests.post(f"{BACKEND_URL}/olt/delete_port_setting", json=data)
             if response.status_code == 200:
