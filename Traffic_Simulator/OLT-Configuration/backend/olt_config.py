@@ -212,38 +212,37 @@ async def display_port_status_details(config: PortConfigRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"During port status | Reason: {str(e)}")
 
-def extract_port_information(output, user_pon_port):
+def extract_port_information(output, user_uplink_port, user_pon_port):
     """
-    Extract Uplink Port, Native VLAN, State, PON Port, and all ONT Serial Numbers belonging to the given PON Port.
+    Extracts Native VLAN from 'Native VLAN:' key, State for the given Uplink Port,
+    and all ONT Serial Numbers for the given PON Port.
     """
 
-    # Pattern to extract OLT Port details
-    olt_pattern = r"\s*(\d+ /\d+/\d+)\s+(\d+)\s+(\w+)"
+    # Extract Native VLAN from "Native VLAN:" key
+    native_vlan_match = re.search(r"Native VLAN:\s*(\d+)", output)
+    native_vlan = native_vlan_match.group(1).strip() if native_vlan_match else "N/A"
 
-    # Pattern to extract ONT Port and ONT Serial Number(s)
+    # Extract State for the given Uplink Port
+    state_pattern = r"\s*(\d+ /\d+/\d+)\s+(\d+)\s+(\w+)"
+    state_match = re.search(state_pattern, output)
+    state = state_match.group(3).strip() if state_match else "N/A"
+
+    # Extract ONT Port and ONT Serial Number(s)
     ont_pattern = r"F/S/P\s*:\s*(\d+/\d+/\d+).*?Ont SN\s*:\s*([\w\d]+)\s*\((.*?)\)"
-
-    # Extract OLT Port Information
-    olt_match = re.search(olt_pattern, output)
-    olt_port = olt_match.group(1).strip() if olt_match else "N/A"
-    native_vlan = olt_match.group(2).strip() if olt_match else "N/A"
-    state = olt_match.group(3).strip() if olt_match else "N/A"
-
-    # Extract all ONT Port and ONT Serial Number(s)
     ont_matches = re.findall(ont_pattern, output, re.DOTALL)
 
-    # Collect ONT SNs belonging to the user-specified PON Port
+    # Filter ONT Serial Numbers belonging to the specified PON Port
     ont_sn_list = [
         f"{ont_sn} ({ont_vendor})"
         for pon_port, ont_sn, ont_vendor in ont_matches
         if pon_port.strip() == user_pon_port.strip()
     ]
 
-    # If no ONTs found for the specified PON Port, return default message
+    # If no ONTs found, return default message
     ont_sn_result = ", ".join(ont_sn_list) if ont_sn_list else "No ONT found"
 
     return {
-        "Uplink Port": olt_port,
+        "Uplink Port": user_uplink_port,
         "Native VLAN": native_vlan,
         "State": state,
         "PON Port": user_pon_port,
@@ -275,14 +274,16 @@ async def display_port_status_summary(config: PortConfigRequest):
 
         print(f"Backend Executed Commands Output: {output}")
         # Extract information
-        port_info = extract_port_information(output, config.pon_port)
+        port_info = extract_port_information(output, config.uplink_port, config.pon_port)
         print(f"Extracted VLAN Info: {port_info}")
 
         if port_info:
             output_string = "\n".join([
+                "------------------Uplink Info------------------\n"
                 f"Uplink Port: {port_info.get('Uplink Port', 'N/A')}",
                 f"Native VLAN: {port_info.get('Native VLAN', 'N/A')}",
                 f"State: {port_info.get('State', 'N/A')}",
+                "------------------OLT PON Info------------------\n"
                 f"PON Port: {port_info.get('PON Port', 'N/A')}",
                 f"ONT Serial Num: {port_info.get('ONT Serial Num', 'No ONT found')}"
             ])
