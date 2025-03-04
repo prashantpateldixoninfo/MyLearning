@@ -1,4 +1,3 @@
-````markdown
 # OLT Configuration Script
 
 ## 🚀 Overview
@@ -9,7 +8,7 @@ This project demonstrates how to create an OLT telnet session and push and see c
 
 ## 📂 Project Structure
 
-```plaintext
+````bash
 OLT-Configuration/
 ├── gui/                     # Frontend (QtPy-based GUI)
 │   ├── __init__.py
@@ -31,8 +30,7 @@ OLT-Configuration/
 │   ├── test_backend.py
 ├── README.md                # Documentation
 ├── .gitignore               # Ignore Unwanted Files
-```
-````
+
 
 ## 🔧 **Installation**
 
@@ -41,7 +39,7 @@ OLT-Configuration/
 ```sh
 git clone https://github.com/prashantpateldixoninfo/MyLearning.git
 cd MyLearning/Traffic_Simulator/OLT-Configuration
-```
+````
 
 ### 🖥 2️⃣ **Set Up Backend**
 
