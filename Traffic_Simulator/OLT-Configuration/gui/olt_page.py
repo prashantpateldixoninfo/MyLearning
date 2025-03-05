@@ -140,6 +140,13 @@ class OLTConfiguration(QWidget):
         self.debug_enabled = state == 2  # Qt.Checked = 2, Qt.Unchecked = 0
         print(f"Checkbox State Updated: {self.debug_enabled}")  # Prints True/False
 
+    def get_olt_data(self):
+        """Retrieve IP Address, VLAN, and OLT Port for ONT Page"""
+        return {
+            "ip": self.ip_input.text().strip(),
+            "vlan": self.vlan_input.text().strip(),
+            "olt_port": self.olt_port_input.text().strip(),
+        }
 
     def validate_ip(self, ip):
         """Validate IP Address format and range."""

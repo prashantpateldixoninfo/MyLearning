@@ -15,11 +15,11 @@ class MainPage(QWidget):
         self.resize(500, 300)
 
         self.stack = QStackedWidget()
-        self.page1 = OLTConfiguration(self.stack)
-        self.page2 = ONTConfiguration(self.stack)
+        self.olt_page = OLTConfiguration(self.stack)
+        self.ont_page = ONTConfiguration(self.stack, self.olt_page)
 
-        self.stack.addWidget(self.page1)
-        self.stack.addWidget(self.page2)
+        self.stack.addWidget(self.olt_page)
+        self.stack.addWidget(self.ont_page)
 
         layout = QVBoxLayout()
         layout.addWidget(self.stack)
