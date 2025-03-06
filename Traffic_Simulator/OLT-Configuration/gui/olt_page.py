@@ -35,9 +35,12 @@ class OLTConfiguration(QWidget):
 
         # Input Fields for OLT Connection
         self.ip_input = QLineEdit(placeholderText="IP Address")
+        self.ip_input.setText("10.11.104.2")
         self.user_input = QLineEdit(placeholderText="User")
+        self.user_input.setText("root")
         self.password_input = QLineEdit(placeholderText="Password")
         self.password_input.setEchoMode(QLineEdit.Password)  # Hide password input
+        self.password_input.setText("admin")
 
         olt_layout.addWidget(self.ip_input)
         olt_layout.addWidget(self.user_input)
@@ -70,8 +73,11 @@ class OLTConfiguration(QWidget):
         olt_port_layout = QVBoxLayout()
   
         self.uplink_input = QLineEdit(placeholderText="Uplink Port (Frame/Slot/Port)")
+        self.uplink_input.setText("0/16/5")
         self.vlan_input = QLineEdit(placeholderText="VLAN (1-65535)")
+        self.vlan_input.setText("55")
         self.olt_port_input = QLineEdit(placeholderText="OLT PON Port (Frame/Slot/Port)")
+        self.olt_port_input.setText("0/1/5")
         
         olt_port_layout.addWidget(self.uplink_input)
         olt_port_layout.addWidget(self.vlan_input)
@@ -109,9 +115,9 @@ class OLTConfiguration(QWidget):
         main_layout.addWidget(olt_port_group)
 
         # === Next Button ===
-        next_button = QPushButton("Next →")
-        next_button.setFixedSize(100, 30)
-        next_button.setStyleSheet(
+        self.next_button = QPushButton("Next →")
+        self.next_button.setFixedSize(100, 30)
+        self.next_button.setStyleSheet(
             """
             QPushButton {
                 background-color: #A5D6A7;
@@ -126,8 +132,8 @@ class OLTConfiguration(QWidget):
             }
         """
         )
-        next_button.clicked.connect(self.go_to_next)
-        main_layout.addWidget(next_button, alignment=Qt.AlignRight)
+        # self.next_button.clicked.connect(self.go_to_next)
+        main_layout.addWidget(self.next_button, alignment=Qt.AlignRight)
 
         self.setLayout(main_layout)
 

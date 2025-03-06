@@ -37,8 +37,6 @@ async def connect(olt: OLTConnectionRequest):
     tn, message = connect_to_olt(olt.ip, olt.username, olt.password)
     if tn:
         commands = [
-            "enable",
-            "config",
             "idle-timeout 240",
             "history-command max-size 100",
         ]

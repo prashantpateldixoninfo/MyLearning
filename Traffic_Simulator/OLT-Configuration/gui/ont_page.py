@@ -18,18 +18,15 @@ from shared.config import BACKEND_URL
 
 
 class ONTConfiguration(QWidget):
-    def __init__(self, stack, olt_page):
+    def __init__(self, stack, olt_data):
         super().__init__()
         self.stack = stack
         self.debug_enabled = False
-        self.olt_page = olt_page  # Reference to OLT Page for data retrieval
+        self.olt_data = olt_data  # Store the received dictionary
         self.init_ui()
 
     def init_ui(self):
         main_layout = QVBoxLayout()
-
-        # Retrieve inherited data
-        olt_data = self.olt_page.get_olt_data()
 
         # === ONT Profile Configuration Block ===
         ont_profile_group = QGroupBox("ONT Profile Configuration")
@@ -37,8 +34,11 @@ class ONTConfiguration(QWidget):
         ont_profile_layout = QVBoxLayout()
 
         self.profile_id_input = QLineEdit(placeholderText="Profile ID (0-8192)")
+        self.profile_id_input.setText(self.olt_data.get('vlan'))
         self.tcont_id_input = QLineEdit(placeholderText="TCONT ID (0-127)")
+        self.tcont_id_input.setText("1")
         self.gemport_id_input = QLineEdit(placeholderText="GEM Port ID (0-1023)")
+        self.gemport_id_input.setText("1")
 
         ont_profile_layout.addWidget(self.profile_id_input)
         ont_profile_layout.addWidget(self.tcont_id_input)
@@ -79,7 +79,9 @@ class ONTConfiguration(QWidget):
         ont_service_layout = QVBoxLayout()
 
         self.serial_number_input = QLineEdit(placeholderText="Serial Number (XXXX-XXXXXXXX or XXXXXXXXXXXX)")
+        self.serial_number_input.setText("ZYOT-CE000292")
         self.ont_id_input = QLineEdit(placeholderText="ONT ID (0-127)")
+        self.ont_id_input.setText("0")
 
         ont_service_layout.addWidget(self.serial_number_input)
         ont_service_layout.addWidget(self.ont_id_input)
@@ -162,31 +164,86 @@ class ONTConfiguration(QWidget):
     def send_request(self, endpoint, data, output_box):
         try:
             response = requests.post(f"{BACKEND_URL}/ont/{endpoint}", json=data)
-            if response.status_code == 200:
-                output_box.setText(f"Success: {response.json().get('message')}\n{response.json().get('output')}")
-                output_box.setStyleSheet("color: green;")
-            else:
-                output_box.setText(f"Error: {response.json().get('error')}")
-                output_box.setStyleSheet("color: red;")
+            if response.status_code == 200:  # Success
+                message = response.json().get("message")
+                formatted_text = f"""
+                    <p style="color: green; font-weight: bold;">Success | {message}</p>
+                """
+                output_box.setHtml(formatted_text)
+                if self.debug_enabled:
+                    output_box.append(f"{response.json().get('output')}")
+                    output_box.setStyleSheet("color: blue;")
+            elif response.status_code == 400:  # Command execution error
+                error_details = response.json().get("detail", {})
+                formatted_text = f"""
+                    <p style="color: orange; font-weight: bold;">Error | {error_details.get('message')}</p>
+                """
+                output_box.setHtml(formatted_text)
+                if self.debug_enabled:
+                    output_box.append(f"{error_details.get('output')}")
+                    output_box.setStyleSheet("color: blue;")
+            elif response.status_code == 500:  # Connection or unexpected failure
+                error_details = response.json().get("detail", {})
+                formatted_text = f"""
+                    <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
+                """
+                output_box.setHtml(formatted_text)
+                if self.debug_enabled:
+                    output_box.appendt(f"{error_details.get('output')}")
+                    output_box.setStyleSheet("color: blue;")
         except requests.exceptions.RequestException as e:
-            output_box.setText(f"Connection Error: {e}")
-            output_box.setStyleSheet("color: red;")
+            output_box.setText(f"Unknown Error Occurred | {e}")
+            output_box.setStyleSheet("color: red; font-weight: bold;")
+
+    def send_request_summary(self, endpoint, data, output_box):
+        try:
+            response = requests.post(f"{BACKEND_URL}/ont/{endpoint}", json=data)
+            
+            if response.status_code == 200:  # Success
+                message = response.json().get("message")
+                formatted_text = f"""
+                    <p style="color: green; font-weight: bold;">Success | {message}</p>
+                """
+                output_box.setHtml(formatted_text)
+                output_box.append(f"{response.json().get('output')}")
+                output_box.setStyleSheet("color: blue;")
+            elif response.status_code == 400:  # Command execution error
+                error_details = response.json().get("detail", {})
+                formatted_text = f"""
+                    <p style="color: orange; font-weight: bold;">Error | {error_details.get('message')}</p>
+                """
+                output_box.setHtml(formatted_text)
+                output_box.append(f"{error_details.get('output')}")
+                output_box.setStyleSheet("color: blue;")
+            elif response.status_code == 500:  # Connection or unexpected failure
+                error_details = response.json().get("detail", {})
+                formatted_text = f"""
+                    <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
+                """
+                output_box.setHtml(formatted_text)
+                output_box.appendt(f"{error_details.get('output')}")
+                output_box.setStyleSheet("color: blue;")
+        except requests.exceptions.RequestException as e:
+            output_box.setText(f"Unknown Error Occurred | {e}")
+            output_box.setStyleSheet("color: red; font-weight: bold;")
 
     def create_profile(self):
         profile_id = self.profile_id_input.text().strip()
         tcont_id = self.tcont_id_input.text().strip()
         gemport_id = self.gemport_id_input.text().strip()
 
-        error = self.validate_ont_profile(profile_id, tcont_id, gemport_id)
-        if error:
-            QMessageBox.critical(self, "Validation Error", error)
+        validation_error = self.validate_ont_profile(profile_id, tcont_id, gemport_id)
+        if validation_error:
+            self.ont_profile_output.setText(validation_error)
+            self.ont_profile_output.setStyleSheet("font-weight: bold; color: red;")
             return
 
         data = {
-            "ip": "192.168.1.1",
-            "profile_id": self.profile_id_input.text().strip() or "1",
-            "tcont_id": self.tcont_id_input.text().strip() or "2",
-            "gemport_id": self.gemport_id_input.text().strip() or "3"
+            "ip": self.olt_data.get('ip'),
+            "profile_id": profile_id or self.olt_data.get('vlan'),
+            "tcont_id": tcont_id or "1",
+            "gemport_id": gemport_id or "1",
+            "vlan_id": self.olt_data.get('vlan')
         }
         self.send_request("create_profile", data, self.ont_profile_output)
 
@@ -195,25 +252,42 @@ class ONTConfiguration(QWidget):
         tcont_id = self.tcont_id_input.text().strip()
         gemport_id = self.gemport_id_input.text().strip()
 
-        error = self.validate_ont_profile(profile_id, tcont_id, gemport_id)
-        if error:
-            QMessageBox.critical(self, "Validation Error", error)
+        validation_error = self.validate_ont_profile(profile_id, tcont_id, gemport_id)
+        if validation_error:
+            self.ont_profile_output.setText(validation_error)
+            self.ont_profile_output.setStyleSheet("font-weight: bold; color: red;")
             return
 
-        data = {"ip": "192.168.1.1", "profile_id": self.profile_id_input.text().strip() or "1"}
-        self.send_request("status_profile", data, self.ont_profile_output)
+        data = {
+            "ip": self.olt_data.get('ip'),
+            "profile_id": self.profile_id_input.text().strip() or self.olt_data.get('vlan'),
+            "tcont_id": self.tcont_id_input.text().strip() or "1",
+            "gemport_id": self.gemport_id_input.text().strip() or "1",
+            "vlan_id": self.olt_data.get('vlan')
+        }
+        if self.debug_enabled:
+            self.send_request("status_profile_details", data, self.ont_profile_output)
+        else:
+            self.send_request_summary("status_profile_summary", data, self.ont_profile_output)
 
     def delete_profile(self):
         profile_id = self.profile_id_input.text().strip()
         tcont_id = self.tcont_id_input.text().strip()
         gemport_id = self.gemport_id_input.text().strip()
 
-        error = self.validate_ont_profile(profile_id, tcont_id, gemport_id)
-        if error:
-            QMessageBox.critical(self, "Validation Error", error)
+        validation_error = self.validate_ont_profile(profile_id, tcont_id, gemport_id)
+        if validation_error:
+            self.ont_profile_output.setText(validation_error)
+            self.ont_profile_output.setStyleSheet("font-weight: bold; color: red;")
             return
 
-        data = {"ip": "192.168.1.1", "profile_id": self.profile_id_input.text().strip() or "1"}
+        data = {
+            "ip": self.olt_data.get('ip'),
+            "profile_id": profile_id or self.olt_data.get('vlan'),
+            "tcont_id": tcont_id or "1",
+            "gemport_id": gemport_id or "1",
+            "vlan_id": self.olt_data.get('vlan')
+        }
         self.send_request("delete_profile", data, self.ont_profile_output)
 
     def create_service(self):
@@ -222,7 +296,7 @@ class ONTConfiguration(QWidget):
 
         error = self.validate_ont_service(serial_number, ont_id)
         if error:
-            QMessageBox.critical(self, "Validation Error", error)
+            # QMessageBox.critical(self, "Validation Error", error)
             return
 
         data = {
@@ -238,7 +312,7 @@ class ONTConfiguration(QWidget):
 
         error = self.validate_ont_service(serial_number, ont_id)
         if error:
-            QMessageBox.critical(self, "Validation Error", error)
+            # QMessageBox.critical(self, "Validation Error", error)
             return
 
         data = {"ip": "192.168.1.1", "ont_id": self.ont_id_input.text().strip() or "10"}
@@ -250,7 +324,7 @@ class ONTConfiguration(QWidget):
 
         error = self.validate_ont_service(serial_number, ont_id)
         if error:
-            QMessageBox.critical(self, "Validation Error", error)
+            # QMessageBox.critical(self, "Validation Error", error)
             return
 
         data = {"ip": "192.168.1.1", "ont_id": self.ont_id_input.text().strip() or "10"}
