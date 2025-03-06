@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import asyncio
+from olt_telnet import execute_telnet_commands_batch
 
 ont_router = APIRouter()
 
@@ -14,44 +15,6 @@ class ONTServiceRequest(BaseModel):
     ip: str
     serial_number: str
     ont_id: int
-
-def execute_telnet_commands_batch(ip: str, commands: list):
-    """Execute multiple commands on an active Telnet session step-by-step with pagination & <cr> handling."""
-    tn_data = telnet_sessions.get(ip)
-    if not tn_data:
-        raise HTTPException(status_code=400, detail=f"No active session for OLT {ip}. Please connect first.")
-
-    tn, _ = tn_data  # Retrieve session
-    try:
-        output = []
-        for cmd in commands:
-            tn.write(cmd.encode("ascii") + b"\n")
-            time.sleep(0.2)  # Small delay to allow OLT to process the command
-            
-            response = ""
-            while True:
-                chunk = tn.read_until(b">", timeout=2).decode("ascii")
-                response += chunk
-                
-                # Check for pagination (Press 'Q' or ---- More)
-                if "Press 'Q' to break" in chunk or "---- More" in chunk:
-                    tn.write(b" ")  # Send Space to get next page
-                    time.sleep(0.2)  # Allow time for more data
-                # Check for <cr> prompts (example: { <cr>|inner-vlan<K>|to<K> }:)
-                elif "{ <cr>" in chunk:
-                    tn.write(b"\n")  # Send Enter to continue execution
-                    time.sleep(0.2)
-                else:
-                    break  # Exit loop when full output is received
-
-            output.append(f"{cmd} → {response.strip()}")  # Store command and response
-        
-        # Refresh session timestamp
-        telnet_sessions[ip] = (tn, time.time())
-        
-        return "\n".join(output)  # Return all outputs as a formatted string
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Batch command execution failed: {str(e)}")
 
 @ont_router.post("/create_profile")
 async def create_ont_profile(config: ONTProfileRequest):

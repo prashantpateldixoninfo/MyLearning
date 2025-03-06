@@ -2,7 +2,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from olt_telnet import connect_to_olt, telnet_sessions, close_telnet_session, check_telnet_status
+from olt_telnet import connect_to_olt, telnet_sessions, close_telnet_session, check_telnet_status, execute_telnet_commands_batch
 import time
 import re
 
@@ -29,7 +29,6 @@ class PortConfigRequest(BaseModel):
     uplink_port: str
     vlan_id: str
     pon_port: str
-
 
 @olt_router.post("/connect_telnet")
 async def connect(olt: OLTConnectionRequest):
@@ -87,63 +86,6 @@ async def execute_command(command: OLTCommand):
         raise HTTPException(
             status_code=500, detail=f"Command execution failed: {str(e)}"
         )
-
-def execute_telnet_commands_batch(ip: str, commands: list):
-    """Execute multiple commands on an active Telnet session step-by-step with pagination & <cr> handling."""
-    tn_data = telnet_sessions.get(ip)
-    if not tn_data:
-        raise HTTPException(status_code=400, detail=f"No active session for OLT {ip}. Please connect first.")
-
-    tn, _ = tn_data  # Retrieve session
-    try:
-        output = []
-        for cmd in commands:
-            tn.write(cmd.encode("ascii") + b"\n")
-            time.sleep(0.2)  # Small delay to allow OLT to process the command
-            
-            response = ""
-            while True:
-                chunk = tn.read_until(b">", timeout=2).decode("ascii")
-                response += chunk
-                
-                # Check for pagination (Press 'Q' or ---- More)
-                if "Press 'Q' to break" in chunk or "---- More" in chunk:
-                    tn.write(b" ")  # Send Space to get next page
-                    time.sleep(0.2)  # Allow time for more data
-                # Check for <cr> prompts (example: { <cr>|inner-vlan<K>|to<K> }:)
-                elif "{ <cr>" in chunk:
-                    tn.write(b"\n")  # Send Enter to continue execution
-                    time.sleep(0.2)
-                else:
-                    break  # Exit loop when full output is received
-
-            output.append(f"{cmd} → {response.strip()}")  # Store command and response
-        
-        # Refresh session timestamp
-        telnet_sessions[ip] = (tn, time.time())
-        
-        return "\n".join(output)  # Return all outputs as a formatted string
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Batch command execution failed: {str(e)}")
-
-def execute_telnet_commands_batch_Fast(ip: str, commands: list):
-    """Execute multiple commands on an active Telnet session as a batch."""
-    tn_data = telnet_sessions.get(ip)
-    if not tn_data:
-        raise HTTPException(status_code=400, detail=f"No active session for OLT {ip}. Please connect first.")
-    
-    tn, _ = tn_data  # Retrieve session
-    try:
-        full_command = "\n".join(commands) + "\n"
-        tn.write(full_command.encode("ascii"))
-        time.sleep(.5)  # Small delay to ensure execution
-        
-        response = tn.read_very_eager().decode("ascii")
-        telnet_sessions[ip] = (tn, time.time())  # Refresh session timestamp
-        
-        return response.strip()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Batch command execution failed: {str(e)}")
 
 @olt_router.post("/configure_port_setting")
 async def configure_olt_port(config: PortConfigRequest):
