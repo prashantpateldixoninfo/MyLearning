@@ -19,6 +19,32 @@ class ONTServiceRequest(BaseModel):
     vlan_id: int
     pon_port: int
 
+async def handle_command_execution(ip: str, commands: list, success_message: str):
+    """Executes Telnet commands and handles errors with a provided success message."""
+    try:
+        response = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, ip, commands)
+
+        # Handle different response scenarios
+        if response["status"] == "success":
+            return {"message": success_message, "output": response["output"]}
+        elif response["status"] == "error":
+            raise HTTPException(
+                status_code=400,
+                detail={"message": response["message"], "output": response["output"]}
+            )
+        elif response["status"] == "critical":
+            raise HTTPException(
+                status_code=500,
+                detail={"message": response["message"], "output": response["output"]}
+            )
+    except HTTPException as http_err:
+        raise http_err  # Re-raise HTTP errors
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={"message": f"Unexpected error: {str(e)}", "output": ""}
+        )
+
 @ont_router.post("/create_profile")
 async def create_ont_profile(config: ONTProfileRequest):
     commands = [
@@ -35,30 +61,7 @@ async def create_ont_profile(config: ONTProfileRequest):
             f"commit",
             f"quit"
     ]
-
-    try:
-        response = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, config.ip, commands)
-
-        # Handle different response scenarios
-        if response["status"] == "success":
-            return {"message": "ONT Profiles Created", "output": response["output"]}
-        elif response["status"] == "error":
-            raise HTTPException(
-                status_code=400,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-        elif response["status"] == "critical":
-            raise HTTPException(
-                status_code=500,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-    except HTTPException as http_err:
-        raise http_err  # Re-raise HTTP errors
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail={"message": f"Unexpected error: {str(e)}", "output": ""}
-        )
+    return await handle_command_execution(config.ip, commands, "ONT Profiles Created")
 
 @ont_router.post("/status_profile_details")
 async def status_ont_profile_details(config: ONTProfileRequest):
@@ -67,29 +70,7 @@ async def status_ont_profile_details(config: ONTProfileRequest):
             f"display ont-lineprofile gpon profile-id {config.profile_id}",
             f"display ont-srvprofile gpon profile-id {config.profile_id}",
     ]
-    try:
-        response = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, config.ip, commands)
-
-        # Handle different response scenarios
-        if response["status"] == "success":
-            return {"message": "ONT Profiles Details Status", "output": response["output"]}
-        elif response["status"] == "error":
-            raise HTTPException(
-                status_code=400,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-        elif response["status"] == "critical":
-            raise HTTPException(
-                status_code=500,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-    except HTTPException as http_err:
-        raise http_err  # Re-raise HTTP errors
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail={"message": f"Unexpected error: {str(e)}", "output": ""}
-        )
+    return await handle_command_execution(config.ip, commands, "ONT Profiles Details Status")
 
 @ont_router.post("/status_profile_summary")
 async def status_ont_profile_summary(config: ONTProfileRequest):
@@ -98,29 +79,7 @@ async def status_ont_profile_summary(config: ONTProfileRequest):
             f"display ont-lineprofile gpon all",
             f"display ont-srvprofile gpon all",
     ]
-    try:
-        response = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, config.ip, commands)
-
-        # Handle different response scenarios
-        if response["status"] == "success":
-            return {"message": "ONT Profiles Summary Status", "output": response["output"]}
-        elif response["status"] == "error":
-            raise HTTPException(
-                status_code=400,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-        elif response["status"] == "critical":
-            raise HTTPException(
-                status_code=500,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-    except HTTPException as http_err:
-        raise http_err  # Re-raise HTTP errors
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail={"message": f"Unexpected error: {str(e)}", "output": ""}
-        )
+    return await handle_command_execution(config.ip, commands, "ONT Profiles Summary Status")
 
 @ont_router.post("/delete_profile")
 async def delete_ont_profile(config: ONTProfileRequest):
@@ -129,29 +88,7 @@ async def delete_ont_profile(config: ONTProfileRequest):
         f"undo ont-lineprofile gpon profile-id {config.profile_id}",
         f"dba-profile delete profile-id {config.profile_id}"
     ]
-    try:
-        response = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, config.ip, commands)
-
-        # Handle different response scenarios
-        if response["status"] == "success":
-            return {"message": "ONT Profiles Deleted", "output": response["output"]}
-        elif response["status"] == "error":
-            raise HTTPException(
-                status_code=400,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-        elif response["status"] == "critical":
-            raise HTTPException(
-                status_code=500,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-    except HTTPException as http_err:
-        raise http_err  # Re-raise HTTP errors
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail={"message": f"Unexpected error: {str(e)}", "output": ""}
-        )
+    return await handle_command_execution(config.ip, commands, "ONT Profiles Deleted")
 
 @ont_router.post("/create_service")
 async def create_ont_service(config: ONTServiceRequest):
@@ -159,16 +96,21 @@ async def create_ont_service(config: ONTServiceRequest):
         f"interface gpon 0/0",
         f"ont add {config.ont_id} sn {config.serial_number} profile {config.ont_id}"
     ]
-    output = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, config.ip, commands)
-    return {"message": "ONT Service Created", "output": output}
+    return await handle_command_execution(config.ip, commands, "ONT Service Created")
 
-@ont_router.post("/status_service")
-async def status_ont_service(config: ONTServiceRequest):
+@ont_router.post("/status_service_details")
+async def ont_service_status_details(config: ONTServiceRequest):
     commands = [
         f"display ont info {config.ont_id}"
     ]
-    output = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, config.ip, commands)
-    return {"message": "ONT Service Status Retrieved", "output": output}
+    return await handle_command_execution(config.ip, commands, "ONT Service Details Status")
+
+@ont_router.post("/status_service_summary")
+async def ont_service_status_summary(config: ONTServiceRequest):
+    commands = [
+        f"display ont info {config.ont_id}"
+    ]
+    return await handle_command_execution(config.ip, commands, "ONT Service Details Status")
 
 @ont_router.post("/delete_service")
 async def delete_ont_service(config: ONTServiceRequest):
@@ -176,5 +118,4 @@ async def delete_ont_service(config: ONTServiceRequest):
         f"interface gpon 0/0",
         f"ont delete {config.ont_id}"
     ]
-    output = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, config.ip, commands)
-    return {"message": "ONT Service Deleted", "output": output}
+    return await handle_command_execution(config.ip, commands, "ONT Service Deleted")
