@@ -64,7 +64,6 @@ async def display_olt_connection(session: SessionStatusRequest):
         return {"message": f"{msg} {ip} OLT"}
     elif status == "Inactive":
         raise HTTPException(status_code=400, detail=f"{msg} {ip} OLT")
-    
 
 @olt_router.post("/disconnect_telnet")
 async def disconnect_olt(request: DisconnectRequest):
@@ -114,7 +113,6 @@ def extract_port_information(output, user_uplink_port, user_pon_port):
     Extracts Native VLAN from 'Native VLAN:' key, State for the given Uplink Port,
     and all ONT Serial Numbers for the given PON Port.
     """
-
     # Extract Native VLAN from "Native VLAN:" key
     native_vlan_match = re.search(r"Native VLAN:\s*(\d+)", output)
     native_vlan = native_vlan_match.group(1).strip() if native_vlan_match else "N/A"

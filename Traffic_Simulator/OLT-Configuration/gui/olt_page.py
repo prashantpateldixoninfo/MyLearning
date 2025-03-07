@@ -150,8 +150,8 @@ class OLTConfiguration(QWidget):
         """Retrieve IP Address, VLAN, and OLT Port for ONT Page"""
         return {
             "ip": self.ip_input.text().strip(),
-            "vlan": self.vlan_input.text().strip(),
-            "olt_port": self.olt_port_input.text().strip(),
+            "vlan_id": self.vlan_input.text().strip(),
+            "pon_port": self.olt_port_input.text().strip(),
         }
 
     def validate_ip(self, ip):

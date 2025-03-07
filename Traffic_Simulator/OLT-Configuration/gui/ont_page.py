@@ -12,6 +12,7 @@ from qtpy.QtCore import Qt
 import requests
 import sys
 import os
+import re
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from shared.config import BACKEND_URL
@@ -34,7 +35,7 @@ class ONTConfiguration(QWidget):
         ont_profile_layout = QVBoxLayout()
 
         self.profile_id_input = QLineEdit(placeholderText="Profile ID (0-8192)")
-        self.profile_id_input.setText(self.olt_data.get('vlan'))
+        self.profile_id_input.setText(self.olt_data.get('vlan_id'))
         self.tcont_id_input = QLineEdit(placeholderText="TCONT ID (0-127)")
         self.tcont_id_input.setText("1")
         self.gemport_id_input = QLineEdit(placeholderText="GEM Port ID (0-1023)")
@@ -144,23 +145,6 @@ class ONTConfiguration(QWidget):
         self.debug_enabled = state == 2
         print(f"Checkbox State Updated: {self.debug_enabled}")
 
-    def validate_ont_profile(self, profile_id, tcont_id, gemport_id):
-        if not profile_id.isdigit() or not (0 <= int(profile_id) <= 8192):
-            return "Invalid Profile ID! Must be between 0-8192."
-        if not tcont_id.isdigit() or not (0 <= int(tcont_id) <= 127):
-            return "Invalid TCONT ID! Must be between 0-127."
-        if not gemport_id.isdigit() or not (0 <= int(gemport_id) <= 1023):
-            return "Invalid GEM Port ID! Must be between 0-1023."
-        return None
-
-    def validate_ont_service(self, serial_number, ont_id):
-        serial_pattern = r"^(\w{12}|\w{14}|\w{16}|\w{4}-\w{8})$"
-        if not re.match(serial_pattern, serial_number):
-            return "Invalid Serial Number! Format: XXXXXXXXXXXX or XXXX-XXXXXXXX."
-        if not ont_id.isdigit() or not (0 <= int(ont_id) <= 127):
-            return "Invalid ONT ID! Must be between 0-127."
-        return None
-
     def send_request(self, endpoint, data, output_box):
         try:
             response = requests.post(f"{BACKEND_URL}/ont/{endpoint}", json=data)
@@ -254,10 +238,10 @@ class ONTConfiguration(QWidget):
         # Construct Valid Data Dictionary
         valid_data = {
             "ip": self.olt_data.get("ip"),
-            "profile_id": profile_id or self.olt_data.get("vlan"),
-            "tcont_id": tcont_id or "1",
-            "gemport_id": gemport_id or "1",
-            "vlan_id": self.olt_data.get("vlan"),
+            "profile_id": profile_id,
+            "tcont_id": tcont_id,
+            "gemport_id": gemport_id,
+            "vlan_id": self.olt_data.get("vlan_id"),
         }
         return valid_data
 
@@ -279,42 +263,48 @@ class ONTConfiguration(QWidget):
         if data:
             self.send_request("delete_profile", data, self.ont_profile_output)
 
-    def create_service(self):
+    def validate_and_get_ont_service_data(self):
+        """Validate ONT Serivce Inputs, Show Errors if Any, and Return Valid Data"""
         serial_number = self.serial_number_input.text().strip()
         ont_id = self.ont_id_input.text().strip()
 
-        error = self.validate_ont_service(serial_number, ont_id)
-        if error:
-            # QMessageBox.critical(self, "Validation Error", error)
-            return
+        serial_pattern = r"^(\w{12}|\w{14}|\w{16}|\w{4}-\w{8})$"
+        if not re.match(serial_pattern, serial_number):
+            self.ont_service_output.setText("Invalid Serial Number! Format: XXXXXXXXXXXX or XXXX-XXXXXXXX.")
+            self.ont_service_output.setStyleSheet("font-weight: bold; color: red;")
+            return None
 
-        data = {
-            "ip": "192.168.1.1",
-            "serial_number": self.serial_number_input.text().strip() or "123456789ABC",
-            "ont_id": self.ont_id_input.text().strip() or "10"
+        if not ont_id.isdigit() or not (0 <= int(ont_id) <= 127):
+            self.ont_service_output.setText("Invalid ONT ID! Must be between 0-127.")
+            self.ont_service_output.setStyleSheet("font-weight: bold; color: red;")
+            return None
+
+        # Construct Valid Data Dictionary
+        valid_data = {
+            "ip": self.olt_data.get("ip"),
+            "serial_number": serial_number,
+            "ont_id": ont_id,
+            "vlan_id": self.olt_data.get("vlan_id"),
+            "pon_port": self.olt_data.get("pon_port"),
+            "gemport_id": self.gemport_id_input.text().strip(),
+            "profile_id": self.profile_id_input.text().strip(),
         }
-        self.send_request("create_service", data, self.ont_service_output)
+        return valid_data
+
+    def create_service(self):
+        data = self.validate_and_get_ont_service_data()
+        if data:
+            self.send_request("create_service", data, self.ont_service_output)
 
     def status_service(self):
-        serial_number = self.serial_number_input.text().strip()
-        ont_id = self.ont_id_input.text().strip()
-
-        error = self.validate_ont_service(serial_number, ont_id)
-        if error:
-            # QMessageBox.critical(self, "Validation Error", error)
-            return
-
-        data = {"ip": "192.168.1.1", "ont_id": self.ont_id_input.text().strip() or "10"}
-        self.send_request("status_service", data, self.ont_service_output)
+        data = self.validate_and_get_ont_service_data()
+        if data:
+            if self.debug_enabled:
+                self.send_request("status_service_details", data, self.ont_service_output)
+            else:
+                self.send_request_summary("status_service_summary", data, self.ont_service_output)
 
     def delete_service(self):
-        serial_number = self.serial_number_input.text().strip()
-        ont_id = self.ont_id_input.text().strip()
-
-        error = self.validate_ont_service(serial_number, ont_id)
-        if error:
-            # QMessageBox.critical(self, "Validation Error", error)
-            return
-
-        data = {"ip": "192.168.1.1", "ont_id": self.ont_id_input.text().strip() or "10"}
-        self.send_request("delete_service", data, self.ont_service_output)
+        data = self.validate_and_get_ont_service_data()
+        if data:
+            self.send_request("delete_service", data, self.ont_service_output)

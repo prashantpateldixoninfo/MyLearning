@@ -174,22 +174,3 @@ async def handle_command_execution(ip: str, commands: list, success_message: str
             status_code=500,
             detail={"message": f"Unexpected error: {str(e)}", "output": ""}
         )
-
-def execute_telnet_commands_batch_Fast(ip: str, commands: list):
-    """Execute multiple commands on an active Telnet session as a batch."""
-    tn_data = telnet_sessions.get(ip)
-    if not tn_data:
-        raise HTTPException(status_code=400, detail=f"No active session for OLT {ip}. Please connect first.")
-    
-    tn, _ = tn_data  # Retrieve session
-    try:
-        full_command = "\n".join(commands) + "\n"
-        tn.write(full_command.encode("ascii"))
-        time.sleep(.5)  # Small delay to ensure execution
-        
-        response = tn.read_very_eager().decode("ascii")
-        telnet_sessions[ip] = (tn, time.time())  # Refresh session timestamp
-        
-        return response.strip()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Batch command execution failed: {str(e)}")
