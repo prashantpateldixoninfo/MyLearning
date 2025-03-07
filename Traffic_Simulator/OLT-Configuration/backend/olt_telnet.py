@@ -1,5 +1,6 @@
 import telnetlib
 import threading
+import asyncio
 import time
 from fastapi import HTTPException
 
@@ -148,6 +149,31 @@ def execute_telnet_commands_batch(ip: str, commands: list):
             "output": "\n".join(output)
         }
 
+async def handle_command_execution(ip: str, commands: list, success_message: str):
+    """Executes Telnet commands and handles errors with a provided success message."""
+    try:
+        response = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, ip, commands)
+
+        # Handle different response scenarios
+        if response["status"] == "success":
+            return {"message": success_message, "output": response["output"]}
+        elif response["status"] == "error":
+            raise HTTPException(
+                status_code=400,
+                detail={"message": response["message"], "output": response["output"]}
+            )
+        elif response["status"] == "critical":
+            raise HTTPException(
+                status_code=500,
+                detail={"message": response["message"], "output": response["output"]}
+            )
+    except HTTPException as http_err:
+        raise http_err  # Re-raise HTTP errors
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={"message": f"Unexpected error: {str(e)}", "output": ""}
+        )
 
 def execute_telnet_commands_batch_Fast(ip: str, commands: list):
     """Execute multiple commands on an active Telnet session as a batch."""

@@ -2,7 +2,14 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from olt_telnet import connect_to_olt, telnet_sessions, close_telnet_session, check_telnet_status, execute_telnet_commands_batch
+from olt_telnet import (
+    connect_to_olt,
+    telnet_sessions,
+    close_telnet_session,
+    check_telnet_status,
+    execute_telnet_commands_batch,
+    handle_command_execution,
+)
 import time
 import re
 
@@ -67,90 +74,40 @@ async def disconnect_olt(request: DisconnectRequest):
         return {"message": f"Disconnected from OLT {ip}"}
     raise HTTPException(status_code=400, detail=f"No active session found for OLT {ip}. Unable to Delete")
 
-@olt_router.post("/execute")
-async def execute_command(command: OLTCommand):
-    """Execute command on OLT"""
-    tn_data = telnet_sessions.get(command.ip)
-    if not tn_data:
-        raise HTTPException(status_code=400, detail="No active session. Connect first.")
-
-    tn, _ = tn_data  # Retrieve session
-    try:
-        tn.write(command.command.encode("ascii") + b"\n")
-        response = tn.read_until(b">", timeout=5).decode("ascii")
-        telnet_sessions[command.ip] = (tn, time.time())  # Refresh session timestamp
-        return {"output": response.strip()}
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Command execution failed: {str(e)}"
-        )
-
 @olt_router.post("/configure_port_setting")
 async def configure_olt_port(config: PortConfigRequest):
     """
     Configures the OLT port with VLAN and upstream port settings.
     """
-    try:
-        print(f"Backend Configure IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
-
-        # Construct Huawei CLI commands
-        olt_slot, olt_port = config.pon_port.rsplit("/", 1)
-        upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
-        commands = [
-            f"interface gpon {olt_slot}",
-            f"port {olt_port} ont-auto-find enable",
-            "quit",
-            f"vlan {config.vlan_id} smart",
-            f"port vlan {config.vlan_id} {upstream_slot} {upstream_port}",
-            f"interface eth {upstream_slot}",
-            f"native-vlan {upstream_port} vlan {config.vlan_id}",
-            "quit",
-        ]
-
-        print(f"Backend Executing commands: {commands}")
-        
-        # Run Telnet commands asynchronously
-        loop = asyncio.get_running_loop()
-        output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
-
-        print(f"Backend Executed Commands Output: {output}")
-        return {"message": "Port configuration applied!", "output": output}
-    
-    except HTTPException as e:
-        raise HTTPException(status_code=e.status_code, detail=f"During port configuration | Reason: {e.detail}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"During port configuration | Reason: {str(e)}")
+    print(f"Backend Configure IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
+    olt_slot, olt_port = config.pon_port.rsplit("/", 1)
+    upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
+    commands = [
+        f"interface gpon {olt_slot}",
+        f"port {olt_port} ont-auto-find enable",
+        "quit",
+        f"vlan {config.vlan_id} smart",
+        f"port vlan {config.vlan_id} {upstream_slot} {upstream_port}",
+        f"interface eth {upstream_slot}",
+        f"native-vlan {upstream_port} vlan {config.vlan_id}",
+        "quit",
+    ]
+    return await handle_command_execution(config.ip, commands, "Port configuration applied!")
 
 @olt_router.post("/display_port_status_details")
 async def display_port_status_details(config: PortConfigRequest):
     """
     Display the OLT port with VLAN and upstream port settings.
     """
-    try:
-        print(f"Backend Display Details IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
-
-        # Construct Huawei CLI commands
-        olt_slot, olt_port = config.pon_port.rsplit("/", 1)
-        upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
-        commands = [
-            f"display vlan {config.vlan_id}",
-            f"display port vlan {config.uplink_port}",
-            f"display ont autofind all"
-        ]
-
-        print(f"Backend Executing commands: {commands}")
-        
-        # Run Telnet commands asynchronously
-        loop = asyncio.get_running_loop()
-        output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
-
-        print(f"Backend Executed Commands Output: {output}")
-        return {"message": "Displaying the port configurations in details!", "output": output}
-  
-    except HTTPException as e:
-        raise HTTPException(status_code=e.status_code, detail=f"During port status | Reason: {e.detail}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"During port status | Reason: {str(e)}")
+    print(f"Backend Display Details IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
+    olt_slot, olt_port = config.pon_port.rsplit("/", 1)
+    upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
+    commands = [
+        f"display vlan {config.vlan_id}",
+        f"display port vlan {config.uplink_port}",
+        f"display ont autofind all"
+    ]
+    return await handle_command_execution(config.ip, commands, "Displaying the port configurations in details!")
 
 def extract_port_information(output, user_uplink_port, user_pon_port):
     """
@@ -242,33 +199,17 @@ async def unconfig_olt_port(config: PortConfigRequest):
     """
     UnConfigures the OLT port with VLAN and upstream port settings.
     """
-    try:
-        print(f"Backend Delete IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
-
-        # Construct Huawei CLI commands
-        olt_slot, olt_port = config.pon_port.rsplit("/", 1)
-        upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
-        commands = [
-            f"interface eth {upstream_slot}",
-            f"native-vlan {upstream_port} vlan 1",
-            "quit",
-            f"undo port vlan {config.vlan_id} {upstream_slot} {upstream_port}",
-            f"undo vlan {config.vlan_id}",
-            f"interface gpon {olt_slot}",
-            f"port {olt_port} ont-auto-find disable",
-            "quit"
-        ]
-
-        print(f"Backend Executing commands: {commands}")
-        
-        # Run Telnet commands asynchronously
-        loop = asyncio.get_running_loop()
-        output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
-
-        print(f"Backend Executed Commands Output: {output}")
-        return {"message": "Port configuration deleted!", "output": output}
-    
-    except HTTPException as e:
-        raise HTTPException(status_code=e.status_code, detail=f"During port unconfiguration | Reason: {e.detail}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"During port unconfiguration | Reason: {str(e)}")
+    print(f"Backend Delete IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
+    olt_slot, olt_port = config.pon_port.rsplit("/", 1)
+    upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
+    commands = [
+        f"interface eth {upstream_slot}",
+        f"native-vlan {upstream_port} vlan 1",
+        "quit",
+        f"undo port vlan {config.vlan_id} {upstream_slot} {upstream_port}",
+        f"undo vlan {config.vlan_id}",
+        f"interface gpon {olt_slot}",
+        f"port {olt_port} ont-auto-find disable",
+        "quit"
+    ]
+    return await handle_command_execution(config.ip, commands, "Port configuration deleted!")

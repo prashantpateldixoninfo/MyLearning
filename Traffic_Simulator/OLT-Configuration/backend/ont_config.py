@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 import asyncio
-from olt_telnet import execute_telnet_commands_batch
+from olt_telnet import handle_command_execution
 
 ont_router = APIRouter()
 
@@ -18,32 +18,6 @@ class ONTServiceRequest(BaseModel):
     ont_id: int
     vlan_id: int
     pon_port: int
-
-async def handle_command_execution(ip: str, commands: list, success_message: str):
-    """Executes Telnet commands and handles errors with a provided success message."""
-    try:
-        response = await asyncio.get_running_loop().run_in_executor(None, execute_telnet_commands_batch, ip, commands)
-
-        # Handle different response scenarios
-        if response["status"] == "success":
-            return {"message": success_message, "output": response["output"]}
-        elif response["status"] == "error":
-            raise HTTPException(
-                status_code=400,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-        elif response["status"] == "critical":
-            raise HTTPException(
-                status_code=500,
-                detail={"message": response["message"], "output": response["output"]}
-            )
-    except HTTPException as http_err:
-        raise http_err  # Re-raise HTTP errors
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail={"message": f"Unexpected error: {str(e)}", "output": ""}
-        )
 
 @ont_router.post("/create_profile")
 async def create_ont_profile(config: ONTProfileRequest):
