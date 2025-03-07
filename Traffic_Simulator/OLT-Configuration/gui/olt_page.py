@@ -169,94 +169,137 @@ class OLTConfiguration(QWidget):
         else:
             return "Invalid IP Address range!"
 
-    def validate_credentials(self, ip, username, password):
-        """Validate IP Address, Username, and Password"""
-
-        # Validate IP using validate_ip function
-        ip_error = self.validate_ip(ip)
-        if ip_error:
-            return ip_error  # Return error message if IP is invalid
-
-        # Validate Username
-        if not username:
-            return "Username cannot be empty!"
-
-        # Validate Password
-        if len(password) < 4:
-            return "Password must be at least 4 characters long!"
-
-        return None  # Everything is valid
-
-
-    def connect_olt_session(self):
-        """Collect, validate, and send data to the backend"""
+    def validate_and_get_credentials(self):
+        """Extracts and validates IP, Username, and Password."""
         ip = self.ip_input.text().strip()
         username = self.user_input.text().strip()
         password = self.password_input.text().strip()
 
-        validation_error = self.validate_credentials(ip, username, password)
-        if validation_error:
-            self.olt_output.setText(validation_error)
+        # Validate IP
+        ip_error = self.validate_ip(ip)
+        if ip_error:
+            self.olt_output.setText(ip_error)
             self.olt_output.setStyleSheet("font-weight: bold; color: red;")
-            return
+            return ip_error, None  # Return error message if IP is invalid
 
-        data = {"ip": ip, "username": username, "password": password}
+        # Validate Username
+        if not username:
+            self.olt_output.setText("Username cannot be empty!")
+            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
+            return "Username cannot be empty!", None
+
+        # Validate Password
+        if len(password) < 4:
+            self.olt_output.setText("Password must be at least 4 characters long!")
+            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
+            return "Password must be at least 4 characters long!", None
+
+        validated_data = {"ip": ip, "username": username, "password": password}
+        return None, validated_data        
+
+    def send_telnet_request(self, endpoint, data):
+        """
+        Sends a POST request to the given API endpoint with provided data.
+        Handles errors and updates the output box accordingly.
+        """
         try:
-            response = requests.post(f"{BACKEND_URL}/olt/connect_telnet", json=data)
+            response = requests.post(endpoint, json=data)
             if response.status_code == 200:
-                self.olt_output.setText(f"Success: {response.json().get('message')}")
+                self.olt_output.setText(f"Success | {response.json().get('message')}")
                 self.olt_output.setStyleSheet("font-weight: bold; color: green;")
             else:
-                self.olt_output.setText(f"Error: {response.json().get('detail')}")
+                self.olt_output.setText(f"Error | {response.json().get('detail')}")
                 self.olt_output.setStyleSheet("font-weight: bold; color: red;")
         except requests.exceptions.RequestException as e:
-            self.olt_output.setText(f"Connection Error: {e}")
+            self.olt_output.setText(f"Critical | {e}")
             self.olt_output.setStyleSheet("font-weight: bold; color: red;")
+
+    def connect_olt_session(self):
+        """Collect, validate, and send data to the backend"""
+        error, data = self.validate_and_get_credentials()
+
+        if data:
+            self.send_telnet_request(f"{BACKEND_URL}/olt/connect_telnet", data)
 
     def display_olt_session(self):
-        ip = self.ip_input.text().strip()
-        
-        validation_error = self.validate_credentials(ip, "username", "password")
-        if validation_error:
-            self.olt_output.setText(validation_error)
-            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
-            return
-    
-        data = {"ip": ip}
-        try:
-            response = requests.post(f"{BACKEND_URL}/olt/display_telnet", json=data)
-            if response.status_code == 200:
-                self.olt_output.setText(f"Success: {response.json().get('message')}")
-                self.olt_output.setStyleSheet("font-weight: bold; color: green;")
-            else:
-                self.olt_output.setText(f"Error: {response.json().get('detail')}")
-                self.olt_output.setStyleSheet("font-weight: bold; color: red;")
-        except requests.exceptions.RequestException as e:
-            self.olt_output.setText(f"Displaying Error: {e}")
-            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
+        """Collect, validate, and send data to the backend"""
+        error, data = self.validate_and_get_credentials()
+
+        if data:
+            self.send_telnet_request(f"{BACKEND_URL}/olt/display_telnet", data)
 
     def disconnect_olt_session(self):
-        ip = self.ip_input.text().strip()
+        """Collect, validate, and send data to the backend"""
+        error, data = self.validate_and_get_credentials()
 
-        validation_error = self.validate_credentials(ip, "username", "password")
-        if validation_error:
-            self.olt_output.setText(validation_error)
-            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
-            return
+        if data:
+            self.send_telnet_request(f"{BACKEND_URL}/olt/disconnect_telnet", data)
 
-        data = {"ip": ip}
+    def send_request(self, endpoint, data, output_box):
         try:
-            response = requests.post(f"{BACKEND_URL}/olt/disconnect_telnet", json=data)
-            if response.status_code == 200:
-                self.olt_output.setText(f"Success: {response.json().get('message')}")
-                self.olt_output.setStyleSheet("font-weight: bold; color: green;")
-            else:
-                self.olt_output.setText(f"Error: {response.json().get('detail')}")
-                self.olt_output.setStyleSheet("font-weight: bold; color: red;")
+            response = requests.post(f"{BACKEND_URL}/olt/{endpoint}", json=data)
+            if response.status_code == 200:  # Success
+                message = response.json().get("message")
+                formatted_text = f"""
+                    <p style="color: green; font-weight: bold;">Success | {message}</p>
+                """
+                output_box.setHtml(formatted_text)
+                if self.debug_enabled:
+                    output_box.append(f"{response.json().get('output')}")
+                    output_box.setStyleSheet("color: blue;")
+            elif response.status_code == 400:  # Command execution error
+                error_details = response.json().get("detail", {})
+                formatted_text = f"""
+                    <p style="color: orange; font-weight: bold;">Error | {error_details.get('message')}</p>
+                """
+                output_box.setHtml(formatted_text)
+                if self.debug_enabled:
+                    output_box.append(f"{error_details.get('output')}")
+                    output_box.setStyleSheet("color: blue;")
+            elif response.status_code == 500:  # Connection or unexpected failure
+                error_details = response.json().get("detail", {})
+                formatted_text = f"""
+                    <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
+                """
+                output_box.setHtml(formatted_text)
+                if self.debug_enabled:
+                    output_box.appendt(f"{error_details.get('output')}")
+                    output_box.setStyleSheet("color: blue;")
         except requests.exceptions.RequestException as e:
-            self.olt_output.setText(f"Disconnection Error: {e}")
-            self.olt_output.setStyleSheet("font-weight: bold; color: red;")
+            output_box.setText(f"Unknown Error Occurred | {e}")
+            output_box.setStyleSheet("color: red; font-weight: bold;")
 
+    def send_request_summary(self, endpoint, data, output_box):
+        try:
+            response = requests.post(f"{BACKEND_URL}/olt/{endpoint}", json=data)
+            
+            if response.status_code == 200:  # Success
+                message = response.json().get("message")
+                formatted_text = f"""
+                    <p style="color: green; font-weight: bold;">Success | {message}</p>
+                """
+                output_box.setHtml(formatted_text)
+                output_box.append(f"{response.json().get('output')}")
+                output_box.setStyleSheet("color: blue;")
+            elif response.status_code == 400:  # Command execution error
+                error_details = response.json().get("detail", {})
+                formatted_text = f"""
+                    <p style="color: orange; font-weight: bold;">Error | {error_details.get('message')}</p>
+                """
+                output_box.setHtml(formatted_text)
+                output_box.append(f"{error_details.get('output')}")
+                output_box.setStyleSheet("color: blue;")
+            elif response.status_code == 500:  # Connection or unexpected failure
+                error_details = response.json().get("detail", {})
+                formatted_text = f"""
+                    <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
+                """
+                output_box.setHtml(formatted_text)
+                output_box.appendt(f"{error_details.get('output')}")
+                output_box.setStyleSheet("color: blue;")
+        except requests.exceptions.RequestException as e:
+            output_box.setText(f"Unknown Error Occurred | {e}")
+            output_box.setStyleSheet("color: red; font-weight: bold;")
 
     def validate_port_settings(self, olt_port, vlan_id, uplink_port):
         port_pattern = r"^\d{1,2}/\d{1,2}/\d{1,2}$"
@@ -270,105 +313,46 @@ class OLTConfiguration(QWidget):
             return "Invalid Uplink Port format! Use Frame/Slot/Port."
         return None
 
-    def config_port_settings(self):
+    def get_validated_port_data(self):
+        """Extract and validate port settings, returning errors or validated data."""
         olt_port = self.olt_port_input.text().strip()
         vlan_id = self.vlan_input.text().strip()
         uplink_port = self.uplink_input.text().strip()
         ip = self.ip_input.text().strip()
 
         validation_error = self.validate_port_settings(olt_port, vlan_id, uplink_port)
+    
         if validation_error:
             self.olt_port_output.setText(validation_error)
             self.olt_port_output.setStyleSheet("color: red;")
-            return
+            return validation_error, None  # Return error and no valid data
 
-        data = {"ip": ip, "uplink_port": uplink_port, "vlan_id": vlan_id, "pon_port": olt_port}
-        print(f"Configuring IP: {ip}, Uplink Port: {uplink_port}, VLAN: {vlan_id}, OLT Port: {olt_port}")
-        try:
-            response = requests.post(f"{BACKEND_URL}/olt/configure_port_setting", json=data)
-            print(f"Response: {response.json()}")
-            if response.status_code == 200:
-                # Use HTML formatting inside QTextEdit
-                message = response.json().get("message")
-                formatted_text = f"""
-                    <p style="color: green; font-weight: bold;">Success: {message}</p>
-                """
-                self.olt_port_output.setHtml(formatted_text)
-                if self.debug_enabled:
-                    self.olt_port_output.append(f"{response.json().get('output')}")
-                    self.olt_port_output.setStyleSheet("color: blue;")
-            else:
-                self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
-                self.olt_port_output.setStyleSheet("color: red;")
-        except requests.exceptions.RequestException as e:
-            self.olt_port_output.setText(f"Connection Error: {e}")
-            self.olt_port_output.setStyleSheet("color: red;")
+        validated_data = {
+            "ip": ip,
+            "uplink_port": uplink_port,
+            "vlan_id": vlan_id,
+            "pon_port": olt_port
+        }
+
+        return None, validated_data  # No error, return validated data
+
+    def config_port_settings(self):
+        error, data = self.get_validated_port_data()
+        if data:
+            print(f"Configuring IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
+            self.send_request("configure_port_setting", data, self.olt_port_output)
 
     def display_port_settings_details(self):
-        olt_port = self.olt_port_input.text().strip()
-        vlan_id = self.vlan_input.text().strip()
-        uplink_port = self.uplink_input.text().strip()
-        ip = self.ip_input.text().strip()
-
-        validation_error = self.validate_port_settings(olt_port, vlan_id, uplink_port)
-        if validation_error:
-            self.olt_port_output.setText(validation_error)
-            self.olt_port_output.setStyleSheet("color: red;")
-            return
-
-        data = {"ip": ip, "uplink_port": uplink_port, "vlan_id": vlan_id, "pon_port": olt_port}
-        print(f"Display IP: {ip}, Uplink Port: {uplink_port}, VLAN: {vlan_id}, OLT Port: {olt_port}")
-        try:
-            response = requests.post(f"{BACKEND_URL}/olt/display_port_status_details", json=data)
-            print(f"Response: {response.json()}")
-            if response.status_code == 200:
-                # Use HTML formatting inside QTextEdit
-                message = response.json().get("message")
-                formatted_text = f"""
-                    <p style="color: green; font-weight: bold;">Success: {message}</p>
-                """
-                self.olt_port_output.setHtml(formatted_text)
-                self.olt_port_output.append(f"{response.json().get('output')}")
-                self.olt_port_output.setStyleSheet("color: blue;")
-            else:
-                self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
-                self.olt_port_output.setStyleSheet("color: red;")
-        except requests.exceptions.RequestException as e:
-            self.olt_port_output.setText(f"Connection Error: {e}")
-            self.olt_port_output.setStyleSheet("color: red;")
+        error, data = self.get_validated_port_data()
+        if data:
+            print(f"Status Details IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
+            self.send_request("display_port_status_details", data, self.olt_port_output)
 
     def display_port_settings_summary(self):
-        olt_port = self.olt_port_input.text().strip()
-        vlan_id = self.vlan_input.text().strip()
-        uplink_port = self.uplink_input.text().strip()
-        ip = self.ip_input.text().strip()
-
-        validation_error = self.validate_port_settings(olt_port, vlan_id, uplink_port)
-        if validation_error:
-            self.olt_port_output.setText(validation_error)
-            self.olt_port_output.setStyleSheet("color: red;")
-            return
-
-        data = {"ip": ip, "uplink_port": uplink_port, "vlan_id": vlan_id, "pon_port": olt_port}
-        print(f"Display Summary IP: {ip}, Uplink Port: {uplink_port}, VLAN: {vlan_id}, OLT Port: {olt_port}")
-        try:
-            response = requests.post(f"{BACKEND_URL}/olt/display_port_status_summary", json=data)
-            print(f"Response: {response.json()}")
-            if response.status_code == 200:
-                # Use HTML formatting inside QTextEdit
-                message = response.json().get("message")
-                formatted_text = f"""
-                    <p style="color: green; font-weight: bold;">Success: {message}</p>
-                """
-                self.olt_port_output.setHtml(formatted_text)
-                self.olt_port_output.append(f"{response.json().get('output')}")
-                self.olt_port_output.setStyleSheet("color: blue;")
-            else:
-                self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
-                self.olt_port_output.setStyleSheet("color: red;")
-        except requests.exceptions.RequestException as e:
-            self.olt_port_output.setText(f"Connection Error: {e}")
-            self.olt_port_output.setStyleSheet("color: red;")
+        error, data = self.get_validated_port_data()
+        if data:
+            print(f"Status Summary IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
+            self.send_request_summary("display_port_status_details", data, self.olt_port_output)
 
     def display_port_settings(self):
         if self.debug_enabled:
@@ -378,34 +362,7 @@ class OLTConfiguration(QWidget):
         
 
     def delete_port_settings(self):
-        olt_port = self.olt_port_input.text().strip()
-        vlan_id = self.vlan_input.text().strip()
-        uplink_port = self.uplink_input.text().strip()
-        ip = self.ip_input.text().strip()
-
-        validation_error = self.validate_port_settings(olt_port, vlan_id, uplink_port)
-        if validation_error:
-            self.olt_port_output.setText(validation_error)
-            self.olt_port_output.setStyleSheet("color: red;")
-            return
-
-        data = {"ip": ip, "uplink_port": uplink_port, "vlan_id": vlan_id, "pon_port": olt_port}
-        print(f"UnConfiguring IP: {ip}, Uplink Port: {uplink_port}, VLAN: {vlan_id}, OLT Port: {olt_port}")
-        try:
-            response = requests.post(f"{BACKEND_URL}/olt/delete_port_setting", json=data)
-            if response.status_code == 200:
-                message = response.json().get("message")
-                formatted_text = f"""
-                    <p style="color: green; font-weight: bold;">Success: {message}</p>
-                """
-                self.olt_port_output.setHtml(formatted_text)
-                if self.debug_enabled:
-                    self.olt_port_output.append(f"{response.json().get('output')}")
-                    self.olt_port_output.setStyleSheet("color: blue;")
-            else:
-                self.olt_port_output.setText(f"Error: {response.json().get('detail')}")
-                self.olt_port_output.setStyleSheet("color: red;")
-        except requests.exceptions.RequestException as e:
-            self.olt_port_output.setText(f"Connection Error: {e}")
-            self.olt_port_output.setStyleSheet("color: red;")
-
+        error, data = self.get_validated_port_data()
+        if data:
+            print(f"Deleting IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
+            self.send_request("display_port_status_details", data, self.olt_port_output)
