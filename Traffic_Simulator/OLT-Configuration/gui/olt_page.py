@@ -158,9 +158,11 @@ class OLTConfiguration(QWidget):
         """Validate IP Address format and range."""
         ip_pattern = r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$"
 
-        # Check if IP matches the pattern
+        if not ip:
+            return "No IP Address provided!"
+
         match = re.match(ip_pattern, ip)
-        if not ip or not match:
+        if not match:
             return "Invalid IP Address format!"
 
         # Ensure all octets are in the range 0-255
@@ -180,22 +182,22 @@ class OLTConfiguration(QWidget):
         if ip_error:
             self.olt_output.setText(ip_error)
             self.olt_output.setStyleSheet("font-weight: bold; color: red;")
-            return ip_error, None  # Return error message if IP is invalid
+            return None
 
         # Validate Username
         if not username:
             self.olt_output.setText("Username cannot be empty!")
             self.olt_output.setStyleSheet("font-weight: bold; color: red;")
-            return "Username cannot be empty!", None
+            return None
 
         # Validate Password
         if len(password) < 4:
             self.olt_output.setText("Password must be at least 4 characters long!")
             self.olt_output.setStyleSheet("font-weight: bold; color: red;")
-            return "Password must be at least 4 characters long!", None
+            return None
 
         validated_data = {"ip": ip, "username": username, "password": password}
-        return None, validated_data        
+        return validated_data        
 
     def send_telnet_request(self, endpoint, data):
         """
@@ -216,22 +218,19 @@ class OLTConfiguration(QWidget):
 
     def connect_olt_session(self):
         """Collect, validate, and send data to the backend"""
-        error, data = self.validate_and_get_credentials()
-
+        data = self.validate_and_get_credentials()
         if data:
             self.send_telnet_request(f"{BACKEND_URL}/olt/connect_telnet", data)
 
     def display_olt_session(self):
         """Collect, validate, and send data to the backend"""
-        error, data = self.validate_and_get_credentials()
-
+        data = self.validate_and_get_credentials()
         if data:
             self.send_telnet_request(f"{BACKEND_URL}/olt/display_telnet", data)
 
     def disconnect_olt_session(self):
         """Collect, validate, and send data to the backend"""
-        error, data = self.validate_and_get_credentials()
-
+        data = self.validate_and_get_credentials()
         if data:
             self.send_telnet_request(f"{BACKEND_URL}/olt/disconnect_telnet", data)
 
@@ -263,7 +262,7 @@ class OLTConfiguration(QWidget):
                 """
                 output_box.setHtml(formatted_text)
                 if self.debug_enabled:
-                    output_box.appendt(f"{error_details.get('output')}")
+                    output_box.append(f"{error_details.get('output')}")
                     output_box.setStyleSheet("color: blue;")
         except requests.exceptions.RequestException as e:
             output_box.setText(f"Unknown Error Occurred | {e}")
@@ -295,7 +294,7 @@ class OLTConfiguration(QWidget):
                     <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
                 """
                 output_box.setHtml(formatted_text)
-                output_box.appendt(f"{error_details.get('output')}")
+                output_box.append(f"{error_details.get('output')}")
                 output_box.setStyleSheet("color: blue;")
         except requests.exceptions.RequestException as e:
             output_box.setText(f"Unknown Error Occurred | {e}")
@@ -325,7 +324,7 @@ class OLTConfiguration(QWidget):
         if validation_error:
             self.olt_port_output.setText(validation_error)
             self.olt_port_output.setStyleSheet("color: red;")
-            return validation_error, None  # Return error and no valid data
+            return None  # Return error and no valid data
 
         validated_data = {
             "ip": ip,
@@ -334,35 +333,34 @@ class OLTConfiguration(QWidget):
             "pon_port": olt_port
         }
 
-        return None, validated_data  # No error, return validated data
+        return validated_data  # No error, return validated data
 
     def config_port_settings(self):
-        error, data = self.get_validated_port_data()
+        data = self.get_validated_port_data()
         if data:
             print(f"Configuring IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
             self.send_request("configure_port_setting", data, self.olt_port_output)
 
     def display_port_settings_details(self):
-        error, data = self.get_validated_port_data()
+        data = self.get_validated_port_data()
         if data:
             print(f"Status Details IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
             self.send_request("display_port_status_details", data, self.olt_port_output)
 
     def display_port_settings_summary(self):
-        error, data = self.get_validated_port_data()
+        data = self.get_validated_port_data()
         if data:
             print(f"Status Summary IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
-            self.send_request_summary("display_port_status_details", data, self.olt_port_output)
+            self.send_request_summary("display_port_status_summary", data, self.olt_port_output)
 
     def display_port_settings(self):
         if self.debug_enabled:
             self.display_port_settings_details()
         else:
-            self.display_port_settings_summary()
-        
+            self.display_port_settings_summary() 
 
     def delete_port_settings(self):
-        error, data = self.get_validated_port_data()
+        data = self.get_validated_port_data()
         if data:
             print(f"Deleting IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
-            self.send_request("display_port_status_details", data, self.olt_port_output)
+            self.send_request("delete_port_setting", data, self.olt_port_output)

@@ -151,31 +151,21 @@ async def display_port_status_summary(config: PortConfigRequest):
     """
     Display the OLT port with VLAN and upstream port settings.
     """
+    print(f"Backend Display Summary IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
+    olt_slot, olt_port = config.pon_port.rsplit("/", 1)
+    upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
+    commands = [
+        f"display vlan {config.vlan_id}",
+        f"display port vlan {config.uplink_port}",
+        f"display ont autofind all"
+    ]
+    result =  await handle_command_execution(config.ip, commands, "Displaying the port configurations in summary!")
+    
+    print(f"Prashant Backend Executed Commands Output: {result}")
     try:
-        print(f"Backend Display Summary IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
-
-        # Construct Huawei CLI commands
-        olt_slot, olt_port = config.pon_port.rsplit("/", 1)
-        upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
-        commands = [
-            f"display vlan {config.vlan_id}",
-            f"display port vlan {config.uplink_port}",
-            f"display ont autofind all"
-        ]
-
-        print(f"Backend Executing commands: {commands}")
-        
-        # Run Telnet commands asynchronously
-        loop = asyncio.get_running_loop()
-        output = await loop.run_in_executor(executor, execute_telnet_commands_batch, config.ip, commands)
-
-        print(f"Backend Executed Commands Output: {output}")
-        # Extract information
-        port_info = extract_port_information(output, config.uplink_port, config.pon_port)
-        print(f"Extracted VLAN Info: {port_info}")
-
+        port_info = extract_port_information(result['output'], config.uplink_port, config.pon_port)
         if port_info:
-            output_string = "\n".join([
+            filter_output = "\n".join([
                 "------------------Uplink Info------------------\n"
                 f"Uplink Port: {port_info.get('Uplink Port', 'N/A')}",
                 f"Native VLAN: {port_info.get('Native VLAN', 'N/A')}",
@@ -185,14 +175,12 @@ async def display_port_status_summary(config: PortConfigRequest):
                 f"ONT Serial Num: {port_info.get('ONT Serial Num', 'No ONT found')}"
             ])
         else:
-            output_string = "No Port information found."
-        print(f"Output String:\n{output_string}")
-        return {"message": "Displaying the port configurations as summary!", "output": output_string}
-  
+            filter_output = "No Port information found."
+        return {"message": result['message'], "output": filter_output}
     except HTTPException as e:
-        raise HTTPException(status_code=e.status_code, detail=f"During port status | Reason: {e.detail}")
+        raise HTTPException(status_code=e.status_code, detail=f"During port status summary | Reason: {e.detail}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"During port status | Reason: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"During port status summary| Reason: {str(e)}")
 
 @olt_router.post("/delete_port_setting")
 async def unconfig_olt_port(config: PortConfigRequest):

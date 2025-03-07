@@ -189,7 +189,7 @@ class ONTConfiguration(QWidget):
                 """
                 output_box.setHtml(formatted_text)
                 if self.debug_enabled:
-                    output_box.appendt(f"{error_details.get('output')}")
+                    output_box.append(f"{error_details.get('output')}")
                     output_box.setStyleSheet("color: blue;")
         except requests.exceptions.RequestException as e:
             output_box.setText(f"Unknown Error Occurred | {e}")
@@ -221,74 +221,63 @@ class ONTConfiguration(QWidget):
                     <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
                 """
                 output_box.setHtml(formatted_text)
-                output_box.appendt(f"{error_details.get('output')}")
+                output_box.append(f"{error_details.get('output')}")
                 output_box.setStyleSheet("color: blue;")
         except requests.exceptions.RequestException as e:
             output_box.setText(f"Unknown Error Occurred | {e}")
             output_box.setStyleSheet("color: red; font-weight: bold;")
 
-    def create_profile(self):
+    def validate_and_get_ont_profile_data(self):
+        """Validate ONT Profile Inputs, Show Errors if Any, and Return Valid Data"""
+
+        # Extract input values
         profile_id = self.profile_id_input.text().strip()
         tcont_id = self.tcont_id_input.text().strip()
         gemport_id = self.gemport_id_input.text().strip()
 
-        validation_error = self.validate_ont_profile(profile_id, tcont_id, gemport_id)
-        if validation_error:
-            self.ont_profile_output.setText(validation_error)
+        # Validation Rules
+        if not profile_id.isdigit() or not (0 <= int(profile_id) <= 8192):
+            self.ont_profile_output.setText("Invalid Profile ID! Must be between 0-8192.")
             self.ont_profile_output.setStyleSheet("font-weight: bold; color: red;")
-            return
+            return None
 
-        data = {
-            "ip": self.olt_data.get('ip'),
-            "profile_id": profile_id or self.olt_data.get('vlan'),
+        if not tcont_id.isdigit() or not (0 <= int(tcont_id) <= 127):
+            self.ont_profile_output.setText("Invalid TCONT ID! Must be between 0-127.")
+            self.ont_profile_output.setStyleSheet("font-weight: bold; color: red;")
+            return None
+
+        if not gemport_id.isdigit() or not (0 <= int(gemport_id) <= 1023):
+            self.ont_profile_output.setText("Invalid GEM Port ID! Must be between 0-1023.")
+            self.ont_profile_output.setStyleSheet("font-weight: bold; color: red;")
+            return None
+
+        # Construct Valid Data Dictionary
+        valid_data = {
+            "ip": self.olt_data.get("ip"),
+            "profile_id": profile_id or self.olt_data.get("vlan"),
             "tcont_id": tcont_id or "1",
             "gemport_id": gemport_id or "1",
-            "vlan_id": self.olt_data.get('vlan')
+            "vlan_id": self.olt_data.get("vlan"),
         }
-        self.send_request("create_profile", data, self.ont_profile_output)
+        return valid_data
+
+    def create_profile(self):
+        data = self.validate_and_get_ont_profile_data()
+        if data:
+            self.send_request("create_profile", data, self.ont_profile_output)
 
     def status_profile(self):
-        profile_id = self.profile_id_input.text().strip()
-        tcont_id = self.tcont_id_input.text().strip()
-        gemport_id = self.gemport_id_input.text().strip()
-
-        validation_error = self.validate_ont_profile(profile_id, tcont_id, gemport_id)
-        if validation_error:
-            self.ont_profile_output.setText(validation_error)
-            self.ont_profile_output.setStyleSheet("font-weight: bold; color: red;")
-            return
-
-        data = {
-            "ip": self.olt_data.get('ip'),
-            "profile_id": self.profile_id_input.text().strip() or self.olt_data.get('vlan'),
-            "tcont_id": self.tcont_id_input.text().strip() or "1",
-            "gemport_id": self.gemport_id_input.text().strip() or "1",
-            "vlan_id": self.olt_data.get('vlan')
-        }
-        if self.debug_enabled:
-            self.send_request("status_profile_details", data, self.ont_profile_output)
-        else:
-            self.send_request_summary("status_profile_summary", data, self.ont_profile_output)
+        data = self.validate_and_get_ont_profile_data()
+        if data:
+            if self.debug_enabled:
+                self.send_request("status_profile_details", data, self.ont_profile_output)
+            else:
+                self.send_request_summary("status_profile_summary", data, self.ont_profile_output)
 
     def delete_profile(self):
-        profile_id = self.profile_id_input.text().strip()
-        tcont_id = self.tcont_id_input.text().strip()
-        gemport_id = self.gemport_id_input.text().strip()
-
-        validation_error = self.validate_ont_profile(profile_id, tcont_id, gemport_id)
-        if validation_error:
-            self.ont_profile_output.setText(validation_error)
-            self.ont_profile_output.setStyleSheet("font-weight: bold; color: red;")
-            return
-
-        data = {
-            "ip": self.olt_data.get('ip'),
-            "profile_id": profile_id or self.olt_data.get('vlan'),
-            "tcont_id": tcont_id or "1",
-            "gemport_id": gemport_id or "1",
-            "vlan_id": self.olt_data.get('vlan')
-        }
-        self.send_request("delete_profile", data, self.ont_profile_output)
+        data = self.validate_and_get_ont_profile_data()
+        if data:
+            self.send_request("delete_profile", data, self.ont_profile_output)
 
     def create_service(self):
         serial_number = self.serial_number_input.text().strip()
