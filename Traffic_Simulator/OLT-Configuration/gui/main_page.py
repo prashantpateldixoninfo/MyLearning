@@ -1,7 +1,8 @@
 from olt_page import OLTConfiguration
 from ont_page import ONTConfiguration
 from qtpy.QtWidgets import QWidget, QVBoxLayout, QStackedWidget
-
+from PyQt5.QtGui import QIcon
+import os
 
 class MainPage(QWidget):
     """Main Window with Stacked Pages"""
@@ -12,6 +13,9 @@ class MainPage(QWidget):
 
     def init_ui(self):
         self.setWindowTitle("Huawei OLT Configuration")
+        img_path = os.path.join(os.getcwd(), "dixon_img.png")
+        img_path = os.path.normpath(img_path)  
+        self.setWindowIcon(QIcon(img_path))
         self.resize(500, 300)
 
         self.stack = QStackedWidget()
