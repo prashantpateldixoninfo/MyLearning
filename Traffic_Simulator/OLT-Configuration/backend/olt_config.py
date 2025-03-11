@@ -40,7 +40,6 @@ class PortConfigRequest(BaseModel):
 @olt_router.post("/connect_telnet")
 async def connect(olt: OLTConnectionRequest):
     """Connect to OLT"""
-    print("Connecting to OLT", olt.ip, olt.username, olt.password)
     tn, message = connect_to_olt(olt.ip, olt.username, olt.password)
     if tn:
         commands = [
@@ -51,7 +50,6 @@ async def connect(olt: OLTConnectionRequest):
         loop = asyncio.get_running_loop()
         output = await loop.run_in_executor(executor, execute_telnet_commands_batch, olt.ip, commands)
 
-        print(f"Backend Executed Commands Output: {output}")
         return {"message": message, "output": output}
     raise HTTPException(status_code=400, detail=message)
 
@@ -78,7 +76,6 @@ async def configure_olt_port(config: PortConfigRequest):
     """
     Configures the OLT port with VLAN and upstream port settings.
     """
-    print(f"Backend Configure IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
     olt_slot, olt_port = config.pon_port.rsplit("/", 1)
     upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
     commands = [
@@ -98,9 +95,6 @@ async def display_port_status_details(config: PortConfigRequest):
     """
     Display the OLT port with VLAN and upstream port settings.
     """
-    print(f"Backend Display Details IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
-    olt_slot, olt_port = config.pon_port.rsplit("/", 1)
-    upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
     commands = [
         f"display vlan {config.vlan_id}",
         f"display port vlan {config.uplink_port}",
@@ -149,17 +143,12 @@ async def display_port_status_summary(config: PortConfigRequest):
     """
     Display the OLT port with VLAN and upstream port settings.
     """
-    print(f"Backend Display Summary IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
-    olt_slot, olt_port = config.pon_port.rsplit("/", 1)
-    upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
     commands = [
         f"display vlan {config.vlan_id}",
         f"display port vlan {config.uplink_port}",
         f"display ont autofind all"
     ]
     result =  await handle_command_execution(config.ip, commands, "Displaying the port configurations in summary!")
-    
-    print(f"Prashant Backend Executed Commands Output: {result}")
     try:
         port_info = extract_port_information(result['output'], config.uplink_port, config.pon_port)
         if port_info:
@@ -185,7 +174,6 @@ async def unconfig_olt_port(config: PortConfigRequest):
     """
     UnConfigures the OLT port with VLAN and upstream port settings.
     """
-    print(f"Backend Delete IP: {config.ip}, Uplink Port: {config.uplink_port}, VLAN: {config.vlan_id}, PON Port: {config.pon_port}")
     olt_slot, olt_port = config.pon_port.rsplit("/", 1)
     upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
     commands = [

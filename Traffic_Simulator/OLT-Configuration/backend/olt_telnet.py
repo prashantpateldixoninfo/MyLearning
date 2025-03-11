@@ -14,7 +14,6 @@ def cleanup_idle_sessions():
         current_time = time.time()
         for ip, (tn, last_active) in list(telnet_sessions.items()):
             if current_time - last_active > session_timeout:
-                print(f"Closing idle session for {ip}")
                 tn.close()
                 del telnet_sessions[ip]
         time.sleep(10)
@@ -65,7 +64,6 @@ def connect_to_olt(ip: str, username: str, password: str):
 
 def close_telnet_session(ip: str):
     """Close a Telnet session"""
-    print(f"Closing session for {ip}")
     tn_data = telnet_sessions.pop(ip, None)
     if tn_data:
         tn_data[0].close()
@@ -118,7 +116,7 @@ def execute_telnet_commands_batch(ip: str, commands: list):
 
                 # Stop if we reach the expected prompt (meaning command execution is complete)
                 elif ")#" in chunk:
-                    print(f"Command executed: {cmd}")
+                    # print(f"Command executed: {cmd}")
                     break # Exit loop when full output is received
 
             # Store executed command and its response

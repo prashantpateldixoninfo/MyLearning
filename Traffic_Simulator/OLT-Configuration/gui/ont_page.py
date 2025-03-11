@@ -9,14 +9,8 @@ from qtpy.QtWidgets import (
     QCheckBox,
 )
 from qtpy.QtCore import Qt
-import requests
-import sys
-import os
+from request_handler import send_request, send_telnet_request, DebugMode
 import re
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from shared.config import BACKEND_URL
-
 
 class ONTConfiguration(QWidget):
     def __init__(self, stack, olt_data):
@@ -143,73 +137,6 @@ class ONTConfiguration(QWidget):
 
     def on_checkbox_toggle(self, state):
         self.debug_enabled = state == 2
-        print(f"Checkbox State Updated: {self.debug_enabled}")
-
-    def send_request(self, endpoint, data, output_box):
-        try:
-            response = requests.post(f"{BACKEND_URL}/ont/{endpoint}", json=data)
-            if response.status_code == 200:  # Success
-                message = response.json().get("message")
-                formatted_text = f"""
-                    <p style="color: green; font-weight: bold;">Success | {message}</p>
-                """
-                output_box.setHtml(formatted_text)
-                if self.debug_enabled:
-                    output_box.append(f"{response.json().get('output')}")
-                    output_box.setStyleSheet("color: blue;")
-            elif response.status_code == 400:  # Command execution error
-                error_details = response.json().get("detail", {})
-                formatted_text = f"""
-                    <p style="color: orange; font-weight: bold;">Error | {error_details.get('message')}</p>
-                """
-                output_box.setHtml(formatted_text)
-                if self.debug_enabled:
-                    output_box.append(f"{error_details.get('output')}")
-                    output_box.setStyleSheet("color: blue;")
-            elif response.status_code == 500:  # Connection or unexpected failure
-                error_details = response.json().get("detail", {})
-                formatted_text = f"""
-                    <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
-                """
-                output_box.setHtml(formatted_text)
-                if self.debug_enabled:
-                    output_box.append(f"{error_details.get('output')}")
-                    output_box.setStyleSheet("color: blue;")
-        except requests.exceptions.RequestException as e:
-            output_box.setText(f"Unknown Error Occurred | {e}")
-            output_box.setStyleSheet("color: red; font-weight: bold;")
-
-    def send_request_summary(self, endpoint, data, output_box):
-        try:
-            response = requests.post(f"{BACKEND_URL}/ont/{endpoint}", json=data)
-            
-            if response.status_code == 200:  # Success
-                message = response.json().get("message")
-                formatted_text = f"""
-                    <p style="color: green; font-weight: bold;">Success | {message}</p>
-                """
-                output_box.setHtml(formatted_text)
-                output_box.append(f"{response.json().get('output')}")
-                output_box.setStyleSheet("color: blue;")
-            elif response.status_code == 400:  # Command execution error
-                error_details = response.json().get("detail", {})
-                formatted_text = f"""
-                    <p style="color: orange; font-weight: bold;">Error | {error_details.get('message')}</p>
-                """
-                output_box.setHtml(formatted_text)
-                output_box.append(f"{error_details.get('output')}")
-                output_box.setStyleSheet("color: blue;")
-            elif response.status_code == 500:  # Connection or unexpected failure
-                error_details = response.json().get("detail", {})
-                formatted_text = f"""
-                    <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
-                """
-                output_box.setHtml(formatted_text)
-                output_box.append(f"{error_details.get('output')}")
-                output_box.setStyleSheet("color: blue;")
-        except requests.exceptions.RequestException as e:
-            output_box.setText(f"Unknown Error Occurred | {e}")
-            output_box.setStyleSheet("color: red; font-weight: bold;")
 
     def validate_and_get_ont_profile_data(self):
         """Validate ONT Profile Inputs, Show Errors if Any, and Return Valid Data"""
@@ -248,20 +175,20 @@ class ONTConfiguration(QWidget):
     def create_profile(self):
         data = self.validate_and_get_ont_profile_data()
         if data:
-            self.send_request("create_profile", data, self.ont_profile_output)
+            send_request("ont/create_profile", data, self.ont_profile_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
 
     def status_profile(self):
         data = self.validate_and_get_ont_profile_data()
         if data:
             if self.debug_enabled:
-                self.send_request("status_profile_details", data, self.ont_profile_output)
+                send_request("ont/status_profile_details", data, self.ont_profile_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
             else:
-                self.send_request_summary("status_profile_summary", data, self.ont_profile_output)
+                send_request("ont/status_profile_summary", data, self.ont_profile_output, DebugMode.SUMMARY)
 
     def delete_profile(self):
         data = self.validate_and_get_ont_profile_data()
         if data:
-            self.send_request("delete_profile", data, self.ont_profile_output)
+            send_request("ont/delete_profile", data, self.ont_profile_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
 
     def validate_and_get_ont_service_data(self):
         """Validate ONT Serivce Inputs, Show Errors if Any, and Return Valid Data"""
@@ -294,17 +221,17 @@ class ONTConfiguration(QWidget):
     def create_service(self):
         data = self.validate_and_get_ont_service_data()
         if data:
-            self.send_request("create_service", data, self.ont_service_output)
+            send_request("ont/create_service", data, self.ont_service_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
 
     def status_service(self):
         data = self.validate_and_get_ont_service_data()
         if data:
             if self.debug_enabled:
-                self.send_request("status_service_details", data, self.ont_service_output)
+                send_request("ont/status_service_details", data, self.ont_service_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
             else:
-                self.send_request_summary("status_service_summary", data, self.ont_service_output)
+                send_request("ont/status_service_summary", data, self.ont_service_output, DebugMode.SUMMARY)
 
     def delete_service(self):
         data = self.validate_and_get_ont_service_data()
         if data:
-            self.send_request("delete_service", data, self.ont_service_output)
+            send_request("ont/delete_service", data, self.ont_service_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
