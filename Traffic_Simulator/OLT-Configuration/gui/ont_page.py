@@ -2,6 +2,7 @@ from qtpy.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
+    QLabel,
     QLineEdit,
     QPushButton,
     QTextEdit,
@@ -23,21 +24,34 @@ class ONTConfiguration(QWidget):
     def init_ui(self):
         main_layout = QVBoxLayout()
 
+        # Function to create a row with Label + Input
+        def add_labeled_input(label_text, input_widget):
+            row_layout = QHBoxLayout()
+            label = QLabel(label_text)
+            label.setFixedWidth(70)  # Set fixed width for alignment
+            row_layout.addWidget(label)
+            row_layout.addWidget(input_widget)
+            return row_layout
+
         # === ONT Profile Configuration Block ===
         ont_profile_group = QGroupBox("ONT Profile Configuration")
         ont_profile_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 14px; }")
         ont_profile_layout = QVBoxLayout()
 
-        self.profile_id_input = QLineEdit(placeholderText="Profile ID (0-8192)")
+        # Input Fields
+        self.profile_id_input = QLineEdit(placeholderText="0-8192")
         self.profile_id_input.setText(self.olt_data.get('vlan_id'))
-        self.tcont_id_input = QLineEdit(placeholderText="TCONT ID (0-127)")
+
+        self.tcont_id_input = QLineEdit(placeholderText="0-127")
         self.tcont_id_input.setText("1")
-        self.gemport_id_input = QLineEdit(placeholderText="GEM Port ID (0-1023)")
+
+        self.gemport_id_input = QLineEdit(placeholderText="0-1023")
         self.gemport_id_input.setText("1")
 
-        ont_profile_layout.addWidget(self.profile_id_input)
-        ont_profile_layout.addWidget(self.tcont_id_input)
-        ont_profile_layout.addWidget(self.gemport_id_input)
+        # Add labeled inputs using function
+        ont_profile_layout.addLayout(add_labeled_input("Profile ID:", self.profile_id_input))
+        ont_profile_layout.addLayout(add_labeled_input("TCONT ID:", self.tcont_id_input))
+        ont_profile_layout.addLayout(add_labeled_input("GEM Port ID:", self.gemport_id_input))
 
         self.ont_profile_output = QTextEdit(placeholderText="ONT Profile Configuration Output...")
         self.ont_profile_output.setReadOnly(True)
@@ -73,13 +87,16 @@ class ONTConfiguration(QWidget):
         ont_service_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 14px; }")
         ont_service_layout = QVBoxLayout()
 
-        self.serial_number_input = QLineEdit(placeholderText="Serial Number (XXXX-XXXXXXXX or XXXXXXXXXXXX)")
+        # Input Fields
+        self.serial_number_input = QLineEdit(placeholderText="XXXX-XXXXXXXX or XXXXXXXXXXXX")
         self.serial_number_input.setText("ZYOT-CE000292")
-        self.ont_id_input = QLineEdit(placeholderText="ONT ID (0-127)")
+
+        self.ont_id_input = QLineEdit(placeholderText="0-127")
         self.ont_id_input.setText("0")
 
-        ont_service_layout.addWidget(self.serial_number_input)
-        ont_service_layout.addWidget(self.ont_id_input)
+        # Add labeled inputs using function
+        ont_service_layout.addLayout(add_labeled_input("Serial Number:", self.serial_number_input))
+        ont_service_layout.addLayout(add_labeled_input("ONT ID:", self.ont_id_input))
 
         self.ont_service_output = QTextEdit(placeholderText="ONT Service Configuration Output...")
         self.ont_service_output.setReadOnly(True)

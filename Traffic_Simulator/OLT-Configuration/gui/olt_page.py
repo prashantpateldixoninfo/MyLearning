@@ -2,6 +2,7 @@ from qtpy.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
+    QLabel,
     QLineEdit,
     QPushButton,
     QTextEdit,
@@ -27,19 +28,32 @@ class OLTConfiguration(QWidget):
         olt_connection_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 14px; }")
         olt_layout = QVBoxLayout()
 
+        # Function to create a row with Label + Input
+        def add_labeled_input(label_text, input_widget):
+            row_layout = QHBoxLayout()
+            label = QLabel(label_text)
+            label.setFixedWidth(70)  # Set fixed width for alignment
+            row_layout.addWidget(label)
+            row_layout.addWidget(input_widget)
+            return row_layout
+
         # Input Fields for OLT Connection
-        self.ip_input = QLineEdit(placeholderText="IP Address")
+        self.ip_input = QLineEdit(placeholderText="Enter IP Address")
         self.ip_input.setText("10.11.104.2")
-        self.user_input = QLineEdit(placeholderText="User")
+
+        self.user_input = QLineEdit(placeholderText="Enter Username")
         self.user_input.setText("root")
-        self.password_input = QLineEdit(placeholderText="Password")
+
+        self.password_input = QLineEdit(placeholderText="Enter Password")
         self.password_input.setEchoMode(QLineEdit.Password)  # Hide password input
         self.password_input.setText("admin")
 
-        olt_layout.addWidget(self.ip_input)
-        olt_layout.addWidget(self.user_input)
-        olt_layout.addWidget(self.password_input)
+        # Add labeled input fields
+        olt_layout.addLayout(add_labeled_input("IP Address:", self.ip_input))
+        olt_layout.addLayout(add_labeled_input("Username:", self.user_input))
+        olt_layout.addLayout(add_labeled_input("Password:", self.password_input))
 
+        # Output & Buttons
         self.olt_output = QTextEdit(placeholderText="OLT Connection Output...")
         self.olt_output.setReadOnly(True)
 
@@ -60,31 +74,40 @@ class OLTConfiguration(QWidget):
         olt_connection_group.setLayout(olt_layout)
         main_layout.addWidget(olt_connection_group)
 
-
         # === OLT Port Setting Block ===
         olt_port_group = QGroupBox("OLT Port Setting")
         olt_port_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 14px; }")
         olt_port_layout = QVBoxLayout()
-  
+
+        # Input Fields for OLT Port Setting
         self.uplink_input = QLineEdit(placeholderText="Uplink Port (Frame/Slot/Port)")
         self.uplink_input.setText("0/16/5")
+
         self.vlan_input = QLineEdit(placeholderText="VLAN (1-65535)")
         self.vlan_input.setText("55")
+
         self.olt_port_input = QLineEdit(placeholderText="OLT PON Port (Frame/Slot/Port)")
         self.olt_port_input.setText("0/1/5")
-        
-        olt_port_layout.addWidget(self.uplink_input)
-        olt_port_layout.addWidget(self.vlan_input)
-        olt_port_layout.addWidget(self.olt_port_input)
 
+        # Add labeled input fields
+        olt_port_layout.addLayout(add_labeled_input("Uplink Port:", self.uplink_input))
+        olt_port_layout.addLayout(add_labeled_input("VLAN ID:", self.vlan_input))
+        olt_port_layout.addLayout(add_labeled_input("OLT PON Port:", self.olt_port_input))
+
+        # Output & Buttons
         self.olt_port_output = QTextEdit(placeholderText="OLT Port Setting Output...")
         self.olt_port_output.setReadOnly(True)
 
-        # Create Checkbox
+        # Checkbox Layout (Bottom-Right)
         self.port_checkbox = QCheckBox("Debug")
         self.port_checkbox.setChecked(False)
         self.port_checkbox.stateChanged.connect(self.on_checkbox_toggle)
 
+        checkbox_layout = QHBoxLayout()
+        checkbox_layout.addStretch()
+        checkbox_layout.addWidget(self.port_checkbox)
+
+        # Buttons for Port Settings
         self.port_config_btn = QPushButton("Config")
         self.port_display_btn = QPushButton("Status")
         self.port_delete_btn = QPushButton("Delete")
@@ -96,11 +119,6 @@ class OLTConfiguration(QWidget):
         port_setting_btn_layout.addWidget(self.port_delete_btn)
         port_setting_btn_layout.addWidget(self.port_display_btn)
         port_setting_btn_layout.addWidget(self.port_config_btn)
-
-        # Create a layout to position the checkbox at the bottom-right
-        checkbox_layout = QHBoxLayout()
-        checkbox_layout.addStretch()  # Push checkbox to the right
-        checkbox_layout.addWidget(self.port_checkbox)
 
         olt_port_layout.addWidget(self.olt_port_output)
         olt_port_layout.addLayout(checkbox_layout)
@@ -126,7 +144,6 @@ class OLTConfiguration(QWidget):
             }
         """
         )
-        # self.next_button.clicked.connect(self.go_to_next)
         main_layout.addWidget(self.next_button, alignment=Qt.AlignRight)
 
         self.setLayout(main_layout)

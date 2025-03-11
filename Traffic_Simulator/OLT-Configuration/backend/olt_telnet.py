@@ -14,6 +14,7 @@ def cleanup_idle_sessions():
         current_time = time.time()
         for ip, (tn, last_active) in list(telnet_sessions.items()):
             if current_time - last_active > session_timeout:
+                print(f"Closing idle session for {ip}")
                 tn.close()
                 del telnet_sessions[ip]
         time.sleep(10)
