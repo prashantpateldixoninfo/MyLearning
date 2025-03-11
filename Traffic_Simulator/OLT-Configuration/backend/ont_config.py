@@ -96,7 +96,8 @@ async def ont_service_status_summary(config: ONTServiceRequest):
         f"interface gpon {pon_slot}",
         f"display ont info {pon_port} all",
         "quit",
-        f"display service-port all"
+        f"display service-port all",
+        f"display mac-address vlan {config.vlan_id}"
     ]
     return await handle_command_execution(config.ip, commands, "ONT Service Summary Status")
 

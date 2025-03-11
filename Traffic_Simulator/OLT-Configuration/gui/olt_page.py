@@ -9,6 +9,7 @@ from qtpy.QtWidgets import (
     QCheckBox,
 )
 from qtpy.QtCore import Qt
+from enum import Enum
 import requests
 import re
 import sys
@@ -17,6 +18,11 @@ import os
 # Add the parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from shared.config import BACKEND_URL
+
+class DebugMode(Enum):
+    NO_DEBUG = "no-debug"
+    DEBUG = "debug"
+    SUMMARY = "summary"
 
 class OLTConfiguration(QWidget):
     def __init__(self, stack):
@@ -234,16 +240,16 @@ class OLTConfiguration(QWidget):
         if data:
             self.send_telnet_request(f"{BACKEND_URL}/olt/disconnect_telnet", data)
 
-    def send_request(self, endpoint, data, output_box):
+    def send_request(self, endpoint, data, output_box, debug_mode=DebugMode.NO_DEBUG):
         try:
-            response = requests.post(f"{BACKEND_URL}/olt/{endpoint}", json=data)
+            response = requests.post(f"{BACKEND_URL}/{endpoint}", json=data)
             if response.status_code == 200:  # Success
                 message = response.json().get("message")
                 formatted_text = f"""
                     <p style="color: green; font-weight: bold;">Success | {message}</p>
                 """
                 output_box.setHtml(formatted_text)
-                if self.debug_enabled:
+                if debug_mode in {DebugMode.DEBUG, DebugMode.SUMMARY}:
                     output_box.append(f"{response.json().get('output')}")
                     output_box.setStyleSheet("color: blue;")
             elif response.status_code == 400:  # Command execution error
@@ -252,7 +258,7 @@ class OLTConfiguration(QWidget):
                     <p style="color: orange; font-weight: bold;">Error | {error_details.get('message')}</p>
                 """
                 output_box.setHtml(formatted_text)
-                if self.debug_enabled:
+                if debug_mode in {DebugMode.DEBUG, DebugMode.SUMMARY}:
                     output_box.append(f"{error_details.get('output')}")
                     output_box.setStyleSheet("color: blue;")
             elif response.status_code == 500:  # Connection or unexpected failure
@@ -261,41 +267,9 @@ class OLTConfiguration(QWidget):
                     <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
                 """
                 output_box.setHtml(formatted_text)
-                if self.debug_enabled:
+                if debug_mode in {DebugMode.DEBUG, DebugMode.SUMMARY}:
                     output_box.append(f"{error_details.get('output')}")
                     output_box.setStyleSheet("color: blue;")
-        except requests.exceptions.RequestException as e:
-            output_box.setText(f"Unknown Error Occurred | {e}")
-            output_box.setStyleSheet("color: red; font-weight: bold;")
-
-    def send_request_summary(self, endpoint, data, output_box):
-        try:
-            response = requests.post(f"{BACKEND_URL}/olt/{endpoint}", json=data)
-            
-            if response.status_code == 200:  # Success
-                message = response.json().get("message")
-                formatted_text = f"""
-                    <p style="color: green; font-weight: bold;">Success | {message}</p>
-                """
-                output_box.setHtml(formatted_text)
-                output_box.append(f"{response.json().get('output')}")
-                output_box.setStyleSheet("color: blue;")
-            elif response.status_code == 400:  # Command execution error
-                error_details = response.json().get("detail", {})
-                formatted_text = f"""
-                    <p style="color: orange; font-weight: bold;">Error | {error_details.get('message')}</p>
-                """
-                output_box.setHtml(formatted_text)
-                output_box.append(f"{error_details.get('output')}")
-                output_box.setStyleSheet("color: blue;")
-            elif response.status_code == 500:  # Connection or unexpected failure
-                error_details = response.json().get("detail", {})
-                formatted_text = f"""
-                    <p style="color: red; font-weight: bold;">Critical | {error_details.get('message')}</p>
-                """
-                output_box.setHtml(formatted_text)
-                output_box.append(f"{error_details.get('output')}")
-                output_box.setStyleSheet("color: blue;")
         except requests.exceptions.RequestException as e:
             output_box.setText(f"Unknown Error Occurred | {e}")
             output_box.setStyleSheet("color: red; font-weight: bold;")
@@ -339,19 +313,19 @@ class OLTConfiguration(QWidget):
         data = self.get_validated_port_data()
         if data:
             print(f"Configuring IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
-            self.send_request("configure_port_setting", data, self.olt_port_output)
+            self.send_request("olt/configure_port_setting", data, self.olt_port_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
 
     def display_port_settings_details(self):
         data = self.get_validated_port_data()
         if data:
             print(f"Status Details IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
-            self.send_request("display_port_status_details", data, self.olt_port_output)
+            self.send_request("olt/display_port_status_details", data, self.olt_port_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
 
     def display_port_settings_summary(self):
         data = self.get_validated_port_data()
         if data:
             print(f"Status Summary IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
-            self.send_request_summary("display_port_status_summary", data, self.olt_port_output)
+            self.send_request("olt/display_port_status_summary", data, self.olt_port_output, DebugMode.SUMMARY)
 
     def display_port_settings(self):
         if self.debug_enabled:
@@ -363,4 +337,4 @@ class OLTConfiguration(QWidget):
         data = self.get_validated_port_data()
         if data:
             print(f"Deleting IP: {data['ip']}, Uplink Port: {data['uplink_port']}, VLAN: {data['vlan_id']}, OLT Port: {data['pon_port']}")
-            self.send_request("delete_port_setting", data, self.olt_port_output)
+            self.send_request("olt/delete_port_setting", data, self.olt_port_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
