@@ -5,6 +5,9 @@ from olt_telnet import handle_command_execution
 
 ont_router = APIRouter()
 
+class ONTCommand(BaseModel):
+    ip: str
+
 class ONTProfileRequest(BaseModel):
     ip: str
     profile_id: int
@@ -111,3 +114,11 @@ async def delete_ont_service(config: ONTServiceRequest):
         "quit",
     ]
     return await handle_command_execution(config.ip, commands, "ONT Service Deleted")
+
+@ont_router.post("/save_configurations")
+async def save_ont_configurations(ont: ONTCommand):
+    """Save the ONT configuration."""
+    commands = [
+        "save"
+    ]
+    return await handle_command_execution(ont.ip, commands, "ALL Current Configurations saved successfully!")

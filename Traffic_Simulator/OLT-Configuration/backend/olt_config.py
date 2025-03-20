@@ -29,7 +29,6 @@ class DisconnectRequest(BaseModel):
 
 class OLTCommand(BaseModel):
     ip: str
-    command: str
 
 class PortConfigRequest(BaseModel):
     ip: str
@@ -187,3 +186,11 @@ async def unconfig_olt_port(config: PortConfigRequest):
         "quit"
     ]
     return await handle_command_execution(config.ip, commands, "Port configuration deleted!")
+
+@olt_router.post("/save_configurations")
+async def save_olt_configurations(olt: OLTCommand):
+    """Save the OLT configuration."""
+    commands = [
+        "save"
+    ]
+    return await handle_command_execution(olt.ip, commands, "ALL Current Configurations saved successfully!")

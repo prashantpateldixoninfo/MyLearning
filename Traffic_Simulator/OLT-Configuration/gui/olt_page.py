@@ -126,7 +126,12 @@ class OLTConfiguration(QWidget):
         olt_port_group.setLayout(olt_port_layout)
         main_layout.addWidget(olt_port_group)
 
-        # === Next Button ===
+        # === Control Buttons ===
+        control_button_layout = QHBoxLayout()
+        self.save_button = QPushButton("Save")
+        self.save_button.setFixedSize(100, 30)
+        self.save_button.clicked.connect(self.save_configurations)
+
         self.next_button = QPushButton("Next →")
         self.next_button.setFixedSize(100, 30)
         self.next_button.setStyleSheet(
@@ -144,7 +149,11 @@ class OLTConfiguration(QWidget):
             }
         """
         )
-        main_layout.addWidget(self.next_button, alignment=Qt.AlignRight)
+        control_button_layout.addStretch(2)
+        control_button_layout.addWidget(self.save_button, alignment=Qt.AlignCenter)
+        control_button_layout.addStretch(1)
+        control_button_layout.addWidget(self.next_button, alignment=Qt.AlignRight)
+        main_layout.addLayout(control_button_layout)
 
         self.setLayout(main_layout)
 
@@ -278,3 +287,8 @@ class OLTConfiguration(QWidget):
         data = self.get_validated_port_data()
         if data:
             send_request("olt/delete_port_setting", data, self.olt_port_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
+
+    def save_configurations(self):
+        data = {"ip": self.ip_input.text().strip()}
+        send_request("olt/save_configurations", data, self.olt_port_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
+

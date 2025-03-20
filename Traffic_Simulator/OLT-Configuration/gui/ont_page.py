@@ -131,9 +131,15 @@ class ONTConfiguration(QWidget):
         ont_service_group.setLayout(ont_service_layout)
         main_layout.addWidget(ont_service_group)
 
-        back_button = QPushButton("← Back")
-        back_button.setFixedSize(100, 30)
-        back_button.setStyleSheet(
+        # === Control Buttons ===
+        control_button_layout = QHBoxLayout()
+        self.save_button = QPushButton("Save")
+        self.save_button.setFixedSize(100, 30)
+        self.save_button.clicked.connect(self.save_configurations)
+    
+        self.back_button = QPushButton("← Back")
+        self.back_button.setFixedSize(100, 30)
+        self.back_button.setStyleSheet(
             """
             QPushButton {
                 background-color: #A5D6A7;
@@ -148,8 +154,12 @@ class ONTConfiguration(QWidget):
             }
         """
         )
-        back_button.clicked.connect(self.go_to_back)
-        main_layout.addWidget(back_button, alignment=Qt.AlignRight)
+        self.back_button.clicked.connect(self.go_to_back)
+        control_button_layout.addStretch(2)
+        control_button_layout.addWidget(self.save_button, alignment=Qt.AlignCenter)
+        control_button_layout.addStretch(1)
+        control_button_layout.addWidget(self.back_button, alignment=Qt.AlignRight)
+        main_layout.addLayout(control_button_layout)
 
         self.setLayout(main_layout)
 
@@ -256,3 +266,8 @@ class ONTConfiguration(QWidget):
         data = self.validate_and_get_ont_service_data()
         if data:
             send_request("ont/delete_service", data, self.ont_service_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
+
+    def save_configurations(self):
+        data = {"ip": self.olt_data.get("ip")}
+        send_request("ont/save_configurations", data, self.ont_service_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
+
