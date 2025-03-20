@@ -43,7 +43,9 @@ class ONTConfiguration(QWidget):
         self.profile_id_input.setText(self.olt_data.get('vlan_id'))
 
         self.tcont_id_input = QLineEdit(placeholderText="0-127")
-        self.tcont_id_input.setText("1")
+        vlan_id = int(self.olt_data.get('vlan_id', 0))
+        default_tcont_id = vlan_id % 10
+        self.tcont_id_input.setText(str(default_tcont_id))
 
         self.gemport_id_input = QLineEdit(placeholderText="0-1023")
         self.gemport_id_input.setText("1")
@@ -92,7 +94,9 @@ class ONTConfiguration(QWidget):
         self.serial_number_input.setText("ZYOT-CE000292")
 
         self.ont_id_input = QLineEdit(placeholderText="0-127")
-        self.ont_id_input.setText("0")
+        vlan_id = int(self.olt_data.get('vlan_id', 0))
+        default_ont_id = vlan_id % 10
+        self.ont_id_input.setText(str(default_ont_id))
 
         # Add labeled inputs using function
         ont_service_layout.addLayout(add_labeled_input("Serial Number:", self.serial_number_input))
