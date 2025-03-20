@@ -91,7 +91,7 @@ class ONTConfiguration(QWidget):
 
         # Input Fields
         self.serial_number_input = QLineEdit(placeholderText="XXXX-XXXXXXXX or XXXXXXXXXXXX")
-        self.serial_number_input.setText("ZYOT-CE000292")
+        self.serial_number_input.setText("DPDP-C1000168")
 
         self.ont_id_input = QLineEdit(placeholderText="0-127")
         vlan_id = int(self.olt_data.get('vlan_id', 0))
@@ -168,6 +168,24 @@ class ONTConfiguration(QWidget):
 
     def on_checkbox_toggle(self, state):
         self.debug_enabled = state == 2
+
+    def update_olt_data(self, new_olt_data):
+        """Update ONT input fields with latest OLT data if not already set"""
+        
+        if self.profile_id_input.text().strip() == "":
+            self.profile_id_input.setText(new_olt_data.get('vlan_id', ""))
+        if self.tcont_id_input.text().strip() == "":
+            vlan_id = int(new_olt_data.get('vlan_id', 0))
+            default_tcont_id = vlan_id % 10
+            self.tcont_id_input.setText(str(default_tcont_id))
+        if self.gemport_id_input.text().strip() == "":
+            self.gemport_id_input.setText("1")
+        if self.serial_number_input.text().strip() == "":
+            self.serial_number_input.setText("DPDP-C1000168")
+        if self.ont_id_input.text().strip() == "":
+            vlan_id = int(new_olt_data.get('vlan_id', 0))
+            default_ont_id = vlan_id % 10
+            self.ont_id_input.setText(str(default_ont_id))
 
     def validate_and_get_ont_profile_data(self):
         """Validate ONT Profile Inputs, Show Errors if Any, and Return Valid Data"""
