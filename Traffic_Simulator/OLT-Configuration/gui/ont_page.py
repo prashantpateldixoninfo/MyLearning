@@ -11,6 +11,7 @@ from qtpy.QtWidgets import (
 )
 from qtpy.QtCore import Qt
 from request_handler import send_request, send_telnet_request, DebugMode
+from traffic_page import TrafficStatistics
 import re
 
 class ONTConfiguration(QWidget):
@@ -20,6 +21,7 @@ class ONTConfiguration(QWidget):
         self.debug_enabled = False
         self.olt_data = olt_data  # Store the received dictionary
         self.init_ui()
+        self.traffic_page = None 
 
     def init_ui(self):
         main_layout = QVBoxLayout()
@@ -133,10 +135,8 @@ class ONTConfiguration(QWidget):
 
         # === Control Buttons ===
         control_button_layout = QHBoxLayout()
-        self.save_button = QPushButton("Save")
-        self.save_button.setFixedSize(100, 30)
-        self.save_button.clicked.connect(self.save_configurations)
-    
+
+        # Back Button
         self.back_button = QPushButton("← Back")
         self.back_button.setFixedSize(100, 30)
         self.back_button.setStyleSheet(
@@ -155,13 +155,50 @@ class ONTConfiguration(QWidget):
         """
         )
         self.back_button.clicked.connect(self.go_to_back)
-        control_button_layout.addStretch(2)
+
+        # Save Button
+        self.save_button = QPushButton("Save")
+        self.save_button.setFixedSize(100, 30)
+        self.save_button.clicked.connect(self.save_configurations)
+
+        # Next Button
+        self.next_button = QPushButton("Next →")
+        self.next_button.setFixedSize(100, 30)
+        self.next_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #A5D6A7;
+                border: 2px solid #1e90ff;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+                padding: 5px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+        """
+        )
+        self.next_button.clicked.connect(self.go_to_next)
+
+        control_button_layout.addWidget(self.back_button, alignment=Qt.AlignLeft)
+        control_button_layout.addStretch(1)
         control_button_layout.addWidget(self.save_button, alignment=Qt.AlignCenter)
         control_button_layout.addStretch(1)
-        control_button_layout.addWidget(self.back_button, alignment=Qt.AlignRight)
+        control_button_layout.addWidget(self.next_button, alignment=Qt.AlignRight)
+        
         main_layout.addLayout(control_button_layout)
 
         self.setLayout(main_layout)
+
+    def go_to_next(self):
+        """Create Traffic Page dynamically with latest ONT data"""
+    
+        if not hasattr(self, 'traffic_page') or self.traffic_page is None:
+            self.traffic_page = TrafficStatistics(self.stack, self)  # Pass ONT page reference
+            self.stack.addWidget(self.traffic_page)  # Add Traffic Page to stack
+    
+        self.stack.setCurrentWidget(self.traffic_page)  # Switch to Traffic Page
 
     def go_to_back(self):
         self.stack.setCurrentIndex(0)

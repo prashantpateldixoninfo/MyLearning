@@ -81,13 +81,13 @@ class OLTConfiguration(QWidget):
 
         # Input Fields for OLT Port Setting
         self.uplink_input = QLineEdit(placeholderText="Uplink Port (Frame/Slot/Port)")
-        self.uplink_input.setText("0/16/1")
+        self.uplink_input.setText("0/16/0")
 
         self.vlan_input = QLineEdit(placeholderText="VLAN (1-65535)")
-        self.vlan_input.setText("222")
+        self.vlan_input.setText("111")
 
         self.olt_port_input = QLineEdit(placeholderText="OLT PON Port (Frame/Slot/Port)")
-        self.olt_port_input.setText("0/1/1")
+        self.olt_port_input.setText("0/1/0")
 
         # Add labeled input fields
         olt_port_layout.addLayout(add_labeled_input("Uplink Port:", self.uplink_input))
