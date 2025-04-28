@@ -3,12 +3,14 @@ from PyQt5.QtWidgets import (
     QTextEdit, QLabel
 )
 from PyQt5.QtCore import Qt
+from request_handler import send_request, DebugMode
 
 class DebugModeConfig(QWidget):
     def __init__(self, stack, traffic_page):
         super().__init__()
         self.stack = stack
         self.traffic_page = traffic_page
+        self.debug_enabled = True
         self.init_ui()
 
     def init_ui(self):
@@ -42,10 +44,10 @@ class DebugModeConfig(QWidget):
         output_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 14px; }")
         output_layout = QVBoxLayout()
 
-        self.output_box = QTextEdit()
-        self.output_box.setReadOnly(True)
+        self.cmd_output = QTextEdit()
+        self.cmd_output.setReadOnly(True)
 
-        output_layout.addWidget(self.output_box)
+        output_layout.addWidget(self.cmd_output)
         output_group.setLayout(output_layout)
 
         # === Bottom Button Layout (Back, Save) ===
@@ -98,14 +100,17 @@ class DebugModeConfig(QWidget):
     def execute_commands(self):
         """Execute commands"""
         command_text = self.cmd_input.toPlainText().strip()
-        if command_text:
-            self.output_box.append(f"> {command_text}")  # Show command
-            self.cmd_input.clear()  # Clear input field
+        data = {
+            "ip": "10.11.104.2", 
+            "cmd": command_text
+        }
+        send_request("debug/execute_commands", data, self.cmd_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
+        
 
     def clear_commands(self):
         """Clear command input and output"""
         self.cmd_input.clear()
-        self.output_box.clear()
+        self.cmd_output.clear()
 
     def go_to_back(self):
         """Navigate back to TrafficStatistics page"""
@@ -113,7 +118,7 @@ class DebugModeConfig(QWidget):
 
     def save_config(self):
         """Simulate saving configuration"""
-        self.output_box.append("Configuration saved successfully! 💾")
+        self.cmd_output.append("Configuration saved successfully! 💾")
 
     def update_data(self, traffic_data):
         """Update Debug Page with new Traffic Data if needed"""
