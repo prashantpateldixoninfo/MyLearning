@@ -128,7 +128,7 @@ class OLTConfiguration(QWidget):
 
         # === Control Buttons ===
         control_button_layout = QHBoxLayout()
-        self.save_button = QPushButton("Save")
+        self.save_button = QPushButton("Save Configs")
         self.save_button.setFixedSize(100, 30)
         self.save_button.clicked.connect(self.save_configurations)
 

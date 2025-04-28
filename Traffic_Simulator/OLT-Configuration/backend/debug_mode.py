@@ -11,7 +11,6 @@ class DebugCommand(BaseModel):
 
 @debug_router.post("/execute_commands")
 async def execute_cmds(config: DebugCommand):
-    print(config.cmd)
     command_list = [line.strip() for line in config.cmd.splitlines() if line.strip()]
     if not command_list:
         return {"message": "No commands to execute"}

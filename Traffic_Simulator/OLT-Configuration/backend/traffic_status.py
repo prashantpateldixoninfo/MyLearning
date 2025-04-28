@@ -21,30 +21,21 @@ class EthPortTrafficStatusCommand(BaseModel):
 @traffic_router.post("/olt_port_statistics")
 async def olt_port_statistics(config: OLTTrafficStatusCommand):
     pon_slot, pon_port = config.pon_port.rsplit("/", 1)
-    print(f"pon_slot: {pon_slot}, pon_port: {pon_port}")
-    print(f"OLT IP: {config.ip}")
-    print(f"ONT ID: {config.ont_id}")
     commands = [
         f"interface gpon {pon_slot}",
         f"display statistics ont {pon_port} {config.ont_id}",
         f"quit",
     ]
-    print(f"OLT Port Statistics Command: {commands}")
     return await handle_command_execution(config.ip, commands, "OLT Port Statistics")
 
 @traffic_router.post("/eth_port_statistics")
 async def eth_port_statistics(config: EthPortTrafficStatusCommand):
     upstream_slot, upstream_port = config.uplink_port.rsplit("/", 1)
-    print(f"upstream_slot: {upstream_slot}, upstream_port: {upstream_port}")
-    print(f"OLT IP: {config.ip}")
-    print(f"Uplink Port: {upstream_port}")
-    print(f"Upstream Slot: {upstream_slot}")
     commands = [
         f"interface eth {upstream_slot}",
         f"display statistics performance {upstream_port} current-15minutes",
         f"quit",
     ]
-    print(f"Ethernet Port Statistics Command: {commands}")
     return await handle_command_execution(config.ip, commands, "Ethernet Port Statistics")
 
 

@@ -157,7 +157,7 @@ class ONTConfiguration(QWidget):
         self.back_button.clicked.connect(self.go_to_back)
 
         # Save Button
-        self.save_button = QPushButton("Save")
+        self.save_button = QPushButton("Save Configs")
         self.save_button.setFixedSize(100, 30)
         self.save_button.clicked.connect(self.save_configurations)
 
@@ -208,7 +208,9 @@ class ONTConfiguration(QWidget):
 
     def update_olt_data(self, new_olt_data):
         """Update ONT input fields with latest OLT data if not already set"""
+        self.olt_data = new_olt_data  # Update the stored OLT data
         
+        # Update input fields with new OLT data if they are empty
         if self.profile_id_input.text().strip() == "":
             self.profile_id_input.setText(new_olt_data.get('vlan_id', ""))
         if self.tcont_id_input.text().strip() == "":
@@ -223,6 +225,7 @@ class ONTConfiguration(QWidget):
             vlan_id = int(new_olt_data.get('vlan_id', 0))
             default_ont_id = vlan_id % 10
             self.ont_id_input.setText(str(default_ont_id))
+            
 
     def validate_and_get_ont_profile_data(self):
         """Validate ONT Profile Inputs, Show Errors if Any, and Return Valid Data"""

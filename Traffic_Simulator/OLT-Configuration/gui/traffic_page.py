@@ -72,7 +72,7 @@ class TrafficStatistics(QWidget):
         )
         self.back_button.clicked.connect(self.go_to_back)
 
-        self.save_button = QPushButton("Save")
+        self.save_button = QPushButton("Save Configs")
         self.save_button.setFixedSize(100, 30)
         self.save_button.clicked.connect(self.save_statistics)
 
@@ -106,10 +106,6 @@ class TrafficStatistics(QWidget):
         """Navigate back to ONT Configuration page"""
         self.stack.setCurrentWidget(self.ont_page)
 
-    def save_statistics(self):
-        """Placeholder for saving statistics"""
-        print("Saving traffic statistics...")
-
     def refresh_olt_statistics(self):
         """Placeholder: Refresh OLT Port Statistics"""
         data = {
@@ -117,31 +113,27 @@ class TrafficStatistics(QWidget):
             "pon_port": self.ont_page.olt_data.get("pon_port"),
             "ont_id": self.ont_page.ont_id_input.text().strip(),
         }
-        print(f"OLT Statistics Data: {data}")
         if data:
             send_request("traffic/olt_port_statistics", data, self.olt_stat_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
 
 
     def refresh_eth_port_statistics(self):
         """Placeholder: Refresh Upstream Ethernet Port Statistics"""
-        self.eth_stat_output.append("Upstream Ethernet Port Statistics refreshed...")
         data = {
             "ip": self.ont_page.olt_data.get("ip"),
             "uplink_port": self.ont_page.olt_data.get("upstream_port")
         }
-        print(f"Ethernet Statistics Data: {data}")
         if data:
             send_request("traffic/eth_port_statistics", data, self.eth_stat_output, DebugMode.DEBUG if self.debug_enabled else DebugMode.NO_DEBUG)
 
-    def get_statistics_data(self):
-        """Fetch and return OLT and ONT statistics data"""
-        pass
+    def save_statistics(self):
+        data = {"ip": self.ont_page.olt_data.get("ip")}
+        send_request("traffic/save_configurations", data, self.eth_stat_output, DebugMode.NO_DEBUG)
 
     def go_to_next_page(self):
         """Create Debug Page dynamically with latest Traffic Data"""
         if not hasattr(self, 'debug_page'):
             self.debug_page = DebugModeConfig(self.stack, self)  # Pass reference of traffic page
             self.stack.addWidget(self.debug_page)
-        else:
-            self.debug_page.update_data(self.get_statistics_data())
+
         self.stack.setCurrentWidget(self.debug_page)

@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QGroupBox,
-    QTextEdit, QLabel
+    QTextEdit, QLabel, QFileDialog
 )
 from PyQt5.QtCore import Qt
+from datetime import datetime
+
 from request_handler import send_request, DebugMode
 
 class DebugModeConfig(QWidget):
@@ -69,7 +71,7 @@ class DebugModeConfig(QWidget):
             }
         """
         )
-        self.save_button = QPushButton("Save")
+        self.save_button = QPushButton("Save to File")
         self.save_button.setFixedSize(100, 30)
         
         self.back_button.clicked.connect(self.go_to_back)
@@ -117,10 +119,37 @@ class DebugModeConfig(QWidget):
         self.stack.setCurrentWidget(self.traffic_page)
 
     def save_config(self):
-        """Simulate saving configuration"""
-        self.cmd_output.append("Configuration saved successfully! 💾")
+        """Save Command Output to a text file with timestamp."""
+        try:
+            # Generate timestamp string
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    def update_data(self, traffic_data):
-        """Update Debug Page with new Traffic Data if needed"""
-        # You can use traffic_data to update UI elements if required
-        pass
+            # Suggest default filename with timestamp
+            default_filename = f"OLT_Debug_Output_{timestamp}.txt"
+
+            # Open file dialog for user to choose save location
+            options = QFileDialog.Options()
+            options |= QFileDialog.DontUseNativeDialog
+            file_path, _ = QFileDialog.getSaveFileName(
+                self,
+                "Save Command Output",
+                default_filename,
+                "Text Files (*.txt);;All Files (*)",
+                options=options
+            )
+
+            if file_path:
+                # Get the text from output box
+                output_text = self.cmd_output.toPlainText()
+
+                # Write to selected file
+                with open(file_path, "w", encoding="utf-8") as file:
+                    file.write(output_text)
+
+                # Feedback to user
+                self.cmd_output.append(f"\n✅ Configuration saved successfully!\nFile: {file_path}")
+            else:
+                self.cmd_output.append("\n⚠️ Save canceled by user.")
+
+        except Exception as e:
+            self.cmd_output.append(f"\n❌ Failed to save file: {str(e)}")
