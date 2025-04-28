@@ -10,7 +10,7 @@ from qtpy.QtWidgets import (
     QCheckBox,
 )
 from qtpy.QtCore import Qt
-from request_handler import send_request, send_telnet_request, DebugMode
+from request_handler import send_request, DebugMode
 from traffic_page import TrafficStatistics
 import re
 
