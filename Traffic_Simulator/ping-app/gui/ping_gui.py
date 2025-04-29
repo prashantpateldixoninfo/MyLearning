@@ -18,16 +18,16 @@ class PingApp(QWidget):
         self.layout.addWidget(self.input_box)
 
         self.ping_button = QPushButton("Ping")
-        self.save_button = QPushButton("Fetch History")
+        self.history_button = QPushButton("Fetch History")
 
         self.layout.addWidget(self.ping_button)
-        self.layout.addWidget(self.save_button)
+        self.layout.addWidget(self.history_button)
         self.layout.addWidget(self.output_box)
 
         self.setLayout(self.layout)
 
         self.ping_button.clicked.connect(self.ping_host)
-        self.save_button.clicked.connect(self.get_history)
+        self.history_button.clicked.connect(self.get_history)
 
     def ping_host(self):
         host = self.input_box.text().strip()
