@@ -15,3 +15,4 @@ def test_gui_input_box(app_instance, qtbot):
 def test_gui_buttons_exist(app_instance):
     assert app_instance.ping_button is not None
     assert app_instance.save_button is not None
+    # assert app_instance.history_button is not None

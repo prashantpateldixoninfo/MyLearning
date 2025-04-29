@@ -8,5 +8,5 @@ collection = db["ping_results"]
 def insert_ping(record):
     collection.insert_one(record)
 
-def fetch_history():
-    return list(collection.find({}, {"_id": 0}))
+def fetch_history(query):
+    return list(collection.find(query, {"_id": 0}))

@@ -38,7 +38,8 @@ class PingApp(QWidget):
         self.output_box.setText(res.json()["output"])
 
     def get_history(self):
-        res = requests.get(f"{API_BASE}/history")
+        host = self.input_box.text().strip()
+        res = requests.post(f"{API_BASE}/history", json={"host": host})
         history = res.json()
         out = "\n---\n".join(f"{h['host']}:\n{h['output']}" for h in history)
         self.output_box.setText(out or "No history available.")

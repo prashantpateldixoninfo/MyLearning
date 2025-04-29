@@ -11,9 +11,12 @@ def ping():
     insert_ping({"host": host, "output": output})
     return jsonify({"output": output})
 
-@app.route('/history', methods=['GET'])
+@app.route('/history', methods=['POST'])
 def history():
-    return jsonify(fetch_history())
+    data = request.get_json() or {}
+    host = data.get("host")
+    query = {"host": host} if host else {}
+    return jsonify(fetch_history(query))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

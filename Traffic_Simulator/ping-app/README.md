@@ -34,42 +34,36 @@ git clone https://github.com/prashantpateldixoninfo/MyLearning.git
 cd MyLearning/Traffic_Simulator/ping-app
 ```
 
-### 🖥 2️⃣ **Set Up Backend**
+### 🖥 2️⃣ **Install the libraries**
 
 ```sh
-cd backend
-python -m venv venv   # Create Virtual Environment for one time
-venv\Scripts\activate  # Activate (Windows)
-pip install -r requirements.txt  # Install Dependencies
-deactivate   # Deactivate Environment
+cd ping-app
+python3 -m venv venv                # Create Virtual Environment for one time
+source venv/bin/activate            # Activate (Linux)
+pip install --upgrade pip
+pip install -r backend/requirements.txt
+pip install -r gui/requirements.txt
+pip install pytest pytest-qt
+export MONGO_URI="mongodb://localhost:27017"
+sudo systemctl stop mongod          # Stop the docker if already running
+docker-compose up -d mongo          # Run the mongo-db
+docker ps                           # Check the mongo-db status
 ```
-
-### 🎨 3️⃣ **Set Up GUI**export MONGO_URI="mongodb://localhost:27017"
-
-```sh
-cd gui
-python -m venv venv   # Create Virtual Environment for one time
-venv\Scripts\activate  # Activate (Windows)
-pip install -r requirements.txt  # Install Dependencies
-deactivate   # Deactivate Environment
-```
-
----
 
 ## 🚀 **Running the Application**
 
 ### 🔹 1️⃣ **Start Backend Server**
 
 ```sh
-python -m main
+python3 -m backend.app
 ```
 
-This will run the FastAPI backend on `http://127.0.0.1:8000`.
+This will run the Flask backend on `http://127.0.0.1:5000`.
 
 ### 🔹 2️⃣ **Start GUI Application**
 
 ```sh
-python -m main
+python3 gui/ping_gui.py
 ```
 
 ---
@@ -77,18 +71,8 @@ python -m main
 ## 🧪 **Running Tests**
 
 ```sh
-cd tests
-python -m unittest discover
+PYTHONPATH=. pytest tests           # For Linux
+$env:PYTHONPATH="."; pytest tests   # For Windows
 ```
 
 ---
-
-## 📌 **Additional Notes**
-
--   The backend runs on **port 8000**.
--   The GUI interacts with the backend via API calls.
--   Ensure both environments (`gui/venv` and `backend/venv`) are activated while running respective parts.
--   Update dependencies using:
-    ```sh
-    pip install -r requirements.txt
-    ```
