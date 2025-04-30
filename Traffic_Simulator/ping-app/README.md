@@ -21,115 +21,175 @@ ping-app/
 ├── tests/                   # Unit Tests
 │   ├── test_api.py
 │   ├── test_gui.py
-├── pre_install.sh           # Pre-setup script (Ubuntu/macOS)
-├── post_cleanup.sh          # Cleanup script (Ubuntu/macOS)
-├── pre_install_windows.bat  # Pre-setup script (Windows)
-├── post_cleanup_windows.bat # Cleanup script (Windows)
-├── README.md                # Documentation
+├── install_docker_backend_mongodb.bat      # Pre-setup script (Windows) for Backend + MongoDB
+├── install_docker_mongodb.bat              # Pre-setup script (Windows) for MongoDB
+├── install_all_independent.bat             # Pre-setup script (Windows) for all components independently
+├── uninstall_docker_backend_mongodb.bat    # Cleanup script (Windows) for Backend + MongoDB
+├── uninstall_docker_mongodb.bat            # Cleanup script (Windows) for MongoDB
+├── uninstall_all_independent.bat             # Cleanup script (Windows) for all components independently
+├── README.md                               # Documentation
 ├── .gitignore
 ```
 
 ---
 
-## 🧰 Pre-Installation
+## 🧰 Pre-Installation (Windows)
 
-### 🐧 For Ubuntu/Linux/macOS
+### 1️⃣ Run Through Backend and MongoDB Containers
+
+#### **Pre-Installation**
+
+To set up the project with Backend and MongoDB running as Docker containers, use the following script:
 
 ```bash
-./pre_install.sh
+./install_docker_backend_mongodb.bat
 ```
 
 This script performs:
 
--   Virtual environment creation
--   Dependency installation
--   MongoDB Docker container startup (`ping-app-mongo`)
+-   Creates a Python virtual environment using `venv`.
+-   Installs Backend, GUI, and test dependencies.
+-   Starts both MongoDB(`ping-app-mongo`) and Backend(`ping-app-backend`) containers using Docker Compose.
 
-> ⚠️ Ensure Docker is installed and the daemon is running.
+> ⚠️ Ensure Docker Desktop is installed and running.
 
----
+#### **Running the Application**
 
-### 🪟 For Windows (VS Code + Git Bash)
+After running the `install_docker_backend_mongodb.bat` script:
 
-```bash
-./pre_install_windows.bat
-```
-
-This script performs:
-
--   Python virtual environment setup using `venv`
--   Backend, GUI, and test dependencies installation
--   MongoDB Docker container startup (`ping-app-mongo`)
-
-> ⚠️ Docker Desktop must be installed and running.
-
----
-
-## 🚀 Running the Application
-
-### ✅ 1️⃣ Start the Backend (in activated virtual environment)
-
-```bash
-python -m backend.app
-```
-
-Runs the backend on: `http://127.0.0.1:5000`
-
----
-
-### ✅ 2️⃣ Start the GUI
+1. Launch the GUI:
 
 ```bash
 python gui/ping_gui.py
 ```
 
-A simple GUI will launch where you can enter a hostname or IP address to ping.
+#### **Cleanup**
+
+To stop and remove the MongoDB and Backend containers, use the following script:
+
+```bash
+./uninstall_docker_backend_mongodb.bat
+```
+
+This script stops and removes both the MongoDB(`ping-app-mongo`) and Backend(`ping-app-backend`) containers.
+
+---
+
+### 2️⃣ Run Through MongoDB Container
+
+#### **Pre-Installation**
+
+To set up the project with only MongoDB running in a Docker container, use the following script:
+
+```bash
+./install_docker_mongodb.bat
+```
+
+This script performs:
+
+-   Creates a Python virtual environment using `venv`.
+-   Installs Backend, GUI, and test dependencies.
+-   Starts the MongoDB container (`ping-app-mongo`) using Docker.
+
+> ⚠️ Ensure Docker Desktop is installed and running.
+
+#### **Running the Application**
+
+After running the `install_docker_mongodb.bat` script:
+
+1. Start the Backend:
+
+```bash
+python backend/app.py
+```
+
+2. Launch the GUI:
+
+```bash
+python gui/ping_gui.py
+```
+
+#### **Cleanup**
+
+To stop and remove only the MongoDB container, use the following script:
+
+```bash
+./uninstall_docker_mongodb.bat
+```
+
+This script stops and removes the MongoDB container (`ping-app-mongo`).
+
+---
+
+### 3️⃣ Run Through Without Containers (All Applications Independently)
+
+#### **Pre-Installation**
+
+To set up the project with MongoDB, Backend, and GUI all running independently (without Docker for Backend and MongoDB), use the following script:
+
+```bash
+./install_all_independent.bat
+```
+
+This script performs:
+
+-   Creates a Python virtual environment using `venv`.
+-   Installs Backend, GUI, and test dependencies.
+-   Starts MongoDB, Backend, and GUI applications independently.
+
+> ⚠️ Ensure Docker Desktop is installed and running.
+
+#### **Running the Application**
+
+After running the `install_all_independent.bat` script:
+
+1. Start MongoDB:
+
+Follow the installation process for MongoDB using `mongod` or Docker, depending on your configuration.
+
+```bash
+mongo --version
+net status MongoDB
+net start MongoDB
+net stop MongoDB
+```
+
+2. Start the Backend:
+
+```bash
+python backend/app.py
+```
+
+3. Launch the GUI:
+
+```bash
+python gui/ping_gui.py
+```
+
+#### **Cleanup**
+
+To clean up all applications (MongoDB, Backend, GUI) independently, use the following script:
+
+```bash
+./uninstall_all_independent.bat
+```
+
+This script:
+
+-   Removes the virtual environment and cleans up the project.
 
 ---
 
 ## 🧪 Running Tests
 
-### 🐧 Linux/macOS
-
-```bash
-PYTHONPATH=. pytest tests
-```
+To run the test cases, use the following command:
 
 ### 🪟 Windows (PowerShell or Git Bash)
 
 ```powershell
-$env:PYTHONPATH="."; pytest tests
+set PYTHONPATH=. && pytest tests
 ```
 
-Runs API and GUI tests.
-
----
-
-## 🧹 Post-Cleanup
-
-### 🐧 Ubuntu/Linux/macOS
-
-```bash
-./post_cleanup.sh
-```
-
-### 🪟 Windows
-
-```bash
-./post_cleanup_windows.bat
-```
-
-This script:
-
--   Stops and removes the MongoDB Docker container (`ping-app-mongo`)
--   Leaves the virtual environment and project files intact
-
----
-
-## 📝 Notes
-
--   MongoDB runs inside a Docker container named `ping-app-mongo`.
--   The application uses virtual environments to isolate dependencies.
--   Project is cross-platform: works on both Ubuntu/Linux and Windows systems with proper scripts.
+This will run both the API and GUI tests.
 
 ---
