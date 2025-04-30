@@ -36,4 +36,24 @@ docker run -d --name %CONTAINER_NAME% -p 27017:27017 mongo
 echo Checking container status...
 docker ps
 
-echo Pre-installation complete!
+@echo off
+echo.
+echo ==================================================
+echo        PRE-INSTALLATION COMPLETE! NEXT STEPS:
+echo ==================================================
+echo.
+echo [1] Activate the virtual environment:
+echo     venv\Scripts\activate
+echo.
+echo [2] Run the backend:
+echo     python backend\app.py
+echo.
+echo [3] Run the GUI:
+echo     python gui\ping_gui.py
+echo.
+echo [4] Run the tests:
+echo     set PYTHONPATH=. pytest tests
+echo.
+echo ==================================================
+echo           You're all set. Happy Testing!
+echo ==================================================
