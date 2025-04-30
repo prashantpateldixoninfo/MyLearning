@@ -37,7 +37,7 @@ ping-app/
 
 ### 1️⃣ Run Through Backend and MongoDB Containers
 
-![Alt text](Traffic_Simulator/ping-app/images/GUI_with_Docker_MongoDB_Backend.png)
+![Alt text](images/GUI_with_Docker_MongoDB_Backend.png)
 
 #### **Pre-Installation**
 
@@ -79,7 +79,7 @@ This script stops and removes both the MongoDB(`ping-app-mongo`) and Backend(`pi
 
 ### 2️⃣ Run Through MongoDB Container
 
-![Alt text](Traffic_Simulator/ping-app/images/GUI_Backend_with_Docker_MongoDB.png)
+![Alt text](images/GUI_Backend_with_Docker_MongoDB.png)
 
 #### **Pre-Installation**
 
@@ -127,7 +127,7 @@ This script stops and removes the MongoDB container (`ping-app-mongo`).
 
 ### 3️⃣ Run Through Without Containers (All Applications Independently)
 
-![Alt text](Traffic_Simulator/ping-app/images/GUI_Backend_MongoDB.png)
+![Alt text](images/GUI_Backend_MongoDB.png)
 
 #### **Pre-Installation**
 
