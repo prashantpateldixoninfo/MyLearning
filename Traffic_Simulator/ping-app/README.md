@@ -26,7 +26,7 @@ ping-app/
 ├── install_all_independent.bat             # Pre-setup script (Windows) for all components independently
 ├── uninstall_docker_backend_mongodb.bat    # Cleanup script (Windows) for Backend + MongoDB
 ├── uninstall_docker_mongodb.bat            # Cleanup script (Windows) for MongoDB
-├── uninstall_all_independent.bat             # Cleanup script (Windows) for all components independently
+├── uninstall_all_independent.bat           # Cleanup script (Windows) for all components independently
 ├── README.md                               # Documentation
 ├── .gitignore
 ```
@@ -36,6 +36,8 @@ ping-app/
 ## 🧰 Pre-Installation (Windows)
 
 ### 1️⃣ Run Through Backend and MongoDB Containers
+
+![Alt text](Traffic_Simulator\ping-app\images\GUI_with_Docker_MongoDB_Backend.png)
 
 #### **Pre-Installation**
 
@@ -76,6 +78,8 @@ This script stops and removes both the MongoDB(`ping-app-mongo`) and Backend(`pi
 ---
 
 ### 2️⃣ Run Through MongoDB Container
+
+![Alt text](Traffic_Simulator\ping-app\images\GUI_Backend_with_Docker_MongoDB.png)
 
 #### **Pre-Installation**
 
@@ -122,6 +126,8 @@ This script stops and removes the MongoDB container (`ping-app-mongo`).
 ---
 
 ### 3️⃣ Run Through Without Containers (All Applications Independently)
+
+![Alt text](Traffic_Simulator\ping-app\images\GUI_Backend_MongoDB.png)
 
 #### **Pre-Installation**
 
