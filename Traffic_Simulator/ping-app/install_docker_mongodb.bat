@@ -52,7 +52,8 @@ echo [3] Run the GUI:
 echo     python gui\ping_gui.py
 echo.
 echo [4] Run the tests:
-echo     set PYTHONPATH=. pytest tests
+echo     pytest tests
+echo     set PYTHONPATH=. && pytest tests
 echo.
 echo ==================================================
 echo           You're all set. Happy Testing!

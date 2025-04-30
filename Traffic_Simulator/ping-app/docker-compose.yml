@@ -1,18 +1,21 @@
-version: "3.8"
+version: '3.8'
 
 services:
-    backend:
-        build:
-            context: .
-            dockerfile: Dockerfile.backend
-        ports:
-            - "5000:5000"
-        depends_on:
-            - mongo
-        environment:
-            - MONGO_URI=mongodb://mongo:27017
+  mongo:
+    image: mongo
+    container_name: ping-app-mongo
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
 
-    mongo:
-        image: mongo
-        ports:
-            - "27017:27017"
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: ping-app-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+    depends_on:
+      - mongo

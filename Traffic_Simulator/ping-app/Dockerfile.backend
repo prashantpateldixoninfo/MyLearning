@@ -1,6 +1,32 @@
-FROM python:3.10
+# Use slim version of Python 3.10 as the base image
+FROM python:3.10-slim
+
+# Set the working directory inside the container
 WORKDIR /app
+
+# Install system dependencies (ping utility)
+RUN apt-get update && \
+    apt-get install -y iputils-ping && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy backend Python dependencies
 COPY backend/requirements.txt .
-RUN pip install -r requirements.txt
-COPY backend/ .
-CMD ["python", "app.py"]
+
+# Install Python dependencies
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Copy backend source code
+COPY backend/ /app/backend/
+
+# Set PYTHONPATH so imports like `from backend.ping_logic import run_ping` work
+ENV PYTHONPATH=/app
+
+# Expose the port Flask will run on
+EXPOSE 5000
+
+# Set Flask application entry point
+ENV FLASK_APP=backend.app
+
+# Command to run Flask server
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
