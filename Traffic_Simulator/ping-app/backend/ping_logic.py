@@ -1,7 +1,10 @@
 import subprocess
+import platform
 
-def run_ping(host):
+def run_ping(host, count=4):
+    param = "-n" if platform.system().lower() == "windows" else "-c"
     try:
-        return subprocess.check_output(["ping", "-c", "4", host], text=True)
+        output = subprocess.check_output(["ping", param, str(count), host], text=True)
+        return output
     except subprocess.CalledProcessError as e:
-        return e.output
+        return f"Ping failed: {e}"
