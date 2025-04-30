@@ -2,77 +2,134 @@
 
 ## 🚀 Overview
 
-This project demonstrates how to run ping command through GUI.
+This project demonstrates how to run the `ping` command through a GUI using a Flask backend and MongoDB for data storage.
 
 ---
 
 ## 📂 Project Structure
 
 ```bash
-OLT-Configuration/
-├── gui/                     # Frontend (QtPy-based GUI)
+ping-app/
+├── gui/                     # Frontend (PyQt5-based GUI)
 │   ├── ping_gui.py
-│   ├── requirements.txt     # Frontend Dependencies
+│   ├── requirements.txt     # GUI Dependencies
 ├── backend/                 # Backend (FastAPI)
 │   ├── app.py
-│   ├── db.py                # MongoDB
-│   ├── ping_logic.py        # ping command
+│   ├── db.py                # MongoDB Connection
+│   ├── ping_logic.py        # Ping Logic
 │   ├── requirements.txt     # Backend Dependencies
-├── tests/                   # Test Cases
+├── tests/                   # Unit Tests
 │   ├── test_api.py
 │   ├── test_gui.py
+├── pre_install.sh           # Pre-setup script (Ubuntu/macOS)
+├── post_cleanup.sh          # Cleanup script (Ubuntu/macOS)
+├── pre_install_windows.bat  # Pre-setup script (Windows)
+├── post_cleanup_windows.bat # Cleanup script (Windows)
 ├── README.md                # Documentation
-├── .gitignore               # Ignore Unwanted Files
-```
-
-## 🔧 **Installation**
-
-### 🛠 1️⃣ **Clone the Repository**
-
-```sh
-git clone https://github.com/prashantpateldixoninfo/MyLearning.git
-cd MyLearning/Traffic_Simulator/ping-app
-```
-
-### 🖥 2️⃣ **Install the libraries**
-
-```sh
-cd ping-app
-python3 -m venv venv                # Create Virtual Environment for one time
-source venv/bin/activate            # Activate (Linux)
-pip install --upgrade pip
-pip install -r backend/requirements.txt
-pip install -r gui/requirements.txt
-pip install pytest pytest-qt
-export MONGO_URI="mongodb://localhost:27017"
-sudo systemctl stop mongod          # Stop the docker if already running
-docker-compose up -d mongo          # Run the mongo-db
-docker ps                           # Check the mongo-db status
-```
-
-## 🚀 **Running the Application**
-
-### 🔹 1️⃣ **Start Backend Server**
-
-```sh
-python3 -m backend.app
-```
-
-This will run the Flask backend on `http://127.0.0.1:5000`.
-
-### 🔹 2️⃣ **Start GUI Application**
-
-```sh
-python3 gui/ping_gui.py
+├── .gitignore
 ```
 
 ---
 
-## 🧪 **Running Tests**
+## 🧰 Pre-Installation
 
-```sh
-PYTHONPATH=. pytest tests           # For Linux
-$env:PYTHONPATH="."; pytest tests   # For Windows
+### 🐧 For Ubuntu/Linux/macOS
+
+```bash
+./pre_install.sh
 ```
+
+This script performs:
+
+-   Virtual environment creation
+-   Dependency installation
+-   MongoDB Docker container startup (`ping-app-mongo`)
+
+> ⚠️ Ensure Docker is installed and the daemon is running.
+
+---
+
+### 🪟 For Windows (VS Code + Git Bash)
+
+```bash
+./pre_install_windows.bat
+```
+
+This script performs:
+
+-   Python virtual environment setup using `venv`
+-   Backend, GUI, and test dependencies installation
+-   MongoDB Docker container startup (`ping-app-mongo`)
+
+> ⚠️ Docker Desktop must be installed and running.
+
+---
+
+## 🚀 Running the Application
+
+### ✅ 1️⃣ Start the Backend (in activated virtual environment)
+
+```bash
+python -m backend.app
+```
+
+Runs the backend on: `http://127.0.0.1:5000`
+
+---
+
+### ✅ 2️⃣ Start the GUI
+
+```bash
+python gui/ping_gui.py
+```
+
+A simple GUI will launch where you can enter a hostname or IP address to ping.
+
+---
+
+## 🧪 Running Tests
+
+### 🐧 Linux/macOS
+
+```bash
+PYTHONPATH=. pytest tests
+```
+
+### 🪟 Windows (PowerShell or Git Bash)
+
+```powershell
+$env:PYTHONPATH="."; pytest tests
+```
+
+Runs API and GUI tests.
+
+---
+
+## 🧹 Post-Cleanup
+
+### 🐧 Ubuntu/Linux/macOS
+
+```bash
+./post_cleanup.sh
+```
+
+### 🪟 Windows
+
+```bash
+./post_cleanup_windows.bat
+```
+
+This script:
+
+-   Stops and removes the MongoDB Docker container (`ping-app-mongo`)
+-   Leaves the virtual environment and project files intact
+
+---
+
+## 📝 Notes
+
+-   MongoDB runs inside a Docker container named `ping-app-mongo`.
+-   The application uses virtual environments to isolate dependencies.
+-   Project is cross-platform: works on both Ubuntu/Linux and Windows systems with proper scripts.
 
 ---
