@@ -27,11 +27,11 @@ pip install -r gui\requirements.txt
 
 echo.
 echo Installing test dependencies...
-pip install pytest pytest-qt
+pip install -r tests\requirements.txt
 
 echo.
 echo ==================================================
-echo        Step 2: Build & Launch Docker Services
+echo        Step 2: Build and Launch Docker Services
 echo ==================================================
 
 echo Stopping any running containers...
@@ -54,6 +54,12 @@ echo MongoDB  : mongodb://localhost:27017
 
 echo.
 echo ==================================================
+echo       Running Tests and Code Coverage
+echo ==================================================
+echo     set PYTHONPATH=. && pytest tests
+
+echo.
+echo ==================================================
 echo      Step 3: Run GUI and Tests Manually
 echo ==================================================
 echo.
@@ -64,8 +70,8 @@ echo To launch the GUI:
 echo     python gui\ping_gui.py
 echo.
 echo To run tests:
+echo     set PYTHONPATH=.
 echo     pytest tests
-echo     set PYTHONPATH=. && pytest tests
 echo.
 echo ==================================================
 echo           You're all set. Happy Testing!

@@ -19,7 +19,27 @@ echo Installing GUI dependencies...
 pip install -r gui\requirements.txt
 
 echo Installing test dependencies...
-pip install pytest pytest-qt
+pip install -r tests\requirements.txt
+
+@echo off
+echo ==================================================
+echo       Step 1: Checking if Docker is Running
+echo ==================================================
+
+REM Try to get Docker info
+docker info >nul 2>&1
+
+IF ERRORLEVEL 1 (
+    echo.
+    echo [ERROR] Docker Engine is not running!
+    echo Please start Docker Desktop and try again.
+    echo.
+    pause
+    exit /b 1
+)
+
+echo [OK] Docker is running.
+echo.
 
 echo Setting default Mongo URI...
 set MONGO_URI=mongodb://localhost:27017
@@ -36,6 +56,12 @@ docker run -d --name %CONTAINER_NAME% -p 27017:27017 mongo
 echo Checking container status...
 docker ps
 
+echo.
+echo ==================================================
+echo       Running Tests and Code Coverage
+echo ==================================================
+echo     set PYTHONPATH=. && pytest tests
+
 @echo off
 echo.
 echo ==================================================
@@ -46,14 +72,14 @@ echo [1] Activate the virtual environment:
 echo     venv\Scripts\activate
 echo.
 echo [2] Run the backend:
-echo     python backend\app.py
+echo     python -m backend.app
 echo.
 echo [3] Run the GUI:
 echo     python gui\ping_gui.py
 echo.
 echo [4] Run the tests:
+echo     set PYTHONPATH=.
 echo     pytest tests
-echo     set PYTHONPATH=. && pytest tests
 echo.
 echo ==================================================
 echo           You're all set. Happy Testing!

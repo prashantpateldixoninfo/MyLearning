@@ -14,6 +14,14 @@ ENV/
 .env
 *.pyo
 
+# testing
+/.pytest_cache
+/.coverage
+/tests/__pycache__
+/tests/.coverage
+/htmlcov
+/coverage.xml
+
 # Logs
 *.log
 *.out
