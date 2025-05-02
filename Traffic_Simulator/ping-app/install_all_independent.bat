@@ -3,7 +3,7 @@ cd /d %~dp0
 setlocal enabledelayedexpansion
 
 echo ==================================================
-echo     Step 1: Create And Activate Virtual Environment
+echo   Step 1: Create and Activate Python Environment
 echo ==================================================
 
 if not exist venv (
@@ -18,7 +18,7 @@ echo Upgrading pip...
 python -m pip install --upgrade pip
 
 echo ==================================================
-echo     Step 2: Install Dependencies
+echo   Step 2: Install Dependencies
 echo ==================================================
 
 echo Installing backend dependencies...
@@ -31,7 +31,7 @@ echo Installing test dependencies...
 pip install -r tests\requirements.txt
 
 echo ==================================================
-echo     Step 3: Configure And Start MongoDB
+echo   Step 3: Configure And Start MongoDB
 echo ==================================================
 
 echo Setting default Mongo URI...
@@ -52,12 +52,12 @@ echo Attempting to start MongoDB service (requires Admin)...
 net start MongoDB >nul 2>&1
 
 echo ==================================================
-echo     Step 4: Run Tests and Coverage
+echo   Step 4: Run Tests and Coverage
 echo ==================================================
 echo     set PYTHONPATH=. && pytest tests
 
 echo ==================================================
-echo        INSTALLATION COMPLETE! NEXT STEPS:
+echo   Step 5: Run GUI and Tests Manually
 echo ==================================================
 echo.
 echo [1] Activate the virtual environment:
@@ -76,5 +76,4 @@ echo.
 echo ==================================================
 echo           You're all set. Happy Testing!
 echo ==================================================
-
 endlocal

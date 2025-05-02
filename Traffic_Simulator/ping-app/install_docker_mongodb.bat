@@ -3,8 +3,14 @@ cd /d %~dp0
 
 set CONTAINER_NAME=ping-app-mongo
 
-echo Creating virtual environment (if not exists)...
-python -m venv venv
+echo ==================================================
+echo   Step 1: Create and Activate Python Environment
+echo ==================================================
+
+if not exist venv (
+    echo Creating virtual environment...
+    python -m venv venv
+)
 
 echo Activating virtual environment...
 call venv\Scripts\activate.bat
@@ -12,6 +18,9 @@ call venv\Scripts\activate.bat
 echo Upgrading pip...
 python -m pip install --upgrade pip
 
+echo ==================================================
+echo   Step 2: Install Dependencies
+echo ==================================================
 echo Installing backend dependencies...
 pip install -r backend\requirements.txt
 
@@ -23,7 +32,7 @@ pip install -r tests\requirements.txt
 
 @echo off
 echo ==================================================
-echo       Step 1: Checking if Docker is Running
+echo   Step 3: Checking if Docker is Running
 echo ==================================================
 
 REM Try to get Docker info
@@ -53,19 +62,23 @@ docker rm %CONTAINER_NAME%
 echo Starting MongoDB container with fixed name: %CONTAINER_NAME% ...
 docker run -d --name %CONTAINER_NAME% -p 27017:27017 mongo
 
-echo Checking container status...
-docker ps
+echo.
+echo ==================================================
+echo   Step 4: Docker Services Started Successfully
+echo ==================================================
+echo MongoDB  : mongodb://localhost:27017
+echo docker ps
 
 echo.
 echo ==================================================
-echo       Running Tests and Code Coverage
+echo   Step 5: Running Tests and Code Coverage
 echo ==================================================
 echo     set PYTHONPATH=. && pytest tests
 
 @echo off
 echo.
 echo ==================================================
-echo        PRE-INSTALLATION COMPLETE! NEXT STEPS:
+echo   Step 6: Run GUI and Tests Manually
 echo ==================================================
 echo.
 echo [1] Activate the virtual environment:

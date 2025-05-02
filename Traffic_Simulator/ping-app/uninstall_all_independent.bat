@@ -3,7 +3,7 @@ cd /d %~dp0
 setlocal enabledelayedexpansion
 
 echo ==================================================
-echo         UNINSTALLING ENVIRONMENT & SERVICES
+echo   UNINSTALLING ENVIRONMENT & SERVICES
 echo ==================================================
 
 echo [1] Stopping MongoDB service (requires Admin)...
@@ -25,8 +25,10 @@ if exist venv (
     echo No virtual environment found.
 )
 
+echo.
 echo ==================================================
-echo             Cleanup complete!
+echo   Cleanup Completed Successfully!
 echo ==================================================
+echo.
 
 endlocal

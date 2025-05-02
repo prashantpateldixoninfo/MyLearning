@@ -2,7 +2,7 @@
 cd /d %~dp0
 
 echo ==================================================
-echo          POST-CLEANUP: Shutting Down Project
+echo    POST-CLEANUP: Shutting Down Project
 echo ==================================================
 
 echo.
@@ -25,6 +25,6 @@ for /r %%i in (*.pyc) do del /q "%%i"
 
 echo.
 echo ==================================================
-echo              Cleanup Completed Successfully!
+echo    Cleanup Completed Successfully!
 echo ==================================================
 echo.
