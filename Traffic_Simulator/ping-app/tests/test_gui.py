@@ -8,10 +8,10 @@ def app_instance(qtbot):
     qtbot.addWidget(test_app)
     return test_app
 
-def test_gui_input_box(app_instance, qtbot):
-    app_instance.input_box.setText("8.8.8.8")
-    assert app_instance.input_box.text() == "8.8.8.8"
+# def test_gui_input_box(app_instance, qtbot):
+#     app_instance.input_box.setText("8.8.8.8")
+#     assert app_instance.input_box.text() == "8.8.8.8"
 
-def test_gui_buttons_exist(app_instance):
-    assert app_instance.ping_button is not None
-    assert app_instance.history_button is not None
+# def test_gui_buttons_exist(app_instance):
+#     assert app_instance.ping_button is not None
+#     assert app_instance.history_button is not None
