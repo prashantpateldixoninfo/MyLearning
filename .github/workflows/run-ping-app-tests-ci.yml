@@ -26,8 +26,11 @@ jobs:
             - name: Install backend dependencies
               run: pip install -r Traffic_Simulator/ping-app/backend/requirements.txt
 
-            - name: Install test dependencies
-              run: pip install pytest pytest-qt PyQt5
+            - name: Install GUI dependencies
+              run: pip install -r Traffic_Simulator/ping-app/gui/requirements.txt
+
+            - name: Install test tools
+              run: pip install pytest pytest-qt
 
             - name: Run tests
               working-directory: Traffic_Simulator/ping-app
