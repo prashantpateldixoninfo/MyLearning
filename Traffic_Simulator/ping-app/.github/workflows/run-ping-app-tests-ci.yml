@@ -5,11 +5,16 @@ on: [push, pull_request]
 jobs:
     test:
         runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ping-app
+
         services:
             mongo:
                 image: mongo
                 ports:
                     - 27017:27017
+
         steps:
             - uses: actions/checkout@v3
 
