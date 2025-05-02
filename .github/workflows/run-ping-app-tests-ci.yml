@@ -32,9 +32,6 @@ jobs:
             - name: Install test tools
               run: pip install pytest pytest-qt
 
-            - name: Run tests with Xvfb
-              run: |
-                  sudo apt-get update
-                  sudo apt-get install -y xvfb
-                  xvfb-run -a pytest tests/
+            - name: Run tests
+              run: xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' pytest -v
               working-directory: Traffic_Simulator/ping-app
