@@ -5,9 +5,6 @@ on: [push, pull_request]
 jobs:
     test:
         runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: ping-app
 
         services:
             mongo:
@@ -16,21 +13,20 @@ jobs:
                     - 27017:27017
 
         steps:
-            - uses: actions/checkout@v3
+            - name: Checkout repository
+              uses: actions/checkout@v3
 
             - name: Set up Python
               uses: actions/setup-python@v4
               with:
                   python-version: "3.10"
 
-            - name: Install dependencies
-              run: |
-                  pip install -r backend/requirements.txt
+            - name: Install backend dependencies
+              run: pip install -r Traffic_Simulator/ping-app/backend/requirements.txt
 
-            - name: Install additional test tools
-              run: |
-                  pip install pytest pytest-qt PyQt5
+            - name: Install test dependencies
+              run: pip install pytest pytest-qt PyQt5
 
             - name: Run tests
-              run: |
-                  pytest tests/
+              working-directory: Traffic_Simulator/ping-app
+              run: pytest tests/
