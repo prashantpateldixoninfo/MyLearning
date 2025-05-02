@@ -1,4 +1,4 @@
-# File: MyLearning/.github/workflows/run-ping-app-tests-ci.yml
+# File: .github/workflows/run-ping-app-tests-ci.yml
 
 name: CI Pipeline - Ping App
 
@@ -7,8 +7,6 @@ on: [push, pull_request]
 jobs:
     test:
         runs-on: ubuntu-latest
-        env:
-            CI: true # Explicitly mark environment as CI
 
         services:
             mongo:
@@ -32,8 +30,19 @@ jobs:
               run: pip install -r Traffic_Simulator/ping-app/gui/requirements.txt
 
             - name: Install test tools
-              run: pip install pytest pytest-qt
+              run: pip install pytest pytest-qt coverage pytest-cov
 
-            - name: Run tests
-              run: pytest
+            - name: Run all tests with coverage (offscreen mode)
+              run: |
+                  coverage run -m pytest
+                  coverage report
+                  coverage xml
+              env:
+                  QT_QPA_PLATFORM: offscreen
               working-directory: Traffic_Simulator/ping-app
+
+            - name: Upload coverage report
+              uses: actions/upload-artifact@v3
+              with:
+                  name: coverage-report
+                  path: Traffic_Simulator/ping-app/coverage.xml
