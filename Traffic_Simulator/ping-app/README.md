@@ -1,5 +1,8 @@
 # Ping APP
 
+-   **Tests Status:** [![Tests](https://github.com/prashantpateldixoninfo/MyLearning/actions/workflows/run-ping-app-tests-ci.yml/badge.svg)](https://github.com/prashantpateldixoninfo/MyLearning/actions/workflows/run-ping-app-tests-ci.yml)
+-   **Code Coverage:** [![codecov](https://codecov.io/gh/prashantpateldixoninfo/MyLearning/branch/main/graph/badge.svg)](https://codecov.io/gh/prashantpateldixoninfo/MyLearning)
+
 ## 🚀 Overview
 
 This project demonstrates how to run the `ping` command through a GUI using a Flask backend and MongoDB for data storage.

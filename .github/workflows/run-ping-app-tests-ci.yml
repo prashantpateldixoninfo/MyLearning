@@ -41,8 +41,9 @@ jobs:
                   QT_QPA_PLATFORM: offscreen
               working-directory: Traffic_Simulator/ping-app
 
-            # - name: Upload coverage report
-            #   uses: actions/upload-artifact@v3
-            #   with:
-            #       name: coverage-report
-            #       path: Traffic_Simulator/ping-app/coverage.xml
+            - name: Upload coverage to Codecov
+              uses: codecov/codecov-action@v5
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }} # Add this in your repo's secrets
+                  files: ./Traffic_Simulator/ping-app/coverage.xml
+                  flags: unittests
