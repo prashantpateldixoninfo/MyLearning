@@ -64,7 +64,7 @@ echo [1] Activate the virtual environment:
 echo     venv\Scripts\activate
 echo.
 echo [2] Run the backend:
-echo     python backend\app.py
+echo     python -m backend.app
 echo.
 echo [3] Run the GUI:
 echo     python gui\ping_gui.py
