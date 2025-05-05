@@ -7,6 +7,10 @@
 
 This project demonstrates how to run the `ping` command through a GUI using a Flask backend and MongoDB for data storage.
 
+![PING IP](images/ping_ip_gui.png)
+
+![PING IP](images/ping_fetch_specific_ip_gui.png) ![PING IP](images/ping_fetch_all_ip_gui.png)
+
 ---
 
 ## 📂 Project Structure
