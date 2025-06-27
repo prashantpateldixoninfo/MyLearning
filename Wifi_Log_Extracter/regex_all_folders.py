@@ -5,6 +5,7 @@ import sys
 from statistics import mean
 from openpyxl import Workbook
 from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
 
 
 def extract_serial(lines):
@@ -99,13 +100,13 @@ def process_folder(base_folder, master_data, master_min_max):
     ws["A1"] = serial_number_folder
     ws["A1"].font = bold
     for idx, file_name in enumerate(file_names):
-        col = chr(66 + idx)
+        col = get_column_letter(2 + idx)
         ws[f"{col}1"] = file_name
         ws[f"{col}1"].font = bold
 
-    avg_col = chr(66 + len(file_names))
-    min_col = chr(66 + len(file_names) + 1)
-    max_col = chr(66 + len(file_names) + 2)
+    avg_col = get_column_letter(2 + len(file_names))
+    min_col = get_column_letter(3 + len(file_names))
+    max_col = get_column_letter(4 + len(file_names))
 
     ws[f"{avg_col}1"] = "Average"
     ws[f"{avg_col}1"].font = bold
@@ -117,7 +118,7 @@ def process_folder(base_folder, master_data, master_min_max):
     for row_idx, (test_name, values) in enumerate(all_data.items(), start=2):
         ws[f"A{row_idx}"] = test_name
         for col_offset, value in enumerate(values):
-            col = chr(66 + col_offset)
+            col = get_column_letter(2 + col_offset)
             ws[f"{col}{row_idx}"] = value
         if values:
             ws[f"{avg_col}{row_idx}"] = round(mean(values), 3)
@@ -142,12 +143,12 @@ def generate_master_excel(all_results, master_min_max, base_dir):
     serials = sorted({serial for data in all_results.values() for serial in data})
 
     for idx, serial in enumerate(serials):
-        col = chr(66 + idx)
+        col = get_column_letter(2 + idx)
         ws[f"{col}1"] = serial
         ws[f"{col}1"].font = bold
 
-    min_col = chr(66 + len(serials))
-    max_col = chr(66 + len(serials) + 1)
+    min_col = get_column_letter(2 + len(serials))
+    max_col = get_column_letter(3 + len(serials))
     ws[f"{min_col}1"] = "Min"
     ws[f"{min_col}1"].font = bold
     ws[f"{max_col}1"] = "Max"
@@ -156,7 +157,7 @@ def generate_master_excel(all_results, master_min_max, base_dir):
     for row_idx, (test_name, serial_data) in enumerate(all_results.items(), start=2):
         ws[f"A{row_idx}"] = test_name
         for col_idx, serial in enumerate(serials):
-            col = chr(66 + col_idx)
+            col = get_column_letter(2 + col_idx)
             val = serial_data.get(serial, [])
             if isinstance(val, list):
                 ws[f"{col}{row_idx}"] = round(mean(val), 3) if val else ""
