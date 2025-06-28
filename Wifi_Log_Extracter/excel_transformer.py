@@ -1,9 +1,10 @@
 import os
 import sys
-from openpyxl import load_workbook, Workbook
-from openpyxl.utils import get_column_letter, range_boundaries
+from openpyxl import load_workbook
+from openpyxl.utils import range_boundaries
 from openpyxl.styles import Font
 from copy import copy
+from openpyxl.cell import MergedCell
 
 # Input to Output column index mapping (0-based)
 COLUMN_INDEX_MAP = {
@@ -16,20 +17,27 @@ COLUMN_INDEX_MAP = {
     8: 6,   # I -> G
     9: 7,   # J -> H
     10: 8,  # K -> I
-    12: 9,  # M -> J
-    13: 10, # N -> K
-    14: 16, # O -> Q
-    15: 11, # P -> L
-    16: 12, # Q -> M
-    17: 13, # R -> N
-    18: 14, # S -> O
-    19: 15, # T -> P
+    11: 9,  # L -> J
+    12: 10, # M -> K
+    13: 11, # N -> L
+    14: 17, # O -> R
+    15: 12, # P -> M
+    16: 13, # Q -> N
+    17: 14, # R -> O
+    18: 15, # S -> P
+    19: 16, # T -> Q
 }
 
 SHEET_NAMES = ["Stores & IQC", "SMT", "MI", "BLT & FAT", "PACKING"]
 
 def copy_range_formatting(src_ws, tgt_ws, cell_range):
     min_col, min_row, max_col, max_row = range_boundaries(cell_range)
+
+    for merged_range in src_ws.merged_cells.ranges:
+        minc, minr, maxc, maxr = range_boundaries(str(merged_range))
+        if min_row <= minr <= max_row and min_col <= minc <= max_col:
+            tgt_ws.merge_cells(start_row=minr, start_column=minc, end_row=maxr, end_column=maxc)
+
     for row in range(min_row, max_row + 1):
         for col in range(min_col, max_col + 1):
             src_cell = src_ws.cell(row=row, column=col)
@@ -40,6 +48,17 @@ def copy_range_formatting(src_ws, tgt_ws, cell_range):
                 tgt_cell.border = copy(src_cell.border)
                 tgt_cell.alignment = copy(src_cell.alignment)
                 tgt_cell.number_format = src_cell.number_format
+
+def copy_row_formatting(src_ws, tgt_ws, src_row_idx, tgt_row_idx):
+    for col in range(1, tgt_ws.max_column + 1):
+        src_cell = src_ws.cell(row=src_row_idx, column=col)
+        tgt_cell = tgt_ws.cell(row=tgt_row_idx, column=col, value=src_cell.value)
+        if src_cell.has_style:
+            tgt_cell.font = copy(src_cell.font)
+            tgt_cell.fill = copy(src_cell.fill)
+            tgt_cell.border = copy(src_cell.border)
+            tgt_cell.alignment = copy(src_cell.alignment)
+            tgt_cell.number_format = src_cell.number_format
 
 def transform_excel(input_file, output_file):
     wb_input = load_workbook(input_file)
@@ -58,40 +77,51 @@ def transform_excel(input_file, output_file):
 
         input_ws = wb_input[sheet_name]
 
-        # Create or clear sheet in output file
         if sheet_name in wb_output.sheetnames:
             del wb_output[sheet_name]
         new_ws = wb_output.create_sheet(title=sheet_name)
 
-        # Copy template A1:S8 from PFMEA-Format
-        copy_range_formatting(template_ws, new_ws, "A1:S8")
+        copy_range_formatting(template_ws, new_ws, "A1:T8")
 
-        # Read header from input (starting after row 8)
-        header_row = input_ws[9]  # Row 9 is index 8 (1-based)
-
-        # Copy and map headers to row 8
+        header_row = input_ws[9]  # Row 10 (1-based)
         for orig_idx, new_idx in COLUMN_INDEX_MAP.items():
             if orig_idx < len(header_row):
                 cell_value = header_row[orig_idx].value
                 if cell_value:
-                    cell = new_ws.cell(row=8, column=new_idx + 1, value=cell_value)
-                    cell.font = Font(bold=True)
+                    target_cell = new_ws.cell(row=8, column=new_idx + 1)
+                    if not isinstance(target_cell, MergedCell):
+                        target_cell.value = cell_value
+                        target_cell.font = Font(bold=True)
 
-        # Copy data rows from row 10 onward
+        last_row_written = 8
         for row_idx, row in enumerate(input_ws.iter_rows(min_row=10), start=9):
             for orig_idx, new_idx in COLUMN_INDEX_MAP.items():
                 if orig_idx < len(row):
-                    cell_value = row[orig_idx].value
-                    cell = new_ws.cell(row=row_idx, column=new_idx + 1, value=cell_value)
-                    if row[orig_idx].has_style:
-                        cell.font = copy(row[orig_idx].font)
-                        cell.fill = copy(row[orig_idx].fill)
-                        cell.alignment = copy(row[orig_idx].alignment)
-                        cell.border = copy(row[orig_idx].border)
+                    cell = new_ws.cell(row=row_idx, column=new_idx + 1)
+                    source_cell = row[orig_idx]
+                    cell.value = source_cell.value
+                    if source_cell.has_style:
+                        cell.font = copy(source_cell.font)
+                        cell.fill = copy(source_cell.fill)
+                        cell.alignment = copy(source_cell.alignment)
+                        cell.border = copy(source_cell.border)
+
+            e = new_ws.cell(row=row_idx, column=5).coordinate
+            g = new_ws.cell(row=row_idx, column=7).coordinate
+            j = new_ws.cell(row=row_idx, column=10).coordinate
+            n = new_ws.cell(row=row_idx, column=14).coordinate
+            o = new_ws.cell(row=row_idx, column=15).coordinate
+            p = new_ws.cell(row=row_idx, column=16).coordinate
+
+            new_ws.cell(row=row_idx, column=11, value=f"={e}*{g}*{j}")
+            new_ws.cell(row=row_idx, column=17, value=f"={n}*{o}*{p}")
+            last_row_written = row_idx
+
+        # ✅ Overwrite last row with row 41 from 'PFMEA-Format'
+        copy_row_formatting(template_ws, new_ws, 41, last_row_written)
 
     wb_output.save(output_file)
     print(f"[OK] Output saved as: {output_file}")
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
