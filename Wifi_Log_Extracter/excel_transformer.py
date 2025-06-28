@@ -1,105 +1,108 @@
 import os
 import sys
 from openpyxl import load_workbook, Workbook
-from openpyxl.styles import Font, PatternFill
+from openpyxl.utils import get_column_letter, range_boundaries
+from openpyxl.styles import Font
 from copy import copy
 
-# Column mapping between Original and Modified sheets
-COLUMN_MAP = {
-    "S.No.": "S. No.",
-    "Process": "Process Step / Function",
-    "Potential Failure Mode": "Potential Failure Mode",
-    "Potential Effect(s) of Failure": "Potential Effect(s) of Failure",
-    "Sev. (S)": "Severity (S)",
-    "Potential Causes(s) mechanism(s) of the Failure": "Potential Cause(s) / Mechanism of Failure",
-    "Occ. (O)": "Occurrence (O)",
-    "Prevention": "Prevention",
-    "Detection": "Detection",
-    "Det. (O)": "Detection (D)",
-    "RPN (S X O X D)": "RPN (S×O×D)",
-    "Recommended Action(s)": "Recommended Actions",
-    "Responsibility & target  Completion Date": "Responsibility",
-    "Action(s) Taken": "Action Taken",
-    "Sev.": "New S",
-    "Occ.": "New O",
-    "Det.": "New D",
-    "RPN": "New RPN",
+# Input to Output column index mapping (0-based)
+COLUMN_INDEX_MAP = {
+    0: 0,   # A -> A
+    1: 1,   # B -> B
+    3: 2,   # D -> C
+    4: 3,   # E -> D
+    5: 4,   # F -> E
+    7: 5,   # H -> F
+    8: 6,   # I -> G
+    9: 7,   # J -> H
+    10: 8,  # K -> I
+    12: 9,  # M -> J
+    13: 10, # N -> K
+    14: 16, # O -> Q
+    15: 11, # P -> L
+    16: 12, # Q -> M
+    17: 13, # R -> N
+    18: 14, # S -> O
+    19: 15, # T -> P
 }
 
 SHEET_NAMES = ["Stores & IQC", "SMT", "MI", "BLT & FAT", "PACKING"]
 
+def copy_range_formatting(src_ws, tgt_ws, cell_range):
+    min_col, min_row, max_col, max_row = range_boundaries(cell_range)
+    for row in range(min_row, max_row + 1):
+        for col in range(min_col, max_col + 1):
+            src_cell = src_ws.cell(row=row, column=col)
+            tgt_cell = tgt_ws.cell(row=row, column=col, value=src_cell.value)
+            if src_cell.has_style:
+                tgt_cell.font = copy(src_cell.font)
+                tgt_cell.fill = copy(src_cell.fill)
+                tgt_cell.border = copy(src_cell.border)
+                tgt_cell.alignment = copy(src_cell.alignment)
+                tgt_cell.number_format = src_cell.number_format
 
-def copy_row_formatting(source_row, target_row):
-    for source_cell, target_cell in zip(source_row, target_row):
-        target_cell.value = source_cell.value
-        if source_cell.has_style:
-            target_cell.font = copy(source_cell.font)
-            target_cell.fill = copy(source_cell.fill)
-            target_cell.border = copy(source_cell.border)
-            target_cell.alignment = copy(source_cell.alignment)
-            target_cell.number_format = source_cell.number_format
+def transform_excel(input_file, output_file):
+    wb_input = load_workbook(input_file)
+    wb_output = load_workbook(output_file)
 
-
-def transform_excel(original_file, modified_file):
-    wb_original = load_workbook(original_file)
-    wb_modified = Workbook()
-    wb_modified.remove(wb_modified.active)
-
-    if "PFMEA-Format" not in wb_original.sheetnames:
-        print("[ERROR] 'PFMEA-Format' sheet is missing in original file")
+    if "PFMEA-Format" not in wb_output.sheetnames:
+        print("[ERROR] 'PFMEA-Format' sheet is missing in output/template file")
         sys.exit(1)
 
-    template_ws = wb_original["PFMEA-Format"]
+    template_ws = wb_output["PFMEA-Format"]
 
-    for sheet_name in wb_original.sheetnames:
-        original_ws = wb_original[sheet_name]
-        if sheet_name.strip() in SHEET_NAMES:
-            new_ws = wb_modified.create_sheet(title=sheet_name.strip())
+    for sheet_name in SHEET_NAMES:
+        if sheet_name not in wb_input.sheetnames:
+            print(f"[SKIP] Sheet '{sheet_name}' not found in input file")
+            continue
 
-            # Copy rows 1-7 from PFMEA-Format
-            for row_idx in range(1, 8):
-                source_row = template_ws[row_idx]
-                target_row = new_ws[row_idx]
-                copy_row_formatting(source_row, target_row)
+        input_ws = wb_input[sheet_name]
 
-            # Find header row (assumed to start from row 8 in original)
-            header_row = [cell.value for cell in original_ws[8]]
+        # Create or clear sheet in output file
+        if sheet_name in wb_output.sheetnames:
+            del wb_output[sheet_name]
+        new_ws = wb_output.create_sheet(title=sheet_name)
 
-            # Get index and names of columns to map
-            selected_columns = [(i, COLUMN_MAP[col]) for i, col in enumerate(header_row) if col in COLUMN_MAP]
+        # Copy template A1:S8 from PFMEA-Format
+        copy_range_formatting(template_ws, new_ws, "A1:S8")
 
-            if not selected_columns:
-                print(f"[SKIP] No mapped columns in sheet '{sheet_name}'")
-                continue
+        # Read header from input (starting after row 8)
+        header_row = input_ws[9]  # Row 9 is index 8 (1-based)
 
-            # Write headers at row 8
-            for col_idx, (_, new_col_name) in enumerate(selected_columns, start=1):
-                cell = new_ws.cell(row=8, column=col_idx, value=new_col_name)
+        # Copy and map headers to row 8
+        for orig_idx, new_idx in COLUMN_INDEX_MAP.items():
+            if orig_idx < len(header_row):
+                cell_value = header_row[orig_idx].value
+                if cell_value:
+                    cell = new_ws.cell(row=8, column=new_idx + 1, value=cell_value)
+                    cell.font = Font(bold=True)
 
-            # Write data starting from row 9
-            for row_idx, row in enumerate(original_ws.iter_rows(min_row=9, values_only=True), start=9):
-                for col_idx, (original_index, _) in enumerate(selected_columns, start=1):
-                    new_ws.cell(row=row_idx, column=col_idx, value=row[original_index])
-        else:
-            # Copy sheet as-is
-            new_ws = wb_modified.create_sheet(title=sheet_name.strip())
-            for row in original_ws.iter_rows():
-                new_ws.append([cell.value for cell in row])
+        # Copy data rows from row 10 onward
+        for row_idx, row in enumerate(input_ws.iter_rows(min_row=10), start=9):
+            for orig_idx, new_idx in COLUMN_INDEX_MAP.items():
+                if orig_idx < len(row):
+                    cell_value = row[orig_idx].value
+                    cell = new_ws.cell(row=row_idx, column=new_idx + 1, value=cell_value)
+                    if row[orig_idx].has_style:
+                        cell.font = copy(row[orig_idx].font)
+                        cell.fill = copy(row[orig_idx].fill)
+                        cell.alignment = copy(row[orig_idx].alignment)
+                        cell.border = copy(row[orig_idx].border)
 
-    wb_modified.save(modified_file)
-    print(f"[OK] Output saved as: {modified_file}")
+    wb_output.save(output_file)
+    print(f"[OK] Output saved as: {output_file}")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python excel_transformer.py <original.xlsx> <modified.xlsx>")
+        print("Usage: python excel_transformer.py <input.xlsx> <output_template.xlsx>")
         sys.exit(1)
 
-    orig_file = sys.argv[1]
-    mod_file = sys.argv[2]
+    input_file = sys.argv[1]
+    output_file = sys.argv[2]
 
-    if not os.path.isfile(orig_file):
-        print(f"[ERROR] File not found: {orig_file}")
+    if not os.path.isfile(input_file):
+        print(f"[ERROR] File not found: {input_file}")
         sys.exit(1)
 
-    transform_excel(orig_file, mod_file)
+    transform_excel(input_file, output_file)
