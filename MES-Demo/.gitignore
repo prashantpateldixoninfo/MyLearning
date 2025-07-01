@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# .db files
+*.db
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+.env
+*.pyo
+
+# testing
+/.pytest_cache
+/.coverage
+/tests/__pycache__
+/tests/.coverage
+/htmlcov
+/coverage.xml
+
+# Logs
+*.log
+*.out
+*.err
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.cache
+*.cover
+*.py,cover
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Virtual Environment
+venv/
+
+# System Files
+.DS_Store
+Thumbs.db
