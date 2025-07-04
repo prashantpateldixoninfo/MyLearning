@@ -1,5 +1,14 @@
 ▶️ How to Run This Demo on Laptop
+# Run the application with docker-compose
+## Install WSL(Windows Subsystem Linux) on your PC(One Time Task)
+    [Docker Desktop Installer](https://docs.docker.com/desktop/setup/install/windows-install/)
 
+## Run the docker-compose build up 
+```bash
+docker-compose up --build
+```
+
+# Run the each application independently on Host
 ## Backend
 1. Create virtual environment
 ```bash

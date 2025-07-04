@@ -1,11 +1,25 @@
 import requests
+import os
+import time
+import random
 
-# Simulate scan
-requests.post("http://localhost:8000/scan", json={"serial_no": "ABC456"})
+# Use env variable (Docker will inject this)
+BASE_URL = os.getenv("API_URL", "http://localhost:8000")
+SERIAL_NO = "ABC123"
 
-# Simulate test
-requests.post("http://localhost:8000/test", json={
-    "serial_no": "ABC456",
-    "test_type": "WiFi_Power",
-    "result": "FAILED"
-})
+# Scan product
+r1 = requests.post(f"{BASE_URL}/scan", json={"serial_no": SERIAL_NO})
+print("Scan:", r1.json())
+
+# Simulate multiple test cases
+test_types = ["WiFi_Power", "Bluetooth", "Camera", "Battery"]
+
+for i in range(5):
+    payload = {
+        "serial_no": SERIAL_NO,
+        "test_type": random.choice(test_types),
+        "result": random.choice(["PASS", "FAIL"])
+    }
+    r2 = requests.post(f"{BASE_URL}/test", json=payload)
+    print(f"Test {i+1}:", r2.json())
+    time.sleep(1)

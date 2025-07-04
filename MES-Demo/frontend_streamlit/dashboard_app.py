@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import plotly.express as px
+import os
 
 # Page config
 st.set_page_config(page_title="MES Dashboard", layout="wide")
@@ -9,7 +10,8 @@ st.title("📊 MES Dashboard – Test Results")
 
 # Load data from backend
 try:
-    response = requests.get("http://localhost:8000/dashboard")
+    API_URL = os.getenv("API_URL", "http://localhost:8000")
+    response = requests.get(f"{API_URL}/dashboard")
     data = response.json()
 except Exception as e:
     st.error(f"Failed to connect to MES backend: {e}")
@@ -70,7 +72,7 @@ else:
     def color_rows(row):
         if row["result"] == "PASS":
             return ["background-color: #d4edda"] * len(row)
-        elif row["result"] == "FAILED":
+        elif row["result"] == "FAIL":
             return ["background-color: #f8d7da"] * len(row)
         return [""] * len(row)
 
@@ -88,7 +90,7 @@ else:
         result_counts.columns = ["Result", "Count"]
         fig_result = px.bar(
             result_counts, x="Result", y="Count", color="Result",
-            color_discrete_map={"PASS": "green", "FAILED": "red"},
+            color_discrete_map={"PASS": "green", "FAIL": "red"},
             title="Test Result Distribution"
         )
         st.plotly_chart(fig_result, use_container_width=True)
