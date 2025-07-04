@@ -1,6 +1,6 @@
 ▶️ How to Run This Demo on Laptop
 
-### Backend
+## Backend
 1. Create virtual environment
 ```bash
 cd backend
@@ -22,7 +22,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-### Test Simulator
+## Test Simulator
 1. Create virtual environment
 ```bash
 cd test-simulator
@@ -44,7 +44,43 @@ pip install -r requirements.txt
 python send_test.py
 ``` 
 
-### Frontend
-1. Open dashboard
+## Frontend
+1. Open dashboard from frontend_static folder
     Open [frontend/index.html](file:///D:/Dixon_Projects/Dixon_R&D_Projects/MyLearning/MES-Demo/frontend/index.html) in browser (no server needed if static)
 
+2. Open dashboard from frontend_streamlit folder
+    ```
+    mes-demo/
+        └── frontend_streamlit/
+            ├── dashboard_app.py
+            └── requirements.txt
+    ```
+
+    ### ✅ How to Run the Streamlit Frontend
+
+    1. Open terminal in `mes-demo/frontend_streamlit`
+
+    2. (Optional) Create a virtual environment:
+
+    ```bash
+    python -m venv venv
+    venv\Scripts\activate  # On Windows
+    ```
+
+    3. Install dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+    4. Run the dashboard:
+
+    ```bash
+    streamlit run dashboard_app.py
+    ```
+
+    5. It opens in browser at:
+
+    ```
+    http://localhost:8501
+    ```
