@@ -2,24 +2,33 @@ import requests
 import os
 import time
 import random
+from datetime import datetime
 
-# Use env variable (Docker will inject this)
-BASE_URL = os.getenv("API_URL", "http://localhost:8000")
-SERIAL_NO = "ABC123"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
-# Scan product
-r1 = requests.post(f"{BASE_URL}/scan", json={"serial_no": SERIAL_NO})
-print("Scan:", r1.json())
+# Generate a unique serial number for each run
+serial_no = f"SN-{datetime.now().strftime('%Y%m%d%H%M%S')}-{random.randint(100, 999)}"
 
-# Simulate multiple test cases
-test_types = ["WiFi_Power", "Bluetooth", "Camera", "Battery"]
+# Scan the product
+try:
+    r1 = requests.post(f"{API_URL}/scan", json={"serial_no": serial_no})
+    print("🔍 Scan:", r1.status_code, r1.json())
+except Exception as e:
+    print("❌ Failed to scan:", e)
 
-for i in range(5):
+# Simulate tests
+test_types = ["WiFi_Power", "Bluetooth", "Camera", "Battery", "Display", "Charging"]
+result_options = ["PASS", "FAIL"]
+
+for i in range(random.randint(3, 6)):
     payload = {
-        "serial_no": SERIAL_NO,
+        "serial_no": serial_no,
         "test_type": random.choice(test_types),
-        "result": random.choice(["PASS", "FAIL"])
+        "result": random.choices(result_options, weights=[0.7, 0.3])[0]  # 70% pass rate
     }
-    r2 = requests.post(f"{BASE_URL}/test", json=payload)
-    print(f"Test {i+1}:", r2.json())
-    time.sleep(1)
+    try:
+        r2 = requests.post(f"{API_URL}/test", json=payload)
+        print(f"📤 Test {i+1}:", r2.status_code, r2.json())
+    except Exception as e:
+        print(f"❌ Failed to send test {i+1}:", e)
+    time.sleep(random.uniform(0.5, 1.5))  # randomized delay

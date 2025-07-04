@@ -3,9 +3,19 @@
 ## Install WSL(Windows Subsystem Linux) on your PC(One Time Task)
     [Docker Desktop Installer](https://docs.docker.com/desktop/setup/install/windows-install/)
 
-## Run the docker-compose build up 
+## Start the docker containers 
 ```bash
+cd MES-Demo
 docker-compose up --build
+```
+## See the docker running status 
+```bash
+docker ps
+```
+
+## Stop the docker containers 
+```bash
+docker-compose down -v
 ```
 
 # Run the each application independently on Host
