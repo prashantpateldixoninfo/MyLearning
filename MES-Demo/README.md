@@ -37,7 +37,7 @@ MES-Demo/
 ├── test-simulator/         # Simulates test result data
 ├── frontend_static/        # Static HTML dashboard
 ├── frontend_streamlit/     # Streamlit-based dashboard
-├── frontedn_grafana/       # Grafana provisioning files
+├── frontend_grafana/       # Grafana provisioning files
 ├── docker-compose.yml      # Container orchestration
 └── README.md               
 ```

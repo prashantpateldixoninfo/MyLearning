@@ -2,7 +2,13 @@
 
 name: CI Pipeline - Ping App
 
-on: [push, pull_request]
+on:
+  push:
+      paths:
+          - "Traffic_Simulator/ping-app/**"
+  pull_request:
+      paths:
+          - "Traffic_Simulator/ping-app/**"
 
 jobs:
     test:
