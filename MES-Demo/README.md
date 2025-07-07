@@ -1,105 +1,104 @@
-▶️ How to Run This Demo on Laptop
-# Run the application with docker-compose
-## Install WSL(Windows Subsystem Linux) on your PC(One Time Task)
-    [Docker Desktop Installer](https://docs.docker.com/desktop/setup/install/windows-install/)
+# 🏠 MES-Demo: Manufacturing Execution System (Local Simulation)
 
-## Start the docker containers 
+This project simulates a **basic Manufacturing Execution System (MES)** that:
+
+* Accepts barcode scans from the shop floor.
+* Simulates product test results (Pass/Fail).
+* Displays real-time status via a simple dashboard.
+
+Useful for learning, testing, or prototyping MES functionality on a laptop without any hardware dependencies.
+
+---
+
+## 📦 Features
+
+* ✅ FastAPI backend for receiving scanned/tested data.
+* ✅ Test Simulator to generate mock test results.
+* ✅ Static HTML frontend dashboard to view pass/fail metrics.
+* ✅ Streamlit dashboard for simple visual insights.
+* ✅ Grafana integration for real-time analytics.
+* ✅ Modular structure for easy expansion (e.g., PostgreSQL, Docker).
+
+---
+
+## 👤 Target Audience
+
+* Automation engineers and developers learning MES integration.
+* Factory IT/OT teams building proof-of-concept systems.
+* Students and researchers interested in industrial systems simulation.
+
+---
+
+## 🗂️ Project Structure
+
+```
+MES-Demo/
+├── backend/                # FastAPI server to receive barcode and test data
+├── test-simulator/         # Simulates test result data
+├── frontend_static/        # Static HTML dashboard
+├── frontend_streamlit/     # Streamlit-based dashboard
+├── frontedn_grafana/       # Grafana provisioning files
+├── docker-compose.yml      # Container orchestration
+└── README.md               
+```
+
+---
+
+## ▶️ How to Run This Demo Locally
+
+### 📅 Prerequisites
+
+* Docker and Docker Compose installed
+
+### 🌟 Start with Docker Compose
+
 ```bash
-cd MES-Demo
 docker-compose up --build
 ```
-## See the docker running status 
+
+### ⏹️ Stop and Clean Up
+
 ```bash
-docker ps
+docker-compose down
 ```
 
-## Stop the docker containers 
-```bash
-docker-compose down -v
+> ⚠️ Ensure ports 8000 (FastAPI), 3000 (Grafana), and 8501 (Streamlit) are free before running.
+
+---
+
+## 📈 Frontend Dashboard Access
+
+### 🌐 Static HTML Dashboard
+
+Open in browser:
+
+```
+http://localhost:8080  (if served via local web server)
+OR
+Open ./frontend_static/index.html directly
 ```
 
-# Run the each application independently on Host
-## Backend
-1. Create virtual environment
-```bash
-cd backend
-python -m venv venv
+Displays basic pre-rendered pass/fail results.
+
+### 🌎 Streamlit Dashboard
+
+Access via browser:
+
+```
+http://localhost:8501
 ```
 
-2. Activate virtual environment
-```bash
-venv\Scripts\activate
+Streamlit displays real-time or recent test results interactively.
+
+### 📊 Grafana Dashboard
+
+Access via browser:
+
+```
+http://localhost:3000
 ```
 
-3. Install dependencies
-```bash
-pip install -r requirements.txt
-```
+* Login: `admin / admin`
+* Explore dashboards under `MES Metrics`
 
-4. Run the FastAPI server
-```bash
-uvicorn main:app --reload
-```
-
-## Test Simulator
-1. Create virtual environment
-```bash
-cd test-simulator
-python -m venv venv
-```
-
-2. Activate virtual environment
-```bash
-venv\Scripts\activate
-```
-
-3. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-4. Run the simulator
-```bash
-python send_test.py
-``` 
-
-## Frontend
-1. Open dashboard from frontend_static folder
-    Open [frontend/index.html](file:///D:/Dixon_Projects/Dixon_R&D_Projects/MyLearning/MES-Demo/frontend/index.html) in browser (no server needed if static)
-
-2. Open dashboard from frontend_streamlit folder
-    ```
-    mes-demo/
-        └── frontend_streamlit/
-            ├── dashboard_app.py
-            └── requirements.txt
-    ```
-
-    ### ✅ How to Run the Streamlit Frontend
-
-    1. Open terminal in `mes-demo/frontend_streamlit`
-
-    2. (Optional) Create a virtual environment:
-
-    ```bash
-    python -m venv venv
-    venv\Scripts\activate  # On Windows
-    ```
-
-    3. Install dependencies:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-    4. Run the dashboard:
-
-    ```bash
-    streamlit run dashboard_app.py
-    ```
-
-    5. It opens in browser at:
-
-    ```
-    http://localhost:8501
-    ```
+---
