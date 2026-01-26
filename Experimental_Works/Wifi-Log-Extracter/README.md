@@ -15,7 +15,7 @@ This Python script parses `.dat` log files inside subdirectories (where each fol
 
 ```
 
-Wifi ports3/
+Wifiports3/
 ├── NKOTEF000024/
 │   ├── log1.dat
 │   └── log2.dat
@@ -56,23 +56,23 @@ pip install openpyxl
 Navigate to your project directory and run:
 
 ```bash
-python regex_all_folders.py "Wifi ports3"
+python regex_all_folders.py "Wifiports3"
 ```
 
 Or if the folder has space or is nested:
 
 ```bash
-python regex_all_folders.py ".\Wifi ports3"
+python regex_all_folders.py ".\Wifiports3"
 ```
 
 ✅ This will:
 
-* Traverse all subdirectories under `Wifi ports3`
+* Traverse all subdirectories under `Wifiports3`
 * Parse `.dat` files
 * Generate:
 
   * `NKOTEF000024_Test_Result.xlsx`, `NKOTEF000030_Test_Result.xlsx`, etc.
-  * `Master_Test_Result.xlsx` (in `Wifi ports3/`)
+  * `Master_Test_Result.xlsx` (in `Wifiports3/`)
 
 ---
 
