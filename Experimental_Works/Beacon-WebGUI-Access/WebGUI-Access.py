@@ -33,15 +33,50 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
 
-# Create screenshot folder
 if not os.path.exists("screenshots"):
     os.makedirs("screenshots")
+
+
+# ---------------- CLICK FUNCTION ----------------
+def click_AAP321NK(driver, wait):
+    logging.info("Waiting for AAP321NK to appear...")
+
+    try:
+        wait.until(EC.presence_of_element_located(
+            (By.XPATH, "//*[contains(text(),'AAP321NK')]")
+        ))
+    except:
+        logging.error("AAP321NK not found")
+        return False
+
+    for i in range(5):
+        try:
+            logging.info(f"Click attempt {i+1}")
+
+            elements = driver.find_elements(By.XPATH, "//*[contains(text(),'AAP321NK')]")
+
+            for el in elements:
+                if el.is_displayed():
+                    driver.execute_script("arguments[0].scrollIntoView({block:'center'});", el)
+                    time.sleep(1)
+
+                    driver.execute_script("arguments[0].click();", el)
+
+                    logging.info("AAP321NK clicked successfully")
+                    return True
+
+        except Exception as e:
+            logging.warning(f"Retry failed: {e}")
+
+        time.sleep(2)
+
+    return False
 
 
 class FWATool:
     def __init__(self, root):
         self.root = root
-        self.root.title("FWA Debug Tool (GUI Mode)")
+        self.root.title("FWA Debug Tool (Final)")
         self.root.geometry("700x650")
 
         tk.Label(root, text="SCAN DEVICE SERIAL", font=("Arial", 12, "bold")).pack(pady=10)
@@ -61,47 +96,40 @@ class FWATool:
 
         self.img_label = None
 
-    # ---------------- CSV LOG ----------------
+    # ---------------- CSV ----------------
     def save_to_log(self, sn, status, screenshot_path):
-        logging.info(f"Saving log → SN={sn}, STATUS={status}")
-
-        file_exists = False
-        try:
-            with open(LOG_FILE, 'r'):
-                file_exists = True
-        except FileNotFoundError:
-            pass
+        file_exists = os.path.exists(LOG_FILE)
 
         with open(LOG_FILE, 'a', newline='') as f:
             writer = csv.writer(f)
 
             if not file_exists:
-                writer.writerow(["Timestamp", "Scanned_SN", "Status", "Screenshot"])
+                writer.writerow(["Timestamp", "SN", "Status", "Screenshot"])
 
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            writer.writerow([timestamp, sn, status, screenshot_path])
+            writer.writerow([
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                sn,
+                status,
+                screenshot_path
+            ])
 
     # ---------------- START ----------------
     def start_process(self, event=None):
         scanned_sn = self.serial_entry.get().strip()
 
         if not scanned_sn:
-            logging.warning("No serial entered")
             return
-
-        logging.info(f"STARTING CHECK for SN: {scanned_sn}")
 
         self.status_label.config(text="PROCESSING...", bg="#FF9800")
         self.btn.config(state="disabled")
 
         threading.Thread(target=self.verify_device, args=(scanned_sn,), daemon=True).start()
 
-    # ---------------- MAIN LOGIC ----------------
+    # ---------------- MAIN ----------------
     def verify_device(self, scanned_sn):
 
         options = Options()
 
-        # 🔥 HEADLESS CONTROL
         if HEADLESS:
             options.add_argument("--headless=new")
         else:
@@ -116,8 +144,6 @@ class FWATool:
         screenshot_path = ""
 
         try:
-            logging.info("Launching browser...")
-
             driver = webdriver.Chrome(
                 service=Service(ChromeDriverManager().install()),
                 options=options
@@ -126,72 +152,68 @@ class FWATool:
             wait = WebDriverWait(driver, 15)
 
             # Open URL
-            logging.info(f"Opening https://{TARGET_IP}")
             driver.get(f"https://{TARGET_IP}")
-            time.sleep(DEBUG_DELAY)
+            time.sleep(2)
 
             # SSL bypass
             try:
                 wait.until(EC.presence_of_element_located((By.ID, "details-button"))).click()
                 wait.until(EC.presence_of_element_located((By.ID, "proceed-link"))).click()
-                logging.info("SSL bypassed")
-                time.sleep(DEBUG_DELAY)
             except:
-                logging.info("No SSL warning page")
+                pass
 
             # LOGIN
-            logging.info("Logging in...")
+            wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text']"))).send_keys(USERNAME)
+            driver.find_element(By.XPATH, "//input[@type='password']").send_keys(PASSWORD + Keys.RETURN)
 
-            username_field = wait.until(
-                EC.presence_of_element_located((By.XPATH, "//input[@type='text']"))
-            )
-            username_field.clear()
-            username_field.send_keys(USERNAME)
-            time.sleep(DEBUG_DELAY)
+            time.sleep(3)
 
-            password_field = driver.find_element(By.XPATH, "//input[@type='password']")
-            password_field.clear()
-            password_field.send_keys(PASSWORD)
-            time.sleep(DEBUG_DELAY)
+            # ---------------- WAIT FULL PAGE ----------------
+            logging.info("Waiting 10 sec for full UI load...")
+            time.sleep(10)
 
-            # ENTER instead of button
-            password_field.send_keys(Keys.RETURN)
-            time.sleep(DEBUG_DELAY + 1)
+            # ---------------- CLICK DEVICE ----------------
+            if not click_AAP321NK(driver, wait):
+                raise Exception("Click failed")
 
-            # Wait for page load
-            wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+            time.sleep(2)
 
-            # ---------------- SCREENSHOT ----------------
-            logging.info("Taking screenshot...")
+            # ---------------- HANDLE POPUP ----------------
+            try:
+                ok_btn = WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Okay')]"))
+                )
+                ok_btn.click()
+                logging.info("Popup handled")
+            except:
+                logging.info("No popup")
 
-            time.sleep(5)
-            screenshot_path = f"screenshots/{scanned_sn}.png"
+            time.sleep(2)
+
+            # ---------------- FINAL SCREENSHOT ----------------
+            screenshot_path = f"screenshots/{scanned_sn}_FINAL.png"
             driver.save_screenshot(screenshot_path)
-
-            logging.info(f"Screenshot saved: {screenshot_path}")
 
             self.display_screenshot(screenshot_path)
 
-            status = "SCREENSHOT_CAPTURED"
+            status = "SUCCESS"
 
         except Exception as e:
-            logging.error(f"Error: {str(e)}")
-            self.update_status("CONNECTION ERROR", "#F44336")
+            logging.error(str(e))
+            self.update_status("ERROR", "#F44336")
 
         finally:
             if driver:
                 driver.quit()
-                logging.info("Browser closed")
 
             self.save_to_log(scanned_sn, status, screenshot_path)
             self.root.after(0, self.reset_ui)
 
-    # ---------------- DISPLAY IMAGE ----------------
+    # ---------------- DISPLAY ----------------
     def display_screenshot(self, path):
         try:
             img = Image.open(path)
             img = img.resize((600, 320))
-
             photo = ImageTk.PhotoImage(img)
 
             def update():
@@ -203,14 +225,13 @@ class FWATool:
                     self.img_label.image = photo
                     self.img_label.pack(pady=10)
 
-                self.status_label.config(text="📸 Screenshot Loaded", bg="#4CAF50")
+                self.status_label.config(text="DONE", bg="#4CAF50")
 
             self.root.after(0, update)
 
         except Exception as e:
-            logging.error(f"Image display error: {e}")
+            logging.error(str(e))
 
-    # ---------------- UI SAFE ----------------
     def update_status(self, text, color):
         self.root.after(0, lambda: self.status_label.config(text=text, bg=color))
 
@@ -218,7 +239,6 @@ class FWATool:
         self.serial_entry.delete(0, tk.END)
         self.btn.config(state="normal")
         self.serial_entry.focus_set()
-        logging.info("READY FOR NEXT SCAN\n" + "-"*50)
 
 
 # ---------------- MAIN ----------------
