@@ -1,0 +1,228 @@
+import tkinter as tk
+import csv
+from datetime import datetime
+import threading
+import logging
+import os
+import time
+
+from PIL import Image, ImageTk
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+from webdriver_manager.chrome import ChromeDriverManager
+
+# ---------------- SETTINGS ----------------
+TARGET_IP = "192.168.1.1"
+LOG_FILE = "device_logs.csv"
+USERNAME = "admin"
+PASSWORD = "Airtel@123"
+
+HEADLESS = False   # 🔥 CHANGE THIS → True for production
+DEBUG_DELAY = 1    # seconds (for watching steps)
+
+# ---------------- LOGGING ----------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
+
+# Create screenshot folder
+if not os.path.exists("screenshots"):
+    os.makedirs("screenshots")
+
+
+class FWATool:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("FWA Debug Tool (GUI Mode)")
+        self.root.geometry("700x650")
+
+        tk.Label(root, text="SCAN DEVICE SERIAL", font=("Arial", 12, "bold")).pack(pady=10)
+
+        self.serial_entry = tk.Entry(root, font=("Arial", 16), width=30, justify='center')
+        self.serial_entry.pack(pady=10)
+        self.serial_entry.focus_set()
+        self.serial_entry.bind('<Return>', self.start_process)
+
+        self.btn = tk.Button(root, text="START CHECK", command=self.start_process,
+                             bg="#2196F3", fg="white", font=("Arial", 12, "bold"), width=20)
+        self.btn.pack(pady=20)
+
+        self.status_label = tk.Label(root, text="READY", font=("Arial", 18, "bold"),
+                                     bg="#B0BEC5", fg="white", width=40, height=3)
+        self.status_label.pack(pady=10)
+
+        self.img_label = None
+
+    # ---------------- CSV LOG ----------------
+    def save_to_log(self, sn, status, screenshot_path):
+        logging.info(f"Saving log → SN={sn}, STATUS={status}")
+
+        file_exists = False
+        try:
+            with open(LOG_FILE, 'r'):
+                file_exists = True
+        except FileNotFoundError:
+            pass
+
+        with open(LOG_FILE, 'a', newline='') as f:
+            writer = csv.writer(f)
+
+            if not file_exists:
+                writer.writerow(["Timestamp", "Scanned_SN", "Status", "Screenshot"])
+
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            writer.writerow([timestamp, sn, status, screenshot_path])
+
+    # ---------------- START ----------------
+    def start_process(self, event=None):
+        scanned_sn = self.serial_entry.get().strip()
+
+        if not scanned_sn:
+            logging.warning("No serial entered")
+            return
+
+        logging.info(f"STARTING CHECK for SN: {scanned_sn}")
+
+        self.status_label.config(text="PROCESSING...", bg="#FF9800")
+        self.btn.config(state="disabled")
+
+        threading.Thread(target=self.verify_device, args=(scanned_sn,), daemon=True).start()
+
+    # ---------------- MAIN LOGIC ----------------
+    def verify_device(self, scanned_sn):
+
+        options = Options()
+
+        # 🔥 HEADLESS CONTROL
+        if HEADLESS:
+            options.add_argument("--headless=new")
+        else:
+            options.add_argument("--start-maximized")
+
+        options.add_argument("--ignore-certificate-errors")
+        options.add_argument("--allow-insecure-localhost")
+        options.add_argument("--ignore-ssl-errors=yes")
+
+        driver = None
+        status = "ERROR"
+        screenshot_path = ""
+
+        try:
+            logging.info("Launching browser...")
+
+            driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager().install()),
+                options=options
+            )
+
+            wait = WebDriverWait(driver, 15)
+
+            # Open URL
+            logging.info(f"Opening https://{TARGET_IP}")
+            driver.get(f"https://{TARGET_IP}")
+            time.sleep(DEBUG_DELAY)
+
+            # SSL bypass
+            try:
+                wait.until(EC.presence_of_element_located((By.ID, "details-button"))).click()
+                wait.until(EC.presence_of_element_located((By.ID, "proceed-link"))).click()
+                logging.info("SSL bypassed")
+                time.sleep(DEBUG_DELAY)
+            except:
+                logging.info("No SSL warning page")
+
+            # LOGIN
+            logging.info("Logging in...")
+
+            username_field = wait.until(
+                EC.presence_of_element_located((By.XPATH, "//input[@type='text']"))
+            )
+            username_field.clear()
+            username_field.send_keys(USERNAME)
+            time.sleep(DEBUG_DELAY)
+
+            password_field = driver.find_element(By.XPATH, "//input[@type='password']")
+            password_field.clear()
+            password_field.send_keys(PASSWORD)
+            time.sleep(DEBUG_DELAY)
+
+            # ENTER instead of button
+            password_field.send_keys(Keys.RETURN)
+            time.sleep(DEBUG_DELAY + 1)
+
+            # Wait for page load
+            wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+
+            # ---------------- SCREENSHOT ----------------
+            logging.info("Taking screenshot...")
+
+            time.sleep(5)
+            screenshot_path = f"screenshots/{scanned_sn}.png"
+            driver.save_screenshot(screenshot_path)
+
+            logging.info(f"Screenshot saved: {screenshot_path}")
+
+            self.display_screenshot(screenshot_path)
+
+            status = "SCREENSHOT_CAPTURED"
+
+        except Exception as e:
+            logging.error(f"Error: {str(e)}")
+            self.update_status("CONNECTION ERROR", "#F44336")
+
+        finally:
+            if driver:
+                driver.quit()
+                logging.info("Browser closed")
+
+            self.save_to_log(scanned_sn, status, screenshot_path)
+            self.root.after(0, self.reset_ui)
+
+    # ---------------- DISPLAY IMAGE ----------------
+    def display_screenshot(self, path):
+        try:
+            img = Image.open(path)
+            img = img.resize((600, 320))
+
+            photo = ImageTk.PhotoImage(img)
+
+            def update():
+                if self.img_label:
+                    self.img_label.config(image=photo)
+                    self.img_label.image = photo
+                else:
+                    self.img_label = tk.Label(self.root, image=photo)
+                    self.img_label.image = photo
+                    self.img_label.pack(pady=10)
+
+                self.status_label.config(text="📸 Screenshot Loaded", bg="#4CAF50")
+
+            self.root.after(0, update)
+
+        except Exception as e:
+            logging.error(f"Image display error: {e}")
+
+    # ---------------- UI SAFE ----------------
+    def update_status(self, text, color):
+        self.root.after(0, lambda: self.status_label.config(text=text, bg=color))
+
+    def reset_ui(self):
+        self.serial_entry.delete(0, tk.END)
+        self.btn.config(state="normal")
+        self.serial_entry.focus_set()
+        logging.info("READY FOR NEXT SCAN\n" + "-"*50)
+
+
+# ---------------- MAIN ----------------
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = FWATool(root)
+    root.mainloop()

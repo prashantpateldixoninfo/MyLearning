@@ -1,0 +1,2 @@
+pip install selenium webdriver-manager
+pip install pillow
