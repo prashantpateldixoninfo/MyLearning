@@ -1,5 +1,4 @@
 import tkinter as tk
-import csv
 from datetime import datetime
 import threading
 import logging
@@ -20,10 +19,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # ---------------- SETTINGS ----------------
 TARGET_IP = "192.168.1.1"
-LOG_FILE = "device_logs.csv"
 USERNAME = "admin"
 PASSWORD = "Airtel@123"
-
 HEADLESS = False
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
@@ -35,7 +32,6 @@ if not os.path.exists("screenshots"):
 # ---------------- CLICK FUNCTION ----------------
 def click_AAP321NK(driver, wait):
     wait.until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'AAP321NK')]")))
-
     for _ in range(5):
         elements = driver.find_elements(By.XPATH, "//*[contains(text(),'AAP321NK')]")
         for el in elements:
@@ -66,50 +62,70 @@ def extract_details(driver):
     }
 
 
+# ---------------- LOG FUNCTION ----------------
+def write_log(input_sn, device_sn, result, data):
+
+    now = datetime.now()
+    date_str = now.strftime("%Y-%m-%d")
+    time_str = now.strftime("%H-%M-%S")
+    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    folder = f"{date_str}_All-Devices"
+    os.makedirs(folder, exist_ok=True)
+
+    main_file = os.path.join(folder, f"{date_str}_All-Devices.txt")
+
+    header = "Timestamp             Scanned SN      Device SN          Result        Device Info\n"
+
+    log_line = f"{timestamp}   {input_sn}   {device_sn}   {result}   {data}\n"
+
+    # ✅ Write header only once
+    if not os.path.exists(main_file):
+        with open(main_file, "w") as f:
+            f.write(header)
+
+    # ✅ Always append
+    with open(main_file, "a") as f:
+        f.write(log_line)
+
+    # ✅ PASS file (NO HEADER)
+    if result == "PASS":
+        pass_file = os.path.join(folder, f"{date_str}_{time_str}_{input_sn}.txt")
+
+        with open(pass_file, "w") as f:
+            f.write(str(data))
+
 class FWATool:
     def __init__(self, root):
         self.root = root
         self.root.title("FWA MES Validation Tool")
         self.root.geometry("800x850")
 
-        # SERIAL INPUT
         tk.Label(root, text="SCAN DEVICE SERIAL", font=("Arial", 12, "bold")).pack(pady=5)
         self.serial_entry = tk.Entry(root, font=("Arial", 16), width=30, justify='center')
         self.serial_entry.pack(pady=5)
 
-        # SW INPUT
         tk.Label(root, text="SW VERSION", font=("Arial", 10, "bold")).pack()
         self.sw_entry = tk.Entry(root, font=("Arial", 12), width=25, justify='center')
         self.sw_entry.insert(0, "AAP321NK_R5.0")
         self.sw_entry.pack(pady=5)
 
-        # BUTTON
         self.btn = tk.Button(root, text="START Validation", command=self.start_process,
                              bg="#2196F3", fg="white", font=("Arial", 12, "bold"), width=20)
         self.btn.pack(pady=15)
 
-        # RESULT LABEL
         self.result_label = tk.Label(root, text="READY", font=("Arial", 22, "bold"),
                                      bg="#B0BEC5", fg="white", width=38, height=3)
         self.result_label.pack(pady=10)
 
-        # ---------------- DEVICE INFO PANEL ----------------
-        self.info_frame = tk.LabelFrame(root, text="Device Information", font=("Arial", 10, "bold"))
+        self.info_frame = tk.LabelFrame(root, text="Device Information")
         self.info_frame.pack(pady=10, fill="x", padx=20)
 
-        self.device_info_label = tk.Label(
-            self.info_frame,
-            text="No Data",
-            font=("Courier", 10),
-            justify="left",
-            anchor="w"
-        )
-        self.device_info_label.pack(fill="x", padx=10, pady=5)
+        self.device_info_label = tk.Label(self.info_frame, text="No Data", justify="left")
+        self.device_info_label.pack(padx=10, pady=5)
 
-        # IMAGE
         self.img_label = None
 
-    # ---------------- START ----------------
     def start_process(self):
         sn = self.serial_entry.get().strip()
         sw = self.sw_entry.get().strip()
@@ -122,7 +138,6 @@ class FWATool:
 
         threading.Thread(target=self.verify, args=(sn, sw), daemon=True).start()
 
-    # ---------------- MAIN ----------------
     def verify(self, input_sn, input_sw):
 
         options = Options()
@@ -133,11 +148,7 @@ class FWATool:
         driver = None
 
         try:
-            driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()),
-                options=options
-            )
-
+            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
             wait = WebDriverWait(driver, 15)
 
             driver.get(f"https://{TARGET_IP}")
@@ -156,7 +167,7 @@ class FWATool:
 
             time.sleep(10)
 
-            # CLICK DEVICE
+            # CLICK
             click_AAP321NK(driver, wait)
             time.sleep(2)
 
@@ -173,31 +184,26 @@ class FWATool:
             # EXTRACT
             data = extract_details(driver)
 
-            logging.info(f"Detected: {data}")
-
-            # ---------------- UPDATE INFO PANEL ----------------
-            info_text = (
-                f"Device Name     : {data['device_name']}\n"
-                f"Serial Number   : {data['serial']}\n"
-                f"Software Version: {data['sw']}\n"
-                f"Hardware Version: {data['hw']}\n"
-                f"Boot Version    : {data['boot']}"
-            )
+            # UPDATE GUI
+            info_text = "\n".join([f"{k}: {v}" for k, v in data.items()])
             self.update_info(info_text)
 
-            # ---------------- VALIDATION ----------------
-            fail_msg = []
-
+            # VALIDATION
+            fail = []
             if input_sn != data["serial"]:
-                fail_msg.append(f"SN: {input_sn} != {data['serial']}")
-
+                fail.append("SN Mismatch")
             if input_sw != data["sw"]:
-                fail_msg.append(f"SW: {input_sw} != {data['sw']}")
+                fail.append("SW Mismatch")
 
-            if not fail_msg:
+            if not fail:
+                result = "PASS"
                 self.update_result("PASS", "#4CAF50")
             else:
-                self.update_result("FAIL\n" + "\n".join(fail_msg), "#F44336")
+                result = "FAIL"
+                self.update_result("FAIL\n" + "\n".join(fail), "#F44336")
+
+            # LOG WRITE
+            write_log(input_sn, data["serial"], result, data)
 
             # SCREENSHOT
             ss = f"screenshots/{input_sn}.png"
@@ -211,10 +217,8 @@ class FWATool:
         finally:
             if driver:
                 driver.quit()
-
             self.root.after(0, self.reset_ui)
 
-    # ---------------- UI ----------------
     def update_result(self, text, color):
         self.root.after(0, lambda: self.result_label.config(text=text, bg=color))
 
@@ -240,7 +244,6 @@ class FWATool:
     def reset_ui(self):
         self.btn.config(state="normal")
         self.serial_entry.delete(0, tk.END)
-        self.serial_entry.focus_set()
 
 
 # ---------------- MAIN ----------------
