@@ -24,8 +24,8 @@ LOG_FILE = "device_logs.csv"
 USERNAME = "admin"
 PASSWORD = "Airtel@123"
 
-HEADLESS = False   # 🔥 CHANGE THIS → True for production
-DEBUG_DELAY = 1    # seconds (for watching steps)
+HEADLESS = False
+DEBUG_DELAY = 1
 
 # ---------------- LOGGING ----------------
 logging.basicConfig(
@@ -71,6 +71,36 @@ def click_AAP321NK(driver, wait):
         time.sleep(2)
 
     return False
+
+
+# ---------------- EXTRACT FUNCTION ----------------
+def extract_device_details(driver):
+    logging.info("Extracting device details...")
+
+    def get_value(label):
+        try:
+            return driver.find_element(
+                By.XPATH,
+                f"//*[contains(text(),'{label}')]/following::div[1]"
+            ).text.strip()
+        except:
+            return "N/A"
+
+    device_name = get_value("Device name")
+    serial_number = get_value("Serial number")
+    sw_version = get_value("Software version")
+    hw_version = get_value("Hardware version")
+    boot_version = get_value("Boot version")
+
+    logging.info("===== DEVICE DETAILS =====")
+    logging.info(f"Device Name     : {device_name}")
+    logging.info(f"Serial Number   : {serial_number}")
+    logging.info(f"Software Version: {sw_version}")
+    logging.info(f"Hardware Version: {hw_version}")
+    logging.info(f"Boot Version    : {boot_version}")
+    logging.info("==========================")
+
+    return device_name, serial_number, sw_version, hw_version, boot_version
 
 
 class FWATool:
@@ -168,17 +198,17 @@ class FWATool:
 
             time.sleep(3)
 
-            # ---------------- WAIT FULL PAGE ----------------
+            # WAIT FULL UI
             logging.info("Waiting 10 sec for full UI load...")
             time.sleep(10)
 
-            # ---------------- CLICK DEVICE ----------------
+            # CLICK DEVICE
             if not click_AAP321NK(driver, wait):
                 raise Exception("Click failed")
 
             time.sleep(2)
 
-            # ---------------- HANDLE POPUP ----------------
+            # HANDLE POPUP
             try:
                 ok_btn = WebDriverWait(driver, 5).until(
                     EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Okay')]"))
@@ -188,9 +218,18 @@ class FWATool:
             except:
                 logging.info("No popup")
 
+            # WAIT DETAIL PAGE
+            logging.info("Waiting for detail page...")
+            wait.until(EC.presence_of_element_located(
+                (By.XPATH, "//*[contains(text(),'AAP321NK details')]")
+            ))
+
             time.sleep(2)
 
-            # ---------------- FINAL SCREENSHOT ----------------
+            # EXTRACT DATA
+            extract_device_details(driver)
+
+            # SCREENSHOT
             screenshot_path = f"screenshots/{scanned_sn}_FINAL.png"
             driver.save_screenshot(screenshot_path)
 
