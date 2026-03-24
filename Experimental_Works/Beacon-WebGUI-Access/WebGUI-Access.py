@@ -4,6 +4,7 @@ import threading
 import logging
 import os
 import time
+import subprocess
 
 from PIL import Image, ImageTk
 
@@ -27,6 +28,108 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(
 
 if not os.path.exists("screenshots"):
     os.makedirs("screenshots")
+
+
+# ---------------- PING ----------------
+def ping_device(ip):
+    logging.info(f"Pinging {ip}...")
+    try:
+        result = subprocess.run(["ping", "-n", "1", ip], capture_output=True, text=True)
+        return "TTL=" in result.stdout
+    except:
+        return False
+
+# ---------------- SAFE INPUT ----------------
+def safe_send_keys(element, value):
+    logging.info(f"input = {element} value = {value}")
+    try:
+        element.clear()
+        element.click()
+        element.send_keys(value)
+    except:
+        logging.warning("Normal send_keys failed → using JS fallback")
+        driver = element.parent
+        driver.execute_script("arguments[0].value = arguments[1];", element, value)
+
+# ---------------- FACTORY MODE ----------------
+def handle_factory_mode(driver, wait, scanned_sn):
+
+    logging.info(f"[FACTORY MODE] Try login with SN: {scanned_sn}")
+
+    try:
+        username = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text']")))
+        password = driver.find_element(By.XPATH, "//input[@type='password']")
+
+        username.clear()
+        username.send_keys("admin")
+
+        password.clear()
+        password.send_keys(scanned_sn)
+        password.send_keys(Keys.RETURN)
+
+        time.sleep(3)
+
+        # Popup
+        try:
+            wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Okay')]"))).click()
+            logging.info("[FACTORY MODE] Popup handled")
+        except:
+            logging.info("[FACTORY MODE] No popup → normal device")
+            return False
+
+        time.sleep(2)
+
+        # Password fields
+        inputs = driver.find_elements(By.XPATH, "//input[@type='password']")
+        logging.info(f"[FACTORY MODE] Found {len(inputs)} password fields")
+
+        if len(inputs) >= 3:
+            logging.info(f"Going to login with [Original Password] : {scanned_sn} [New Password]: {PASSWORD}")
+            
+            # OLD PASSWORD
+            logging.info("OLD PASSWORD")
+            safe_send_keys(inputs[1], scanned_sn)
+
+            # NEW PASSWORD
+            logging.info("NEW PASSWORD")
+            safe_send_keys(inputs[2], PASSWORD)
+
+            # REPEAT PASSWORD (SPECIAL FIX)
+            logging.info("REPEAT PASSWORD (SPECIAL FIX)")
+            safe_send_keys(inputs[3], PASSWORD)
+            time.sleep(4)
+    
+        # Save
+        try:
+            save_btn = driver.find_element(By.XPATH, "//button[contains(.,'Save')]")
+            driver.execute_script("arguments[0].click();", save_btn)
+            logging.info("[FACTORY MODE] Password changed")
+        except Exception as e:
+            logging.error(f"[FACTORY MODE] Save failed: {e}")
+
+        time.sleep(4)
+
+        # Re-login
+        driver.get(f"https://{TARGET_IP}")
+
+        username = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text']")))
+        password = driver.find_element(By.XPATH, "//input[@type='password']")
+
+        username.clear()
+        username.send_keys("admin")
+
+        password.clear()
+        password.send_keys(PASSWORD)
+        password.send_keys(Keys.RETURN)
+
+        logging.info("[FACTORY MODE] Re-login successful")
+        time.sleep(5)
+
+        return True
+
+    except Exception as e:
+        logging.warning(f"[FACTORY MODE] Skipped: {e}")
+        return False
 
 
 # ---------------- CLICK FUNCTION ----------------
@@ -91,10 +194,53 @@ def write_log(input_sn, device_sn, result, data):
     # ✅ PASS file (NO HEADER)
     if result == "PASS":
         pass_file = os.path.join(folder, f"{date_str}_{time_str}_{input_sn}.txt")
-
         with open(pass_file, "w") as f:
             f.write(str(data))
 
+
+def reset_to_factory(driver, wait):
+
+    logging.info("[RESET] Trying Factory Default Reset")
+
+    try:
+        # Wait for "Factory default" section
+        wait.until(EC.presence_of_element_located(
+            (By.XPATH, "//*[contains(text(),'Factory default')]")
+        ))
+
+        # Click RESET button inside Factory default section
+        reset_btn = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[contains(.,'Reset')]")
+        ))
+        driver.execute_script("arguments[0].click();", reset_btn)
+
+        logging.info("[RESET] Reset button clicked")
+        time.sleep(2)
+
+        # Handle popup (2 types)
+        try:
+            # JS alert popup
+            alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
+            alert.accept()
+            logging.info("[RESET] Alert OK clicked")
+        except:
+            # UI popup
+            ok_btn = wait.until(EC.element_to_be_clickable(
+                (By.XPATH, "//button[contains(.,'OK')]")
+            ))
+            driver.execute_script("arguments[0].click();", ok_btn)
+            logging.info("[RESET] UI OK clicked")
+
+        logging.info("[RESET] Device resetting... waiting 25 sec")
+        time.sleep(25)
+
+        return True
+
+    except Exception as e:
+        logging.warning(f"[RESET] Skipped: {e}")
+        return False
+
+# ---------------- GUI ----------------
 class FWATool:
     def __init__(self, root):
         self.root = root
@@ -140,6 +286,12 @@ class FWATool:
 
     def verify(self, input_sn, input_sw):
 
+        # -------- PING --------
+        if not ping_device(TARGET_IP):
+            self.update_result("DEVICE NOT REACHABLE", "#F44336")
+            self.root.after(0, self.reset_ui)
+            return
+
         options = Options()
         if not HEADLESS:
             options.add_argument("--start-maximized")
@@ -161,11 +313,14 @@ class FWATool:
             except:
                 pass
 
-            # LOGIN
-            wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text']"))).send_keys(USERNAME)
-            driver.find_element(By.XPATH, "//input[@type='password']").send_keys(PASSWORD + Keys.RETURN)
+            # -------- FACTORY MODE --------
+            factory_done = handle_factory_mode(driver, wait, input_sn)
 
-            time.sleep(10)
+            # -------- NORMAL LOGIN --------
+            if not factory_done:
+                wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text']"))).send_keys(USERNAME)
+                driver.find_element(By.XPATH, "//input[@type='password']").send_keys(PASSWORD + Keys.RETURN)
+                time.sleep(10)
 
             # CLICK
             click_AAP321NK(driver, wait)
@@ -209,6 +364,14 @@ class FWATool:
             ss = f"screenshots/{input_sn}.png"
             driver.save_screenshot(ss)
             self.display_screenshot(ss)
+
+            # -------- TRY RESET --------
+            reset_done = reset_to_factory(driver, wait)
+
+            if reset_done:
+                logging.info("[FLOW] Reset done → reload login page")
+                driver.get(f"https://{TARGET_IP}")
+                time.sleep(5)
 
         except Exception as e:
             logging.error(str(e))
