@@ -70,7 +70,7 @@ class FWATool:
     def __init__(self, root):
         self.root = root
         self.root.title("FWA MES Validation Tool")
-        self.root.geometry("750x750")
+        self.root.geometry("800x850")
 
         # SERIAL INPUT
         tk.Label(root, text="SCAN DEVICE SERIAL", font=("Arial", 12, "bold")).pack(pady=5)
@@ -90,9 +90,23 @@ class FWATool:
 
         # RESULT LABEL
         self.result_label = tk.Label(root, text="READY", font=("Arial", 22, "bold"),
-                                     bg="#B0BEC5", fg="white", width=36, height=3)
+                                     bg="#B0BEC5", fg="white", width=38, height=3)
         self.result_label.pack(pady=10)
 
+        # ---------------- DEVICE INFO PANEL ----------------
+        self.info_frame = tk.LabelFrame(root, text="Device Information", font=("Arial", 10, "bold"))
+        self.info_frame.pack(pady=10, fill="x", padx=20)
+
+        self.device_info_label = tk.Label(
+            self.info_frame,
+            text="No Data",
+            font=("Courier", 10),
+            justify="left",
+            anchor="w"
+        )
+        self.device_info_label.pack(fill="x", padx=10, pady=5)
+
+        # IMAGE
         self.img_label = None
 
     # ---------------- START ----------------
@@ -161,21 +175,29 @@ class FWATool:
 
             logging.info(f"Detected: {data}")
 
+            # ---------------- UPDATE INFO PANEL ----------------
+            info_text = (
+                f"Device Name     : {data['device_name']}\n"
+                f"Serial Number   : {data['serial']}\n"
+                f"Software Version: {data['sw']}\n"
+                f"Hardware Version: {data['hw']}\n"
+                f"Boot Version    : {data['boot']}"
+            )
+            self.update_info(info_text)
+
             # ---------------- VALIDATION ----------------
             fail_msg = []
 
             if input_sn != data["serial"]:
-                fail_msg.append(f"SN Mismatch: {input_sn} != {data['serial']}")
+                fail_msg.append(f"SN: {input_sn} != {data['serial']}")
 
             if input_sw != data["sw"]:
-                fail_msg.append(f"SW Mismatch: {input_sw} != {data['sw']}")
+                fail_msg.append(f"SW: {input_sw} != {data['sw']}")
 
-            # RESULT
             if not fail_msg:
                 self.update_result("PASS", "#4CAF50")
             else:
-                msg = "\n".join(fail_msg)
-                self.update_result(f"FAIL\n{msg}", "#F44336")
+                self.update_result("FAIL\n" + "\n".join(fail_msg), "#F44336")
 
             # SCREENSHOT
             ss = f"screenshots/{input_sn}.png"
@@ -195,6 +217,9 @@ class FWATool:
     # ---------------- UI ----------------
     def update_result(self, text, color):
         self.root.after(0, lambda: self.result_label.config(text=text, bg=color))
+
+    def update_info(self, text):
+        self.root.after(0, lambda: self.device_info_label.config(text=text))
 
     def display_screenshot(self, path):
         img = Image.open(path)
